@@ -1,0 +1,118 @@
+body {
+    width: 80%;
+    margin: 0 auto;
+    font-family: "Arial", sans-serif;
+    color: #333;
+}
+
+header {
+    text-align: center;         /* centre le contenu du header */
+    margin: 20px 0;             /* espace vertical */
+}
+
+.container {
+    text-align: center;
+}
+
+.logo {
+    width: 350px;               /* taille du logo (tu peux ajuster) */
+    height: auto;               /* garde les proportions */
+    display: block;             /* permet le centrage via margin auto */
+    margin: 0 auto;             /* centre horizontalement */
+    border-radius: 10px;        /* optionnel : coins arrondis */
+    transition: transform 0.3s; /* petit effet au survol */
+}
+
+.logo:hover {
+    transform: scale(1.05);     /* léger agrandissement au survol */
+}
+
+/* Textes */
+.text-small {
+    text-align: center;
+    font-size: 10pt;
+    color: #555;
+    font-style: italic;
+}
+
+.text-normal {
+    margin: 0 auto;
+    font-size: 12pt;
+    color: #222;
+}
+
+.text-price {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 20pt;
+    color: #000000;
+}
+
+/* Bandeaux */
+.bandeau {
+    background-color: #e6e6e6;
+    padding: 12px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.bandeau h1, .bandeau h2 {
+    margin: 0;
+    color: #000;
+}
+
+.sous-texte {
+    font-size: 10pt;
+    margin-top: 4px;
+}
+
+/* Cadres côte à côte */
+.cadres {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 20px;
+}
+
+.cadre {
+    flex: 1;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.cadre h3 {
+    margin-top: 0;
+    font-size: 12pt;
+    text-align: center;
+}
+
+.download-container {
+    display: flex;
+    justify-content: flex-end;   /* aligne à droite */
+    align-items: center;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: #444;
+}
+
+.download-container a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s;
+}
+
+.download-container a:hover {
+    opacity: 0.8;
+}
+
+.download-container img {
+    width: 40px;
+    height: 40px;
+    margin-left: 6px;
+}
