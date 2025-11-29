@@ -290,3 +290,24 @@ height: 300px;
   opacity: 1;
   transition: max-height 0.4s ease, opacity 0.3s ease;
 }
+
+.errorlist {
+    color: #df0000;           /* rouge sérieux */
+    background-color: #ffecec;
+    font-weight: 600;
+    margin: 5px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.errorlist li {
+    margin-left: 0;
+}
+
+.helptext {
+    font-size: 0.8em;
+    font-style: italic;
+    color: #555;       /* optionnel, pour le contraste */
+    display: block;    /* assure que ça passe bien à la ligne sous le champ */
+    margin-top: 2px;   /* espace entre le champ et l’aide */
+}

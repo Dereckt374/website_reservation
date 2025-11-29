@@ -42,15 +42,10 @@ def get_tarif_multiplier(hour):
         coef = 1.0 + (config.night_factor/100)
         commentaire = "Tarification de nuit"
         return {"coef": coef, "commentaire":commentaire} 
-def evaluer_trajet(depart, arrivee, date_aller, date_retour): #form.cleaned_data["adresse_depart"], form.cleaned_data["adresse_arrivee"], form.cleaned_data['date_aller']
-    # Calcul du prix
-    coef_return = 1
+def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_depart"], form.cleaned_data["adresse_arrivee"], form.cleaned_data['date_aller']
 
     # Si la date est dans le passé, on la remplace par maintenant
     if date_aller < timezone.now(): date_aller = timezone.now()
-
-    # Si il y a un retour, on double le prix
-    if date_retour is not None : coef_return = 2
 
     directions_result = gmaps.directions(depart, 
                                         arrivee,
@@ -61,12 +56,11 @@ def evaluer_trajet(depart, arrivee, date_aller, date_retour): #form.cleaned_data
     distance_km = round(directions_result[0]['legs'][0]['distance']['value']/1000 ,1)
 
     time_multiplier = get_tarif_multiplier(date_aller.hour)['coef']
-    price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min/60)*coef_return ,1)    
+    price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min/60) ,1)    
 
     print(f"""
         🔴 Fonction - EVALUER TRAJET 
         DATE ALLER : {date_aller}
-        DATE RETOUR : {date_retour}
         DEPART : {depart}
         ARRIVEE : {arrivee}
         DUREE : {duree_min} MIN
@@ -76,6 +70,8 @@ def evaluer_trajet(depart, arrivee, date_aller, date_retour): #form.cleaned_data
             """)
     
     return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
+
+
 def get_merchant_code(api_key_application : str) -> str:
     client = Sumup(api_key=sumpup_api_key)
     merchant = client.merchant.get()
@@ -268,11 +264,13 @@ def get_events_current_week(calendar_id, service_account_file=".venv/service.jso
     return event_list
 def is_slot_available(calendar_id : str,
                     start_dt : datetime,
-                    end_dt : datetime) -> bool:
+                    duration_min : int) -> bool:
     """
-    Vérifie si un créneau est libre dans le calendrier A.
-    start_dt et end_dt sont des datetime aware (CEST).
+    Vérifie si un créneau est libre dans le calendrier id.
+    start_dt est un datetime aware (CEST).
+    duration_min est un int
     """
+    end_dt = start_dt + timedelta(minutes=duration_min)
 
     service = get_service()
 
@@ -285,9 +283,15 @@ def is_slot_available(calendar_id : str,
     ).execute()
 
     items = events.get("items", [])
-    print(f"availability for event at {start_dt.isoformat()} is {len(items) != 0}")
 
+    print(f"""
+    ⚪ Fonction - CHECK AVAILABILITIES
+        date event : {start_dt.isoformat().split('+')[0]},
+        duration event (min) : {duration_min},
+        boolean test (True if available) : {len(items) == 0} 
+    """)
     return len(items) == 0  # zéro signifie libre, car pas d'evenement présents : "créneau disponible"
+
 def create_event(calendar_id, start_dt, end_dt, summary="Reservation", description="", location=""):
     service = get_service()
 

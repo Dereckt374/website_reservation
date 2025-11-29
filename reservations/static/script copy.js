@@ -83,6 +83,43 @@ function afficherTrajetSiApercuPresent() {
   }
 }
 
+// ======================================================
+// Gestion du bouton cochable "Aller-retour" + date_retour
+// ======================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  const checkbox = document.getElementById("allerRetourCheckbox");
+  const dateRow = document.getElementById("dateRetourRow");
+  const dateInput = document.getElementById("id_date_retour");
+
+  // si les éléments ne sont pas dans la page, on sort sans erreur
+  if (!checkbox || !dateRow || !dateInput) return;
+
+  function updateVisibility() {
+    const checked = checkbox.checked;
+    if (checked) {
+      dateRow.classList.remove("hidden");
+      dateRow.setAttribute("aria-hidden", "false");
+      checkbox.setAttribute("aria-expanded", "true");
+      dateInput.setAttribute("required", "required");
+    } else {
+      dateRow.classList.add("hidden");
+      dateRow.setAttribute("aria-hidden", "true");
+      checkbox.setAttribute("aria-expanded", "false");
+      dateInput.removeAttribute("required");
+      dateInput.value = "";
+    }
+  }
+
+  // initialisation + écouteur d’événement
+  // Si le serveur a rendu une valeur pour la date de retour, on coche la case côté client
+  if (dateInput.value) {
+    checkbox.checked = true;
+  }
+  updateVisibility();
+  checkbox.addEventListener("change", updateVisibility);
+});
+
 document.getElementById("toggleForm").addEventListener("click", () => {
   const bloc = document.getElementById("formCollapse");
   bloc.classList.toggle("collapsed");

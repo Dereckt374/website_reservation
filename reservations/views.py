@@ -40,7 +40,6 @@ context_init = {
         # TrajetForm(request.POST).get_context,
         ],
         "current_year" : current_year,
-        'aller_retour':  False
     }
 
 # Create your views here.
@@ -49,73 +48,64 @@ def index(request):
     if request.method == "POST":
         form = TrajetForm(request.POST)
  
-        if "btnConfirmer" not in request.POST and form.is_valid(): # Cas où on prévisualise
-            trajet = form.save(commit=False)         
-            date_retour = None
-
-            if "aller_retour" in request.POST :
-                # Récupère la date passée par le formulaire (format ISO local)
-                date_retour_str = form.cleaned_data['date_retour'] #request.POST.get("date_retour", None)
-                if date_retour_str:
-                    dt = parse_datetime(date_retour_str)
-                    if dt:
-                        # rendre aware si nécessaire
-                        if timezone.is_naive(dt):
-                            dt = timezone.make_aware(dt)
-                        date_retour = dt
-                context['aller_retour'] = True
-                
-            data_trajet = evaluer_trajet(
-                form.cleaned_data["adresse_depart"],
-                form.cleaned_data["adresse_arrivee"],
-                form.cleaned_data['date_aller'],
-                date_retour
-                )
+        ## CAS PREVISUALISATION 
+        if "btnConfirmer" not in request.POST and form.is_valid():
+            trajet = form.save(commit=False) 
+            context['type_trajet'] = "Aller Simple"       
+            data_trajet_retour = {"duree_min" :0,"distance_km": 0, "price_euros":0}
+            data_trajet_aller = evaluer_trajet(form.cleaned_data["adresse_depart"],form.cleaned_data["adresse_arrivee"],form.cleaned_data['date_aller'])
             
-            trajet.date_retour = date_retour
-            trajet.distance_km, trajet.duree_min, trajet.price_euros = data_trajet['distance_km'], data_trajet['duree_min'], data_trajet['price_euros']  
-
-            date_aller = form.cleaned_data['date_aller']
-            date_aller_fin = date_aller + timedelta(minutes=data_trajet['duree_min'])
-
-            if is_slot_available(id_agenda_creaneaux, date_aller, date_aller_fin) or not is_slot_available(id_agenda_reservations, date_aller, date_aller_fin):
+            # CHECK SUR AGENDA
+            if is_slot_available(id_agenda_creaneaux, form.cleaned_data['date_aller'], data_trajet_aller['duree_min'])\
+                or not is_slot_available(id_agenda_reservations, form.cleaned_data['date_aller'], data_trajet_aller['duree_min']):
                 context['messages'].append("❌ L'horaire demandé n'est pas disponible pour réservation.\nLes créneaux de cette semaine sont les suivants :")
                 for date in get_events_current_week(id_agenda_creaneaux):
                     context['messages'].append(date)
-                context['messages'].append("\nSi vous vous trouvez déjà dans les créneaux de réservation, il se peut qu'une réservation ait déjà été prise le créneau demandé\n")
+                context['messages'].append("\nSi vous vous trouvez déjà dans les créneaux de réservation, il se peut qu'une réservation ait déjà été faite sur le créneau demandé\n")
                 context['form'] = form
                 return render(request, "reservation.html", context)
-            
+
+            if form.cleaned_data["date_retour"] != None : 
+                context['type_trajet'] = "Aller-Retour"
+
+                data_trajet_retour = evaluer_trajet(
+                    form.cleaned_data["adresse_arrivee"],
+                    form.cleaned_data["adresse_depart"],
+                    form.cleaned_data['date_retour'],
+                    )
+                            # CHECK SUR AGENDA
+                if is_slot_available(id_agenda_creaneaux, form.cleaned_data['date_retour'], data_trajet_retour['duree_min'])\
+                    or not is_slot_available(id_agenda_reservations, form.cleaned_data['date_retour'], data_trajet_retour['duree_min']):
+                    context['messages'].append("❌ L'horaire demandé n'est pas disponible pour réservation pour votre trajet retour.\nLes créneaux de cette semaine sont les suivants :")
+                    for date in get_events_current_week(id_agenda_creaneaux):
+                        context['messages'].append(date)
+                    context['messages'].append("\nSi vous vous trouvez déjà dans les créneaux de réservation, il se peut qu'une réservation ait déjà été faite sur le créneau demandé\n")
+                    context['form'] = form
+                    return render(request, "reservation.html", context)
+                   
+            price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
+            trajet.distance_km = data_trajet_aller['distance_km'] 
+            trajet.duree_min = data_trajet_aller['duree_min']
+            trajet.price_euros = price
+
             context['trajet'] = trajet
 
         elif "btnConfirmer" in request.POST and form.is_valid(): # Cas où on confirme la reservation
             trajet = form.save(commit=False)
-            date_retour = None
-
-            if "aller_retour" in request.POST :
-                # Récupère et parse la date de retour avant sauvegarde
-                date_retour_str = request.POST.get("date_retour", None)
-                date_retour = None
-                if date_retour_str:
-                    dt = parse_datetime(date_retour_str)
-                    if dt:
-                        if timezone.is_naive(dt):
-                            dt = timezone.make_aware(dt)
-                        date_retour = dt
-                context['aller_retour'] = True
-                
-            data_trajet = evaluer_trajet(
-                form.cleaned_data["adresse_depart"],
-                form.cleaned_data["adresse_arrivee"],
-                form.cleaned_data['date_aller'],
-                date_retour
-                )
+            context['type_trajet'] = "Aller Simple"
+            data_trajet_retour = {"duree_min" :0,"distance_km": 0, "price_euros":0}
+            data_trajet_aller = evaluer_trajet(form.cleaned_data["adresse_depart"],form.cleaned_data["adresse_arrivee"],form.cleaned_data['date_aller'])
+                     
+            if form.cleaned_data["date_retour"] != None : 
+                context['type_trajet'] = "Aller-Retour"
+                data_trajet_retour = evaluer_trajet(form.cleaned_data["adresse_arrivee"],form.cleaned_data["adresse_depart"],form.cleaned_data['date_retour'])
             
-            checkout = create_checkout(sumpup_api_key,merchant_code_test, data_trajet['price_euros'], trajet)
-            trajet.date_retour = date_retour
-            trajet.distance_km = data_trajet['distance_km']
-            trajet.duree_min = data_trajet['duree_min']
-            trajet.price_euros = data_trajet['price_euros']  
+            price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
+            checkout = create_checkout(sumpup_api_key,merchant_code_test, price, trajet)
+            trajet.date_retour = form.cleaned_data["date_retour"]
+            trajet.distance_km = data_trajet_aller['distance_km']
+            trajet.duree_min = data_trajet_aller['duree_min']
+            trajet.price_euros = price
             trajet.checkout_id = checkout.id
             trajet.checkout_status = checkout.status
             trajet.checkout_reference = checkout.checkout_reference
@@ -191,7 +181,7 @@ def paiement_resultat(request):  # SUM UP WIDGET REDIRIGE ICI APRÈS PAIEMENT
               f"adresse d'arrivée : {paiement.adresse_arrivee}",
               f"distance : {paiement.distance_km} km",
               f"durée : {paiement.duree_min} mins",
-              f"prix : {paiement.price_euros}",
+              f"prix : {paiement.price_euros} €",
               f"client : NOM: {client.nom_client} PRENOM : {client.prenom_client}",
               f"contact : {paiement.telephone_client}",
               f"reference de paiement : {paiement.checkout_reference}"
