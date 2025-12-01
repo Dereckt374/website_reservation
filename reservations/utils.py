@@ -7,6 +7,7 @@ import os
 import requests
 import googlemaps
 from django.utils import timezone
+from django.template.loader import render_to_string
 from constance import config
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
@@ -70,8 +71,6 @@ def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_dep
             """)
     
     return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
-
-
 def get_merchant_code(api_key_application : str) -> str:
     client = Sumup(api_key=sumpup_api_key)
     merchant = client.merchant.get()
@@ -83,7 +82,7 @@ def create_checkout(api_key_application : str, merchant_code : str, price : floa
         body=CreateCheckoutBody(
             amount=price,
             currency="EUR",
-            checkout_reference=str(uuid.uuid4()),
+            checkout_reference=str(uuid.uuid4()).split('-')[0],
             merchant_code=merchant_code,
             description="description",
             redirect_url="http://127.0.0.1:8000/paiement/resultat/",
@@ -177,6 +176,37 @@ def send_attachments(emails, subject, content, attachments=None):
     Subject : {subject}
     Attachments : {len(attachments) if attachments else 0}
     """)
+    service.quit()
+def send_email_template(emails, subject, template_name, context=None):
+
+    if context is None:
+        context = {}
+
+    # Rendu HTML avec le moteur de templates Django
+    rendered_html = render_to_string(template_name, context)
+
+    # fallback texte brut (optionnel mais recommandé)
+    rendered_text = rendered_html.replace("<br>", "\n").replace("<p>", "\n").replace("</p>", "\n")
+
+    service = smtplib.SMTP("smtp.gmail.com", 587)
+    service.starttls()
+    service.login(os.getenv("email_appli"), os.getenv("mdp_appli"))
+
+    for email in emails:
+
+        msg = MIMEMultipart("alternative")
+        msg["From"] = os.getenv("email_appli")
+        msg["To"] = email
+        msg["Subject"] = subject
+
+        # Texte brut
+        msg.attach(MIMEText(rendered_text, "plain", "utf-8"))
+
+        # HTML
+        msg.attach(MIMEText(rendered_html, "html", "utf-8"))
+
+        service.sendmail(os.getenv("email_appli"), email, msg.as_string())
+
     service.quit()
 def get_service():
     SCOPES = ["https://www.googleapis.com/auth/calendar"]
@@ -291,7 +321,6 @@ def is_slot_available(calendar_id : str,
         boolean test (True if available) : {len(items) == 0} 
     """)
     return len(items) == 0  # zéro signifie libre, car pas d'evenement présents : "créneau disponible"
-
 def create_event(calendar_id, start_dt, end_dt, summary="Reservation", description="", location=""):
     service = get_service()
 

@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bon de réservation</title>
+    <link rel="stylesheet" href="{% static 'css/style_bon.css' %}">
+</head>
+<body>
+    <div class="download-container">
+    <a href="/" download>
+    Télécharger le bon de réservation au format PDF
+    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="Icône PDF">
+    </a>
+    </div>
+    <!-- Logo -->
+    <header>
+        <img src="{% static 'images/logo_SM.jpg' %}" alt="Logo" class="logo" >
+    </header>
+
+    <!-- Texte 1 -->
+    <p class="text-small">Vos trajets en toute séténité</p>
+
+    <!-- Texte 2 -->
+    <div class="container">
+    <p class="text-normal">Exploitant de Véhicule de transport avec chauffeur - Entreprise individuelle - SIRET : {{siret}}</p>
+    <p class="text-normal">Entreprise déclaré au RNE non assujetti à la TVA</p><br>
+    <p class="text-normal">{{adresse}}</p>
+    <p class="text-normal"><b>{{telephone}}</b> - <b>{{mail}}</b></p>
+    </div>
+    <!-- Bandeau 1 -->
+    <section class="bandeau">
+        <h1>BON DE RÉSERVATION</h1>
+        <p class="sous-texte"><em>Prestation de location de véhicule avec chauffeur - Art. R3120-2 du code des transports - Arrêté du 30 juillet 2013</em></p>
+    </section>
+
+    <!-- Paragraphe 1 -->
+    <p class="text-normal">
+        <b>Réservation effectué</b> le {{asked_date}} <em>(date de validation du paiement)</em><br>
+        <b>Mode de réservation</b> : {{mode_reservation}}<br>
+        <b>Référence de reservation</b> : {{reference_dossier}}<br>
+    </p>
+
+    <!-- Bandeau 2 -->
+    <section class="bandeau">
+        <h2>CLIENT(S)</h2>
+    </section>
+
+    <p class="text-normal">
+        <b>Nom :</b>  {{nom_client}}<br>               
+        <b>prénom :</b> {{prenom_client}}<br> 
+        <b>Téléphone :</b>  {{telephone_client}}<br> 
+        <b>@mail :</b> {{email_client}}<br>
+        <b>Autres passagers</b> :{% if passagers %}{{ passagers }}{% else  %}Non{% endif %}<br> 
+    </p>
+        
+        
+    <p class="text-normal">
+        <b>Demandes particulières :</b> {{commentaire_client}}<br>
+    </p>
+
+    <!-- Bandeau 3 -->
+    <section class="bandeau">
+        <h2>PRISE EN CHARGE DEMANDÉE</h2>
+    </section>
+    <p class="text-normal"> <b>Date de la course</b> : {{date_aller}}<br>
+    <b>Heure de prise en charge</b> : {{heure_aller}}</p>  
+    <p class="text-normal"> <b>Lieu de prise en charge</b> : {{adresse_depart}} </p> 
+    <!-- Bandeau 4 -->
+     <section class="bandeau">
+    <h2>DESTINATION DEMANDÉE</h2>
+    </section>
+    <p class="text-normal"> <b>Date de dépôt :</b> {{date_arrivee_estimee}}</p>
+    <p class="text-normal"> <b>Heure de dépôt :</b> {{heure_arrivee_estimee}}</p>
+    <p class="text-normal"> <b>Lieu de dépôt:</b> {{adresse_arrivee}} </p>
+    <!-- Bandeau 5 -->
+    <section class="bandeau">
+    <h2>DETAILS TRAJET</h2>
+    </section>
+    <p class="text-normal"> <b>Distance : </b>{{distance_km}} km</p>
+    <p class="text-normal"> <b>Durée :</b> {{temps_humain}}</p>
+    <p class="text-normal"> <b>Aller et retour:</b> {{aller_retour}} </p>
+    <p class="text-normal"> <b>Observation(s):</b> {{commenataire_trajet}}</p>
+    <!-- Bandeau 5 -->
+    <section class="bandeau">
+        <h2>PRESTATION</h2>
+    </section>
+    <p class="text-normal"> <b>chauffeur:</b> {{driver}}</p>
+    <p class="text-normal"> <b>Véhicule:</b> {{vehicle}} </p>
+    <p class="text-normal"> <b>Immatriculation véhicule :</b> {{vehicle_immatriculation}} </p> 
+    <!-- Deux cadres côte à côte -->
+    <div class="cadres">
+        <div class="cadre">
+            <h3>Prix (en €uros, TTC)</h3>
+            <p class="text-price">{{ prix }} €</p>
+            <p class="text-small">Prix calculé sur la base d'un coût horaire et d'un coût kilométrique</p>
+        </div>
+        <div class="cadre">
+            <h3>Signature</h3>
+            <p class="text-price"> ..</p>
+            <p class="text-small">Bon pour accord</p>
+        </div>
+    </div>
+
+    <p class="text-small">Arrêté du 6 janvier 1993 portant création d'un document valant ordre de mission devant se trouver à bord des véhicules de transport routier public de personnes</p>
+
+</body>
+</html>

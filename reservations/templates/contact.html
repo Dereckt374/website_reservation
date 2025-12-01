@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire de contact</title>
+    <!-- On relie ton CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="container">
+
+  <h1>Formulaire de Contact</h1>
+    <nav>
+      <a href="/">← Retour à l'aperçu</a>
+    </nav>
+
+  <h2>checkout ID</h2>
+  <p>{{ checkout_id }}</p>
+
+
+<form id="trajetForm" method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p class="note"> En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement dans le cadre de ma réservation</p>
+    <button type="submit" class="btn btn-primary mt-3">Envoyer</button>
+</form>
+
+</div>
+</body>
+</html>

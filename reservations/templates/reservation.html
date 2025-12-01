@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservation d'un trajets</title>
+    <!-- On relie ton CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+
+
+<body>
+  <div class="container">
+    <h1>Réservation de trajet</h1>
+    <nav>
+      <a href="/admin/">Admin</a> |
+      <a href="/welcome/">Page d'accueil</a> | 
+      <a href="/paiement/">Paiement</a> | 
+      <a href="/">Reset</a>
+    </nav>
+
+    <!-- Messages Django -->
+    {% if messages %}
+      {% for message in messages %}
+        <p class="{{ message.tags }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+
+
+{% if trajet %}
+  <div class="trajet-container">
+    <div id="apercu">
+      <h3>Votre prestation</h3>
+      <p>Trajet : {{ trajet.type_trajet }}</p>
+      {% if form.info_message %}
+    <div class="alert alert-info">{{ form.info_message }}</div>
+      {% endif %}
+      <p>Heure : {{ trajet.date_aller }}</p>
+      <p>Départ : {{ trajet.adresse_depart }}</p>
+      <p>Arrivée : {{ trajet.adresse_arrivee }}</p>
+      <p>Distance {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.distance_km }} km</p>
+      <p>Durée {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min }} min</p>
+      <p>Coût estimé : {{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
+    </div>
+    <div id="map"></div>
+  </div>
+{% endif %}
+
+
+    <!-- Formulaire -->
+<form id="trajetForm" method="POST">
+  {% csrf_token %}
+    {% if trajet %}
+    <button name="btnConfirmer" type="submit">Confirmer la réservation</button>
+
+    <button type="button" id="toggleForm">Modifier la préstation ⯆</button>
+    {% endif %}
+    
+    <div id="formCollapse" class="{% if trajet %}collapsed{% endif %}">
+
+    {{ form.as_p }}
+  
+  <p class="note">Notes :</p>
+  <p class="note">  - Bagages autorisés : 1 bagage cabine par personne</p>
+  <p class="note">  - Véhicule utilisé pour la préstation : {{ vehicle }} immatriculé : {{ vehicle_immatriculation }} </p>
+  <p class="note">  - {{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
+  
+
+    <button name="btnPrevisualiser" type="submit">Prévisualiser la course</button>
+    </div>  <!-- fin collapsible -->
+</form>
+
+  <footer>
+    &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+  </footer>
+
+  <script async src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places&callback=initMap"></script>
+  <script src="{% static 'script.js' %}"></script>
+</body>
+
+</html>

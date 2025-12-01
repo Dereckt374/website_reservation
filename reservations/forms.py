@@ -2,7 +2,12 @@ from django import forms
 from django.utils import timezone
 from .models import Trajet, ContactClient
 from datetime import timedelta
+from .utils import *
+from dotenv import load_dotenv
+load_dotenv(dotenv_path = '.venv/.env')
 
+id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
+id_agenda_reservations = os.getenv("id_agenda_reservations")
 
 class TrajetForm(forms.ModelForm):
     class Meta:
@@ -19,31 +24,70 @@ class TrajetForm(forms.ModelForm):
             'date_aller': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'date_retour': forms.DateTimeInput(attrs={'type': 'datetime-local'}),                    
         }
-    
+    def add_info(self, msg):
+        self.info_message = msg
     def clean(self):
         cleaned_data = super().clean()
-        date_aller = cleaned_data.get("date_aller")
-        date_retour = cleaned_data.get("date_retour")
-
         now = timezone.now()
+        data_trajet_retour = {"duree_min" :0,"distance_km": 0, "price_euros":0}
 
+        if cleaned_data.get("type_trajet") is None:
+            cleaned_data['type_trajet'] = self._meta.model._meta.get_field("type_trajet").default
+
+        if cleaned_data.get("date_retour") : 
+            cleaned_data["type_trajet"] = "Aller-Retour"
+            data_trajet_retour = evaluer_trajet(cleaned_data["adresse_arrivee"],cleaned_data["adresse_depart"],cleaned_data['date_retour'])
+        data_trajet_aller = evaluer_trajet(cleaned_data["adresse_depart"],cleaned_data["adresse_arrivee"],cleaned_data['date_aller'])
+
+        price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
+        cleaned_data["distance_km"] = data_trajet_aller['distance_km'] 
+        cleaned_data["duree_min"] = data_trajet_aller['duree_min']
+        cleaned_data["price_euros"] = price
+
+        ## --------- VERIFICATIONS ---------
         min_allowed = now + timedelta(minutes=5)
-        if date_aller:
-            if date_aller < min_allowed:
+        if cleaned_data.get("date_aller"):
+            if cleaned_data.get("date_aller") < min_allowed:
                 # cleaned_data["date_aller"] = min_allowed
-                self.add_error("date_aller", 
-                            "L'heure de départ doit être dans le futur (minimum 5 minutes à partir de maintenant).")
+                self.add_info("ℹ️ L'heure de départ a été ajustée.")
+                cleaned_data['date_aller'] = min_allowed
 
-        # --- 2) Validation date_retour > date_aller
-        # Re-récupérer date_aller au cas où elle a été modifiée ci-dessus
-        corrected_date_aller = cleaned_data.get("date_aller")
-
-        if corrected_date_aller and date_retour:
-            if date_retour <= corrected_date_aller:
+        if cleaned_data.get("date_aller") and cleaned_data.get("date_retour"):
+            if cleaned_data.get("date_retour") <= cleaned_data.get("date_aller"):
                 self.add_error("date_retour", 
-                            "La date de retour doit être postérieure à la date d'aller.")
+                            "❌ La date de retour doit être postérieure à la date d'aller.")
+                
+        if cleaned_data.get("date_aller"):
+            if is_slot_available(id_agenda_creaneaux,  cleaned_data['date_aller'], data_trajet_aller['duree_min']):
+                self.add_error("date_aller",
+                               "❌ L'horaire pour le trajet aller est en dehors des horaires de réservation.")
+        if cleaned_data.get("date_aller"):
+            if not is_slot_available(id_agenda_reservations,  cleaned_data['date_aller'], data_trajet_aller['duree_min']):        
+                self.add_error("date_aller",
+                               "❌ Une reservation est déjà effectué sur l'horaire demandé pour le trajet aller.")
+        if cleaned_data.get("date_retour") :
+            if is_slot_available(id_agenda_creaneaux,  cleaned_data['date_retour'], data_trajet_retour['duree_min']):
+                self.add_error("date_retour",
+                               "❌ L'horaire pour le trajet retour est en dehors des horaires de réservation.")
+        if cleaned_data.get("date_retour") :    
+            if not is_slot_available(id_agenda_reservations,  cleaned_data['date_retour'], data_trajet_retour['duree_min']):
+                self.add_error("date_retour",
+                               "❌ Une reservation est déjà effectué sur l'horaire demandé pour le trajet retour.")
         return cleaned_data
 
+    def save(self, commit=True):
+        obj = super().save(commit=False)
+
+        # Transfert des valeurs calculées vers l'objet
+        obj.type_trajet = self.cleaned_data["type_trajet"]
+        obj.distance_km = self.cleaned_data["distance_km"]
+        obj.duree_min    = self.cleaned_data["duree_min"]
+        obj.price_euros   = self.cleaned_data["price_euros"]
+
+        if commit:
+            obj.save()
+
+        return obj
 
 class ContactClientForm(forms.ModelForm):
 

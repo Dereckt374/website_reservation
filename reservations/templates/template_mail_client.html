@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body style="font-family: Arial, sans-serif; color:#333; line-height:1.5; padding:20px;">
+
+  <div style="max-width:650px; margin:auto; border:1px solid #e5e5e5; border-radius:8px; padding:25px;">
+
+    <h2 style="color:#1a73e8; margin-bottom:5px;">
+      Votre réservation est confirmée
+    </h2>
+    <p style="margin-top:0;">
+      Bonjour {{ nom_client }},<br>
+      Nous vous confirmons que votre réservation a bien été validée.
+    </p>
+
+    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+
+
+    <!-- SECTION RÉSERVATION -->
+    <h3 style="margin-bottom:8px;">📝 Détails de votre réservation</h3>
+
+    <table style="width:100%; border-collapse:collapse;">
+      <tr>
+        <td style="padding:8px 0; width:210px; font-weight:bold;">Date de la demande :</td>
+        <td style="padding:8px 0;">{{ asked_date }}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Mode de réservation :</td>
+        <td style="padding:8px 0;">{{ mode_reservation }}</td>
+        <td style="padding:8px 0; font-weight:bold;">Référence de dossier : {{ reference_dossier }}</td>
+        
+      </tr>
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Nom du client :</td>
+        <td style="padding:8px 0;">{{ nom_client }}</td>
+      </tr>
+    </table>
+
+
+    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+
+
+    <!-- SECTION TRAJET -->
+    <h3 style="margin-bottom:8px;">🚗 Informations sur le trajet</h3>
+
+    <table style="width:100%; border-collapse:collapse;">
+      <tr>
+        <td style="padding:8px 0; width:210px; font-weight:bold;">Conducteur :</td>
+        <td style="padding:8px 0;">{{ driver }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Véhicule :</td>
+        <td style="padding:8px 0;">{{ vehicle }}</td>
+        <td style="padding:8px 0;">immatriculé {{ vehicle_immatriculation }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Départ :</td>
+        <td style="padding:8px 0;">
+          {{ date_aller }} à {{ heure_aller }}
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Arrivée estimée :</td>
+        <td style="padding:8px 0;">
+          {{ date_arrivee_estimee }} à {{ heure_arrivee_estimee }}
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Adresse de départ :</td>
+        <td style="padding:8px 0;">{{ adresse_depart }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Adresse d'arrivée :</td>
+        <td style="padding:8px 0;">{{ adresse_arrivee }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:8px 0; font-weight:bold;">Durée estimée :</td>
+        <td style="padding:8px 0;">{{ temps_humain }}</td>
+      </tr>
+    </table>
+
+
+    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+
+
+    <!-- SECTION CONTACT -->
+    <h3 style="margin-bottom:8px;">📞 Informations utiles & assistance</h3>
+
+    <p style="margin-bottom:10px; font-size:14px;">
+      Pour toute question ou modification de votre trajet :
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <tr>
+        <td style="padding:6px 0; width:210px; font-weight:bold;">Téléphone d'urgence :</td>
+        <td style="padding:6px 0;">{{ telephone }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Email de contact :</td>
+        <td style="padding:6px 0;">{{ mail }}</td>
+      </tr>
+
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">SIRET :</td>
+        <td style="padding:6px 0;">{{ siret }}</td>
+      </tr>
+    </table>
+
+
+    <hr style="border:none; border-top:1px solid #ddd; margin:25px 0;">
+
+
+    <p style="font-size:13px; color:#777;">
+      Merci pour votre confiance.<br>
+      Si vous avez besoin d'assistance avant votre trajet, nous restons à votre disposition.
+    </p>
+
+  </div>
+
+</body>
+</html>

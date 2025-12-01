@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accueil</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+  <header>
+    <h1>Bienvenue sur notre service de réservation</h1>
+    <nav>
+      <a href="{% url 'reservation' %}">Réserver un trajet</a> |
+      <a href="/admin/">Espace Admin</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h2>Votre confort, notre priorité</h2>
+      <p>
+        Profitez d'un service de transport fiable, ponctuel et confortable.  
+        Nos trajets sont assurés en <strong>berline moderne</strong> équipée de tout le nécessaire
+        pour rendre votre voyage agréable : climatisation, intérieur cuir, recharge USB, 
+        et un conducteur expérimenté à votre service.
+      </p>
+    </section>
+
+    <section class="vehicle">
+      <h2>Notre véhicule</h2>
+      <div class="vehicle-gallery">
+        <img src="{% static 'images/Polestar 2 fond blanc.webp' %}" alt="Vue extérieure de la berline">
+        <img src="{% static 'images/Polestar 2 banquette arriere.webp' %}" alt="Intérieur confortable de la berline">
+        <img src="{% static 'images/Polestar 2 face arriere.webp' %}" alt="Détails de la finition">
+        <img src="{% static 'images/Polestar 2 volume de coffre.webp' %}" alt="Détails du coffre">
+      </div>
+      <p class="vehicle-description">
+        Notre véhicule est une <strong>berline électrique haut de gamme</strong> alliant élégance et performance.
+        Elle peut accueillir jusqu'à <strong>4 passagers</strong> et dispose d'un coffre spacieux pour vos bagages.  
+        Idéale pour vos trajets professionnels, vos transferts gare/aéroport ou vos déplacements longue distance.
+      </p>
+    </section>
+
+    <section class="intro">
+      <h2>Prêt à voyager ?</h2>
+      <p>Réservez dès maintenant votre trajet en ligne en quelques clics.</p>
+      <a href="{% url 'reservation' %}" class="cta-button">Réserver un trajet</a>
+    </section>
+  </main>
+
+  <footer>
+    &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+  </footer>
+</body>
+</html>

@@ -12,7 +12,7 @@ class Trajet(models.Model):
     date_aller = models.DateTimeField("Date et heure de prise en charge", default= (datetime.now() + timedelta(minutes=10)).replace(microsecond=0).isoformat())
     date_retour = models.DateTimeField("Date et heure de prise en charge retour", null=True, blank=True,help_text="Optionnel",
 )
-
+    type_trajet = models.TextField("Type de trajet", max_length=50, default='Aller Simple')
     # Contraintes numériques
     nb_passagers = models.PositiveIntegerField(
         "Nombre de passagers",

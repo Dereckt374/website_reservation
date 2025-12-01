@@ -259,9 +259,9 @@ header nav a:hover {
 #apercu {
     text-align: center;
   flex: 1;
-height: 300px;
+height: 370px;
   padding: 15px;
-  background: #ffffff;
+  background: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
   min-width: 300px; /* pour éviter qu’il s’écrase */
@@ -270,7 +270,7 @@ height: 300px;
 /* Carte */
 #map {
   flex: 2;
-  height: 300px;
+  height: 370px;
   width: 100%; /* 👈 important pour le rendu Google Maps */
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -310,4 +310,13 @@ height: 300px;
     color: #555;       /* optionnel, pour le contraste */
     display: block;    /* assure que ça passe bien à la ligne sous le champ */
     margin-top: 2px;   /* espace entre le champ et l’aide */
+}
+
+.alert.alert-info {
+    background-color: #e8f3ff;     /* bleu très léger */
+    border-left: 2px solid #4a90e2; /* accent bleu */
+    color: #2b68a0;                /* texte bleu doux */
+    font-style: italic;            /* italique */
+    border-radius: 3px;
+    margin: 10px 0;
 }

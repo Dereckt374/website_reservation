@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Page de paiement</title>
+    <!-- On relie ton CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="container">
+  <h1>Paiement</h1>
+    <nav>
+      <a href="/contact">← Retour au formulaire de contact</a> |
+      <a href="/{{client_ref}}/paiement/resultat">Simuler un paiement →</a>
+    </nav>
+    <br>
+    
+        <!-- Messages Django -->
+    {% if messages %}
+      {% for message in messages %}
+        <p class="{{ message.tags }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+  <h2>checkout ID</h2>
+  <p>{{ checkout_id }}</p>
+
+  <div id="sumup-card"></div>
+  <script
+    type="text/javascript"
+    src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
+  ></script>
+  <script type="text/javascript">
+    SumUpCard.mount({
+      id: 'sumup-card',
+      currency: "EUR",
+      checkoutId: "{{ checkout_id }}",
+      onResponse: function (type, body) {
+        console.log('Type', type);
+        console.log('Body', body);
+      },
+    });
+  </script>
+</div>
+</body>
+</html>

@@ -30,7 +30,8 @@ id_agenda_reservations = os.getenv("id_agenda_reservations")
 
 context_init = {
         "api_key" : googlemaps_api_key,
-        "vehicule" : config.vehicle,
+        "vehicle" : config.vehicle,
+        "vehicle_immatriculation" : config.vehicle_immatriculation,
         "name" : config.driver,
         "messages" : [
         # request.POST,   # Données du formulaire
@@ -51,69 +52,20 @@ def index(request):
         ## CAS PREVISUALISATION 
         if "btnConfirmer" not in request.POST and form.is_valid():
             trajet = form.save(commit=False) 
-            context['type_trajet'] = "Aller Simple"       
-            data_trajet_retour = {"duree_min" :0,"distance_km": 0, "price_euros":0}
-            data_trajet_aller = evaluer_trajet(form.cleaned_data["adresse_depart"],form.cleaned_data["adresse_arrivee"],form.cleaned_data['date_aller'])
-            
-            # CHECK SUR AGENDA
-            if is_slot_available(id_agenda_creaneaux, form.cleaned_data['date_aller'], data_trajet_aller['duree_min'])\
-                or not is_slot_available(id_agenda_reservations, form.cleaned_data['date_aller'], data_trajet_aller['duree_min']):
-                context['messages'].append("❌ L'horaire demandé n'est pas disponible pour réservation.\nLes créneaux de cette semaine sont les suivants :")
-                for date in get_events_current_week(id_agenda_creaneaux):
-                    context['messages'].append(date)
-                context['messages'].append("\nSi vous vous trouvez déjà dans les créneaux de réservation, il se peut qu'une réservation ait déjà été faite sur le créneau demandé\n")
-                context['form'] = form
-                return render(request, "reservation.html", context)
-
-            if form.cleaned_data["date_retour"] != None : 
-                context['type_trajet'] = "Aller-Retour"
-
-                data_trajet_retour = evaluer_trajet(
-                    form.cleaned_data["adresse_arrivee"],
-                    form.cleaned_data["adresse_depart"],
-                    form.cleaned_data['date_retour'],
-                    )
-                            # CHECK SUR AGENDA
-                if is_slot_available(id_agenda_creaneaux, form.cleaned_data['date_retour'], data_trajet_retour['duree_min'])\
-                    or not is_slot_available(id_agenda_reservations, form.cleaned_data['date_retour'], data_trajet_retour['duree_min']):
-                    context['messages'].append("❌ L'horaire demandé n'est pas disponible pour réservation pour votre trajet retour.\nLes créneaux de cette semaine sont les suivants :")
-                    for date in get_events_current_week(id_agenda_creaneaux):
-                        context['messages'].append(date)
-                    context['messages'].append("\nSi vous vous trouvez déjà dans les créneaux de réservation, il se peut qu'une réservation ait déjà été faite sur le créneau demandé\n")
-                    context['form'] = form
-                    return render(request, "reservation.html", context)
-                   
-            price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
-            trajet.distance_km = data_trajet_aller['distance_km'] 
-            trajet.duree_min = data_trajet_aller['duree_min']
-            trajet.price_euros = price
 
             context['trajet'] = trajet
 
         elif "btnConfirmer" in request.POST and form.is_valid(): # Cas où on confirme la reservation
             trajet = form.save(commit=False)
-            context['type_trajet'] = "Aller Simple"
-            data_trajet_retour = {"duree_min" :0,"distance_km": 0, "price_euros":0}
-            data_trajet_aller = evaluer_trajet(form.cleaned_data["adresse_depart"],form.cleaned_data["adresse_arrivee"],form.cleaned_data['date_aller'])
-                     
-            if form.cleaned_data["date_retour"] != None : 
-                context['type_trajet'] = "Aller-Retour"
-                data_trajet_retour = evaluer_trajet(form.cleaned_data["adresse_arrivee"],form.cleaned_data["adresse_depart"],form.cleaned_data['date_retour'])
-            
-            price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
-            checkout = create_checkout(sumpup_api_key,merchant_code_test, price, trajet)
-            trajet.date_retour = form.cleaned_data["date_retour"]
-            trajet.distance_km = data_trajet_aller['distance_km']
-            trajet.duree_min = data_trajet_aller['duree_min']
-            trajet.price_euros = price
+            checkout = create_checkout(sumpup_api_key,merchant_code_test, form.cleaned_data["price_euros"], trajet)
             trajet.checkout_id = checkout.id
             trajet.checkout_status = checkout.status
             trajet.checkout_reference = checkout.checkout_reference
-
             trajet.save()
-
             request.session["checkout_id"] = checkout.id
-            return redirect("contact/")
+            return redirect('contact', client_ref=checkout.checkout_reference)
+
+            return redirect(f"{trajet.checkout_reference}/contact/")
         
         else:
             messages.error(request, "Erreur dans le formulaire ❌")
@@ -124,10 +76,11 @@ def index(request):
 
     return render(request, "reservation.html", context)
 
-def contact_form_view(request):
+def contact_form_view(request, client_ref):
     context = context_init.copy()
     checkout_id = request.session.get("checkout_id")
     context["checkout_id"] = checkout_id
+    context["client_ref"] = client_ref
     if request.method == "POST":
         form = ContactClientForm(request.POST)
         context['form'] = form
@@ -143,9 +96,11 @@ def contact_form_view(request):
 
     return render(request, "contact.html", context=context)
 
-def paiement(request):
+def paiement(request, client_ref):
     context = context_init.copy()
     checkout_id = request.session.get("checkout_id")
+    context["client_ref"] = client_ref
+
     if not checkout_id:
         messages.error(request, "Erreur dans la création du checkout ❌")
         return  render(request, "reservation.html", context)
@@ -165,7 +120,7 @@ def fct_test():
     print(response.text)
     return checkout_id
 
-def paiement_resultat(request):  # SUM UP WIDGET REDIRIGE ICI APRÈS PAIEMENT
+def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS PAIEMENT
     context = context_init.copy()
 
     # checkout_id = request.GET.get("checkout_id") # VRAI CAS
@@ -188,7 +143,39 @@ def paiement_resultat(request):  # SUM UP WIDGET REDIRIGE ICI APRÈS PAIEMENT
         ]
         date_aller = paiement.date_aller
         date_aller_fin = paiement.date_aller + timedelta(minutes=paiement.duree_min)
+
         create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=date_aller, end_dt=date_aller_fin, description='\n'.join(d_), location=paiement.adresse_depart )
+
+        ## Envoi mail récapitulatif au client
+        date_arrivee_estimee = date_aller_fin.strftime("%d/%m/%Y")
+        time_arrivee_estimee = date_aller_fin.strftime("%H:%M")
+        context_mail_client = {
+            "reference_dossier" : client_ref, 
+            "asked_date":paiement.requested_at.strftime("%d/%m/%Y à %H:%M:%S"),
+            "mode_reservation": "Internet",
+            "telephone":config.contact_phone ,
+            "siret": config.contact_siret,
+            "mail" : config.contact_email,
+            "driver" : config.driver,
+            "vehicle" : config.vehicle,
+            "vehicle_immatriculation" : config.vehicle_immatriculation,
+            "date_aller" : paiement.date_aller.strftime("%d/%m/%Y"),
+            "heure_aller" : paiement.date_aller.strftime("%H:%M"),
+            "date_arrivee_estimee" : date_arrivee_estimee,
+            "heure_arrivee_estimee" : time_arrivee_estimee,
+            "adresse_depart" : paiement.adresse_depart ,
+            "adresse_arrivee" : paiement.adresse_arrivee,
+            "temps_humain" : paiement.duree_min,
+            "nom_client" : client.nom_client,
+
+        }
+        
+        send_email_template(
+            emails=mails,
+            subject="[VTC Meslé] Reservation confirmée",
+            template_name="template_mail_client.html",
+            context=context_mail_client
+        )
 
         return render(request, "success.html", context=context)
     else:
@@ -216,16 +203,17 @@ def sumup_webhook(request):
     paiement.checkout_status = status
     paiement.save()
 
-    subject = "[SITE RESERVATION] Webhook triggered"
-    content = f"""
-    Le paiement pour la réservation {checkout_id} a le statut {status}.
-    Requête : {request}, data = {data}
-    Procéder au remboursement : 
-        - Partiel : <<lien pour remboursement pariel - SumUp>>
-        - Intégral : <<lien pour remboursement intégral - SumUp>>
-    """
-    send(mails, subject , content)
-
+    send_email_template(
+        emails=mails,
+        subject="[VTC] Reservation confirmée",
+        template_name="template_mail_owner.html",
+        context={"checkout_id": checkout_id,
+                    "status" : status,
+                    "request" : request,
+                    "data" : data
+                    }
+        )
+    
     return HttpResponse("OK", status=200)
 
 def welcome(request):
@@ -233,7 +221,7 @@ def welcome(request):
 
     return render(request, 'welcome.html', context)
 
-def bon(request):
+def bon(request, client_ref):
     checkout_id = request.session.get("checkout_id")
     current_trajet = Trajet.objects.get(checkout_id=checkout_id)
     current_contact = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).first()
@@ -250,14 +238,16 @@ def bon(request):
     commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
 
     context = {
+        "reference_dossier" : client_ref,
         "asked_date":asked_date,
-        "mode_reservation": "site web",
+        "mode_reservation": "Internet",
         "telephone":config.contact_phone,
         "siret": config.contact_siret,
         "mail" : config.contact_email,
         "adresse" : config.contact_address,
         "driver" : config.driver,
         "vehicle" : config.vehicle,
+        "vehicle_immatriculation" : config.vehicle_immatriculation,
         "date_aller": date_aller,
         "heure_aller": time_aller,
         "date_arrivee_estimee" : date_arrivee_estimee ,
