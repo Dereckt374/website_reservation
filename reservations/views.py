@@ -8,6 +8,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.template.loader import render_to_string, get_template
 from constance import config
 import json
 import os
@@ -15,7 +16,7 @@ import requests
 import googlemaps
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
-import uuid
+from weasyprint import HTML, CSS
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env')
 
@@ -122,7 +123,7 @@ def fct_test():
 
 def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS PAIEMENT
     context = context_init.copy()
-
+    context["client_ref"] = client_ref
     # checkout_id = request.GET.get("checkout_id") # VRAI CAS
     checkout_id = fct_test() 
     
@@ -135,20 +136,19 @@ def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS
               f"adresse de départ : {paiement.adresse_depart}",
               f"adresse d'arrivée : {paiement.adresse_arrivee}",
               f"distance : {paiement.distance_km} km",
-              f"durée : {paiement.duree_min} mins",
+              f"durée : {paiement.duree_min_aller} mins",
               f"prix : {paiement.price_euros} €",
               f"client : NOM: {client.nom_client} PRENOM : {client.prenom_client}",
               f"contact : {paiement.telephone_client}",
               f"reference de paiement : {paiement.checkout_reference}"
         ]
         date_aller = paiement.date_aller
-        date_aller_fin = paiement.date_aller + timedelta(minutes=paiement.duree_min)
+        date_aller_fin = paiement.date_aller + timedelta(minutes=paiement.duree_min_aller)
 
         create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=date_aller, end_dt=date_aller_fin, description='\n'.join(d_), location=paiement.adresse_depart )
-
-        ## Envoi mail récapitulatif au client
         date_arrivee_estimee = date_aller_fin.strftime("%d/%m/%Y")
         time_arrivee_estimee = date_aller_fin.strftime("%H:%M")
+
         context_mail_client = {
             "reference_dossier" : client_ref, 
             "asked_date":paiement.requested_at.strftime("%d/%m/%Y à %H:%M:%S"),
@@ -165,16 +165,30 @@ def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS
             "heure_arrivee_estimee" : time_arrivee_estimee,
             "adresse_depart" : paiement.adresse_depart ,
             "adresse_arrivee" : paiement.adresse_arrivee,
-            "temps_humain" : paiement.duree_min,
+            "temps_humain" : paiement.duree_min_aller,
             "nom_client" : client.nom_client,
-
         }
+        ics_attachment = [{
+            "filename": "reservation_aller.ics",
+            "mimetype": "text/calendar",   # important
+            "content": creer_ics(paiement.date_aller, date_aller_fin, f"Trajet VTC direction {paiement.adresse_arrivee}")
+        }]
         
+        if paiement.date_retour is not None:
+            date_retour_fin = paiement.date_retour+timedelta(minutes=paiement.duree_min_retour)
+            ics_attachment.append({
+            "filename": "reservation_retour.ics",
+            "mimetype": "text/calendar",   # important
+            "content": creer_ics(paiement.date_retour, date_retour_fin, f"Trajet VTC direction {paiement.adresse_depart}") 
+            })
+            create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=date_aller, end_dt=date_retour_fin, description='\n'.join(d_), location=paiement.adresse_depart )
+
         send_email_template(
             emails=mails,
             subject="[VTC Meslé] Reservation confirmée",
             template_name="template_mail_client.html",
-            context=context_mail_client
+            context=context_mail_client,
+            attachments=ics_attachment
         )
 
         return render(request, "success.html", context=context)
@@ -222,19 +236,18 @@ def welcome(request):
     return render(request, 'welcome.html', context)
 
 def bon(request, client_ref):
+    context = context_init.copy()
+    context["client_ref"] = client_ref
     checkout_id = request.session.get("checkout_id")
     current_trajet = Trajet.objects.get(checkout_id=checkout_id)
     current_contact = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).first()
-    print(current_trajet)
-    print(current_contact)
-
     date_aller = current_trajet.date_aller.strftime("%d/%m/%Y")
     time_aller = current_trajet.date_aller.strftime("%H:%M")
     asked_date = current_trajet.requested_at.strftime("%d/%m/%Y à %H:%M:%S")
-    datetime_arrivee = current_trajet.date_aller + timezone.timedelta(minutes=current_trajet.duree_min)
+    datetime_arrivee = current_trajet.date_aller + timezone.timedelta(minutes=current_trajet.duree_min_aller)
     date_arrivee_estimee = datetime_arrivee.strftime("%d/%m/%Y")
     time_arrivee_estimee = datetime_arrivee.strftime("%H:%M")
-    duree_human_readable = humaniser_duree(current_trajet.duree_min)
+    duree_human_readable = humaniser_duree(current_trajet.duree_min_aller)
     commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
 
     context = {
@@ -264,11 +277,17 @@ def bon(request, client_ref):
         "passagers" : current_contact.passagers,
         "commentaire_client" : current_trajet.commentaire_client,
         "commenataire_trajet" : commentaire_trajet,
+        "aller_retour" : current_trajet.type_trajet,
     }
     if current_trajet.date_retour != None:
         context["date_retour"] = current_trajet.date_retour.strftime("%d/%m/%Y")
         context["heure_retour"] = current_trajet.date_retour.strftime("%H:%M")
-        context['aller_retour'] = "Oui"
-    else:
-        context['aller_retour'] = "Non"
+    
+    pdf_name = f"bon_de_reservation_{client_ref}.pdf"
+    html_string = render_to_string("template_bon_reservation.html", context)
+    HTML(string=html_string).write_pdf(
+    "reservations/output/"+pdf_name,
+    stylesheets=[CSS("reservations/static/css/style_bon.css")]
+)
+    print("✅ Rapport généré")
     return render(request, 'template_bon_reservation.html', context)

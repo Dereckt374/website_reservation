@@ -177,7 +177,7 @@ def send_attachments(emails, subject, content, attachments=None):
     Attachments : {len(attachments) if attachments else 0}
     """)
     service.quit()
-def send_email_template(emails, subject, template_name, context=None):
+def send_email_template(emails, subject, template_name, context=None, attachments=None):
 
     if context is None:
         context = {}
@@ -204,9 +204,26 @@ def send_email_template(emails, subject, template_name, context=None):
 
         # HTML
         msg.attach(MIMEText(rendered_html, "html", "utf-8"))
-
+        
+        if attachments:
+            for att in attachments:
+                part = MIMEBase(*att["mimetype"].split("/"))
+                part.set_payload(att["content"])
+                encoders.encode_base64(part)
+                part.add_header(
+                    "Content-Disposition",
+                    f'attachment; filename="{att["filename"]}"'
+                )
+                msg.attach(part)
+                
         service.sendmail(os.getenv("email_appli"), email, msg.as_string())
-
+        print(f"""
+        🟢 Fonction - SEND MAIL HTML TEMPLATED
+        To : {emails}
+        Subject : {subject}
+        Template : {template_name}
+        Attachments : {len(attachments) if attachments else 0}
+        """)
     service.quit()
 def get_service():
     SCOPES = ["https://www.googleapis.com/auth/calendar"]

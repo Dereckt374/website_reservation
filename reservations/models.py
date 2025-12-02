@@ -32,7 +32,8 @@ class Trajet(models.Model):
     )
 
     distance_km = models.PositiveIntegerField("Distance (km)", validators=[MinValueValidator(0), MaxValueValidator(10000)], null=True, blank=True )
-    duree_min = models.PositiveIntegerField("Durée (minutes)", validators=[MinValueValidator(0), MaxValueValidator(2880)], null=True, blank=True)
+    duree_min_aller = models.PositiveIntegerField("Durée (minutes)", validators=[MinValueValidator(0), MaxValueValidator(2880)], null=True, blank=True)
+    duree_min_retour = models.PositiveIntegerField("Durée (minutes)", validators=[MinValueValidator(0), MaxValueValidator(2880)], null=True, blank=True)
     price_euros = models.DecimalField("Prix (€)",max_digits=7,decimal_places=2,validators=[MinValueValidator(Decimal("0.00")),MaxValueValidator(Decimal("10000.00"))],null=True,blank=True) 
     checkout_id = models.TextField("ID paiement sum up", max_length=1000, null=True, blank=True)
     checkout_status = models.TextField("Status paiement sum up", max_length=2000, null=True, blank=True)

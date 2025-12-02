@@ -6,7 +6,7 @@ from .models import Trajet, ContactClient
 
 @admin.register(Trajet)
 class TrajetAdmin(admin.ModelAdmin):
-    list_display = ("requested_at","price_euros","duree_min","distance_km","adresse_depart", "adresse_arrivee", "date_aller", "nb_passagers")
+    list_display = ("requested_at","price_euros","type_trajet","duree_min_aller","distance_km","adresse_depart", "adresse_arrivee", "date_aller", "nb_passagers")
 
 
 @admin.register(ContactClient)

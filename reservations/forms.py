@@ -41,7 +41,8 @@ class TrajetForm(forms.ModelForm):
 
         price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
         cleaned_data["distance_km"] = data_trajet_aller['distance_km'] 
-        cleaned_data["duree_min"] = data_trajet_aller['duree_min']
+        cleaned_data["duree_min_aller"] = data_trajet_aller['duree_min']
+        cleaned_data["duree_min_retour"] = data_trajet_retour['duree_min']
         cleaned_data["price_euros"] = price
 
         ## --------- VERIFICATIONS ---------
@@ -81,7 +82,8 @@ class TrajetForm(forms.ModelForm):
         # Transfert des valeurs calculées vers l'objet
         obj.type_trajet = self.cleaned_data["type_trajet"]
         obj.distance_km = self.cleaned_data["distance_km"]
-        obj.duree_min    = self.cleaned_data["duree_min"]
+        obj.duree_min_aller    = self.cleaned_data["duree_min_aller"]
+        obj.duree_min_retour    = self.cleaned_data["duree_min_retour"]
         obj.price_euros   = self.cleaned_data["price_euros"]
 
         if commit:
