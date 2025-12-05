@@ -6,6 +6,7 @@ from .utils import *
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env')
 
+adresse_base = os.getenv("contact_address")
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 
@@ -74,6 +75,28 @@ class TrajetForm(forms.ModelForm):
             if not is_slot_available(id_agenda_reservations,  cleaned_data['date_retour'], data_trajet_retour['duree_min']):
                 self.add_error("date_retour",
                                "❌ Une reservation est déjà effectué sur l'horaire demandé pour le trajet retour.")
+        if cleaned_data.get("adresse_depart") and cleaned_data.get("adresse_arrivee"):
+            if cleaned_data.get("adresse_depart") == cleaned_data.get("adresse_arrivee"):
+                    self.add_error("adresse_arrivee",
+                                "❌ L'adresse d'arrivée doit être différente de l'adresse de départ.")  
+        if cleaned_data.get("duree_min_aller") :
+            if cleaned_data.get("duree_min_aller") > 240:
+                self.add_error("adresse_arrivee",
+                               "❌ La durée du trajet aller est trop longue (plus de 4h).")
+
+        # if cleaned_data.get("adresse_depart") : 
+        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_depart"],adresse_base,now)
+        #     if distance_km > 500:
+        #         self.add_error("adresse_depart",
+        #                        "❌ L'adresse de départ est trop éloigné.")
+                
+        # if cleaned_data.get("adresse_arrivee") : 
+        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_arrivee"],adresse_base,now)
+        #     if distance_km > 500:
+        #         self.add_error("adresse_arrivee",
+        #                        "❌ L'adresse d'arrivée est trop éloigné.")
+
+
         return cleaned_data
 
     def save(self, commit=True):

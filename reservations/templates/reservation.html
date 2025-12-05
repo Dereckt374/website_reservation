@@ -40,7 +40,7 @@
       <p>Départ : {{ trajet.adresse_depart }}</p>
       <p>Arrivée : {{ trajet.adresse_arrivee }}</p>
       <p>Distance {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.distance_km }} km</p>
-      <p>Durée {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min }} min</p>
+      <p>Durée {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min_aller }} min</p>
       <p>Coût estimé : {{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
     </div>
     <div id="map"></div>

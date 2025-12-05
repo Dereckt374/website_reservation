@@ -6,8 +6,11 @@ import json
 import os
 import requests
 import googlemaps
+from .models import Trajet, ContactClient
 from django.utils import timezone
 from django.template.loader import render_to_string
+from django.templatetags.static import static
+from django.conf import settings
 from constance import config
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
@@ -19,11 +22,12 @@ from email.mime.multipart import MIMEMultipart
 from email import encoders
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from weasyprint import HTML, CSS
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env')
 
 googlemaps_api_key = os.getenv("google_api_key")
-sumpup_api_key = os.getenv("sumup_api_key")
+sumup_api_key = os.getenv("sumup_api_key")
 merchant_code_test = os.getenv("merchant_code_test")
 gmaps = googlemaps.Client(key=googlemaps_api_key)
 current_year = datetime.now().year
@@ -72,12 +76,12 @@ def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_dep
     
     return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
 def get_merchant_code(api_key_application : str) -> str:
-    client = Sumup(api_key=sumpup_api_key)
+    client = Sumup(api_key=sumup_api_key)
     merchant = client.merchant.get()
     merchant_code = merchant.merchant_profile.merchant_code
     return merchant_code
 def create_checkout(api_key_application : str, merchant_code : str, price : float, description: str = "") -> str:
-    client = Sumup(api_key=sumpup_api_key)
+    client = Sumup(api_key=sumup_api_key)
     checkout = client.checkouts.create(
         body=CreateCheckoutBody(
             amount=price,
@@ -382,4 +386,69 @@ def humaniser_duree(duree_min: int) -> str:
     
     # Assemblage avec conjonction
     return " et ".join(segments)
+
+def make_pdf(pdf_name, template_html, context, path_output, css=None):
+    html_string = render_to_string(template_html, context)
+    HTML(string=html_string).write_pdf(
+    os.path.join(path_output,pdf_name),
+    base_url=settings.STATIC_ROOT,
+    stylesheets=[CSS(css)] if css else None
+)
+    print("✅ Rapport généré")
+
+def get_client_context(checkout_id):
+    current_trajet = Trajet.objects.get(checkout_id=checkout_id)  # ou .filter
+    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).first()
+
+    asked_date_str = current_trajet.requested_at.strftime("%d/%m/%Y à %H:%M:%S")
+    date_aller_str = current_trajet.date_aller.strftime("%d/%m/%Y")
+    time_aller_str = current_trajet.date_aller.strftime("%H:%M")
+    datetime_arrivee_estimee_dt = current_trajet.date_aller + timedelta(minutes=current_trajet.duree_min_aller)
+    date_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%d/%m/%Y")
+    time_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%H:%M")
+    duree_human_readable = humaniser_duree(current_trajet.duree_min_aller)
+    commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
+
+    context = {
+        "reference_dossier" : current_trajet.checkout_reference, 
+        "asked_date":asked_date_str,
+        "mode_reservation": "Internet",
+        "telephone":config.contact_phone ,
+        "siret": config.contact_siret,
+        "mail" : config.contact_email,
+        "adresse" : config.contact_address,
+        "driver" : config.driver,
+        "vehicle" : config.vehicle,
+        "vehicle_immatriculation" : config.vehicle_immatriculation,
+        "date_aller" : date_aller_str,
+        "heure_aller" : time_aller_str,
+        "date_arrivee_estimee" : date_arrivee_estimee_str,
+        "heure_arrivee_estimee" : time_arrivee_estimee_str,
+        "adresse_depart" : current_trajet.adresse_depart ,
+        "adresse_arrivee" : current_trajet.adresse_arrivee,
+        "prix"  : current_trajet.price_euros,
+        "distance_km" : current_trajet.distance_km,
+        "duree_min" : current_trajet.duree_min_aller,
+        "temps_humain" : duree_human_readable,
+        "nom_client" : client.nom_client,
+        "prenom_client" : client.prenom_client, 
+        "telephone_client": client.telephone_client,
+        "email_client": client.email_client,
+        "passagers" : client.passagers,
+        "commentaire_client" : current_trajet.commentaire_client,
+        "commenataire_trajet" : commentaire_trajet,
+        "aller_retour" : current_trajet.type_trajet,
+    }
+    if current_trajet.date_retour != None:
+        date_retour_str = current_trajet.date_retour.strftime("%d/%m/%Y")
+        time_retour_str = current_trajet.date_retour.strftime("%H:%M")
+        datetime_arrivee_estimee_dt = current_trajet.date_retour + timedelta(minutes=current_trajet.duree_min_retour)
+        date_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%d/%m/%Y")
+        time_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%H:%M")
+        context["date_retour"] = date_retour_str
+        context["heure_retour"] = time_retour_str
+        context["date_arrivee_estimee_retour"] = date_arrivee_estimee_str
+        context["heure_arrivee_estimee_retour"] = time_arrivee_estimee_str
+    return context
+
 

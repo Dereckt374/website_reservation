@@ -1,5 +1,5 @@
 body {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     font-family: "Arial", sans-serif;
     color: #333;
@@ -30,14 +30,14 @@ header {
 /* Textes */
 .text-small {
     text-align: center;
-    font-size: 10pt;
+    font-size: 8pt;
     color: #555;
     font-style: italic;
 }
 
 .text-normal {
     margin: 0 auto;
-    font-size: 12pt;
+    font-size: 10pt;
     color: #222;
 }
 
@@ -59,12 +59,13 @@ header {
 }
 
 .bandeau h1, .bandeau h2 {
+    font-size: 12pt;
     margin: 0;
     color: #000;
 }
 
 .sous-texte {
-    font-size: 10pt;
+    font-size: 8pt;
     margin-top: 4px;
 }
 
@@ -85,7 +86,7 @@ header {
 
 .cadre h3 {
     margin-top: 0;
-    font-size: 12pt;
+    font-size: 10pt;
     text-align: center;
 }
 

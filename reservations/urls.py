@@ -9,5 +9,5 @@ urlpatterns = [
     path('<str:client_ref>/contact/paiement/', views.paiement, name='paiement'),
     path('<str:client_ref>/paiement/resultat/', views.paiement_resultat, name='resultat_paiement'),
     path('webhook/', views.sumup_webhook, name='webhook'),
-    path('<str:client_ref>/bon_de_commande/', views.bon, name='bon_de_commande'),
+    path("download/<str:client_ref>/", views.download_pdf, name="download_pdf")
     ]
