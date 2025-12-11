@@ -328,6 +328,13 @@ height: 370px;
     text-align: center;
 }
 
+.error-icon {
+    font-size: 70px;
+    color: #c32020; /* rouge echec */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 h2 {
     font-size: 24px;
     margin-bottom: 30px;
@@ -369,3 +376,4 @@ button {
 .btn-secondary:hover {
     background-color: #d0d0d0;
 }
+

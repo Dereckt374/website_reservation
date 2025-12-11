@@ -12,10 +12,6 @@
       Une nouvelle réservation vient d'être <strong>validée et payée</strong> via le site.
     </p>
 
-    <p>
-    Rajouter les boutons pour remboursement
-    </p>
-
     <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
 
     <h3 style="margin-bottom:5px;">Informations générales</h3>
@@ -59,6 +55,30 @@
     ">{{ data }}</pre>
 
     <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+<div style="
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:20px;
+">
+
+    <!-- Bouton 1 -->
+    <a href="{{ partial_refund }}"
+       style="background-color:#d90429; color:white; padding:10px 18px;
+              text-decoration:none; border-radius:6px; font-weight:bold;
+              display:inline-block;">
+        Remboursement partiel (80%)
+    </a>
+
+    <!-- Bouton 2 -->
+    <a href="{{ full_refund }}"
+       style="background-color:#9b1c31; color:white; padding:10px 18px;
+              text-decoration:none; border-radius:6px; font-weight:bold;
+              display:inline-block;">
+        Remboursement total (100%)
+    </a>
+
+</div>
 
     <p style="font-size:13px; color:#777;">
       Ce message a été généré automatiquement par le système de réservation.

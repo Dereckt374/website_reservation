@@ -24,13 +24,16 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from weasyprint import HTML, CSS
 from dotenv import load_dotenv
-load_dotenv(dotenv_path = '.venv/.env')
+load_dotenv(dotenv_path = '.venv/.env_prod')
 
+site_domain = os.getenv("site_domain")
 googlemaps_api_key = os.getenv("google_api_key")
 sumup_api_key = os.getenv("sumup_api_key")
-merchant_code_test = os.getenv("merchant_code_test")
+merchant_code_official = os.getenv("merchant_code_official")
 gmaps = googlemaps.Client(key=googlemaps_api_key)
 current_year = datetime.now().year
+json_service_account_file = os.getenv("json_service_account_file")
+base_url_sumup = "https://api.sumup.com"
 
 def get_tarif_multiplier(hour):
     """Renvoie le multiplicateur horaire selon la période (jour/soir/nuit)."""
@@ -75,22 +78,23 @@ def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_dep
             """)
     
     return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
-def get_merchant_code(api_key_application : str) -> str:
+def get_merchant_code(sumup_api_key : str) -> str:
     client = Sumup(api_key=sumup_api_key)
     merchant = client.merchant.get()
     merchant_code = merchant.merchant_profile.merchant_code
     return merchant_code
-def create_checkout(api_key_application : str, merchant_code : str, price : float, description: str = "") -> str:
+def create_checkout(sumup_api_key : str, merchant_code : str, price : float, description: str = "") -> str:
     client = Sumup(api_key=sumup_api_key)
+    client_reference = str(uuid.uuid4()).split('-')[0]
     checkout = client.checkouts.create(
         body=CreateCheckoutBody(
             amount=price,
             currency="EUR",
-            checkout_reference=str(uuid.uuid4()).split('-')[0],
+            checkout_reference=client_reference,
             merchant_code=merchant_code,
-            description="description",
-            redirect_url="http://127.0.0.1:8000/paiement/resultat/",
-            return_url="http://127.0.0.1:8000/webhook/"
+            description=description,
+            redirect_url=f"{site_domain}/{client_reference}/paiement/resultat/",
+            return_url=f"{site_domain}/webhook/"
         )
     )
 
@@ -182,7 +186,10 @@ def send_attachments(emails, subject, content, attachments=None):
     """)
     service.quit()
 def send_email_template(emails, subject, template_name, context=None, attachments=None):
-
+    """
+    Envoie un email HTML en utilisant un template Django. 
+    ATTENTION, emails doit être une liste même pour un seul destinataire.
+    """
     if context is None:
         context = {}
 
@@ -229,10 +236,10 @@ def send_email_template(emails, subject, template_name, context=None, attachment
         Attachments : {len(attachments) if attachments else 0}
         """)
     service.quit()
-def get_service():
+def get_service(json_creds_file=json_service_account_file):
     SCOPES = ["https://www.googleapis.com/auth/calendar"]
     creds = service_account.Credentials.from_service_account_file(
-        ".venv/service.json", scopes=SCOPES
+        json_creds_file, scopes=SCOPES
     )
     return build("calendar", "v3", credentials=creds)
 def creer_ics(start_dt, end_dt, titre="Reservation"):
@@ -274,7 +281,7 @@ def get_week_date_range():
     time_min = week_start.isoformat()
     time_max = week_end.isoformat()
     return week_start, week_end, time_min, time_max
-def get_events_current_week(calendar_id, service_account_file=".venv/service.json"):
+def get_events_current_week(calendar_id):
     """
     Récupère et affiche tous les événements de la semaine en cours (lundi → dimanche)
     en utilisant un service account Google Calendar.
@@ -393,12 +400,19 @@ def make_pdf(pdf_name, template_html, context, path_output, css=None):
     os.path.join(path_output,pdf_name),
     base_url=settings.STATIC_ROOT,
     stylesheets=[CSS(css)] if css else None
-)
-    print("✅ Rapport généré")
+    )
+    print(f"""
+    🟦 Fonction - MAKE PDF
+        PDF généré : {pdf_name},
+        Template utilisé : {template_html},
+        Chemin de sortie : {os.path.join(path_output,pdf_name)}
+    ✅ Rapport généré
+    """)
+
 
 def get_client_context(checkout_id):
     current_trajet = Trajet.objects.get(checkout_id=checkout_id)  # ou .filter
-    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).first()
+    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
 
     asked_date_str = current_trajet.requested_at.strftime("%d/%m/%Y à %H:%M:%S")
     date_aller_str = current_trajet.date_aller.strftime("%d/%m/%Y")
@@ -451,4 +465,75 @@ def get_client_context(checkout_id):
         context["heure_arrivee_estimee_retour"] = time_arrivee_estimee_str
     return context
 
+def get_transaction_id(checkout_id: str, sumpup_api_key: str) -> str | None:
+    """
+    Récupère un checkout SumUp via son id_checkout
+    et renvoie le transaction_id associé.
+    """
+    client = Sumup(api_key=sumpup_api_key)
+    # Récupération du checkout
+    checkout = client.checkout.get(checkout_id)
 
+    # Même logique que ci-dessus
+    if checkout.transaction_id:
+        return checkout.transaction_id
+
+    if checkout.transactions:
+        return checkout.transactions[0].id
+
+    return None
+
+
+def partial_refund_sumup(transaction_id: str, original_amount: float, ratio: float = 0.8):
+    """Remboursement partiel (80% par défaut)."""
+    refund_amount = round(original_amount * ratio, 2)
+
+    url = f"{base_url_sumup}/v0.1/me/refund/{transaction_id}"
+    headers = {
+        "Authorization": f"Bearer {sumup_api_key}",
+        "Content-Type": "application/json"
+    }
+
+    # response = requests.post(url, headers=headers, json={"amount": refund_amount})
+    response = ''
+
+    print(f"""
+    🟥 Fonction - PARTIAL REFUND
+        Remboursement partiel :
+        Transaction ID : {transaction_id}
+        Montant original : {original_amount} EUR
+        Ratio de remboursement : {ratio*100:.2f}%
+        Montant remboursé : {refund_amount} EUR
+        URL : {url}
+        HTTP response : {response.status_code}
+    """)
+
+    # if response.status_code == 204:
+    #     print(f"✔ Remboursement effectué {ratio*100:.2f}% OK")
+    # else:
+    #     print(f"Echec du remboursement : {response.text}")
+
+    return response
+
+
+def refund_full_sumup(transaction_id: str):
+    """Remboursement total."""
+    url = f"{base_url_sumup}/v0.1/me/refund/{transaction_id}"
+    headers = {"Authorization": f"Bearer {sumup_api_key}"}
+    response = ''
+    # response = requests.post(url, headers=headers)
+
+    print(f"""
+    🟥 Fonction - FULL REFUND
+        Remboursement partiel :
+        Transaction ID : {transaction_id}
+        URL : {url}
+        HTTP response : {response.status_code}
+    """)
+
+    # if response.status_code == 204:
+    #     print("✔ Remboursement total OK")
+    # else:
+    #     print(f"Echec du remboursement : {response.text}")
+    
+    return response

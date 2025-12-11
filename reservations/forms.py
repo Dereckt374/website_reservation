@@ -3,10 +3,11 @@ from django.utils import timezone
 from .models import Trajet, ContactClient
 from datetime import timedelta
 from .utils import *
+from constance import config
 from dotenv import load_dotenv
-load_dotenv(dotenv_path = '.venv/.env')
+load_dotenv(dotenv_path = '.venv/.env_prod')
 
-adresse_base = os.getenv("contact_address")
+adresse_base = config.contact_address
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 

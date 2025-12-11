@@ -10,23 +10,25 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string, get_template
+from django.urls import reverse
 from constance import config
 import json
-import times
+from time import sleep
 import os
 import requests
 import googlemaps
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
 from dotenv import load_dotenv
-load_dotenv(dotenv_path = '.venv/.env')
+load_dotenv(dotenv_path = '.venv/.env_prod')
 
+site_domain = os.getenv("site_domain")
 googlemaps_api_key = os.getenv("google_api_key")
+contact_email = config.contact_email
 sumup_api_key = os.getenv("sumup_api_key")
-merchant_code_test = os.getenv("merchant_code_test")
+merchant_code_official = os.getenv("merchant_code_official")
 gmaps = googlemaps.Client(key=googlemaps_api_key)
 current_year = datetime.now().year
-mails = [os.getenv("email_destination")]
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 
@@ -59,7 +61,7 @@ def index(request):
 
         elif "btnConfirmer" in request.POST and form.is_valid(): # Cas où on confirme la reservation
             trajet = form.save(commit=False)
-            checkout = create_checkout(sumup_api_key, merchant_code_test, form.cleaned_data["price_euros"], trajet)
+            checkout = create_checkout(sumup_api_key, merchant_code_official, form.cleaned_data["price_euros"], description=str(trajet))
             trajet.checkout_id = checkout.id
             trajet.checkout_status = checkout.status
             trajet.checkout_reference = checkout.checkout_reference
@@ -111,10 +113,10 @@ def paiement(request, client_ref):
 def fct_test():
     # Simulation d'un webhook SUM UP pour les tests en local
     with open(r".venv/temp_txt", "r") as f: checkout_id = f.read().strip()
-    url = "http://127.0.0.1:8000/webhook/"
+    url = f"{site_domain}/webhook/"
     payload = {
         "id": checkout_id,
-        "status": "PAID"
+        "status": "PAID" #"FAILED"
     }
     response = requests.post(url, json=payload)
     print(response.text)
@@ -154,11 +156,16 @@ def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS
                 })
                 create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_retour, end_dt=date_retour_fin, description='\n'.join(d_), location=paiement.adresse_arrivee )
 
+            ctx = {
+                    "partial_refund_link": "/coucou/", #reverse("partial_refund", args=[client_ref, checkout_id]),
+                    "full_refund_link": "/coucou2/" #reverse("full_refund", args=[client_ref, checkout_id]),
+                }
+
             send_email_template(
-                emails=mails,
+                emails=[context_client["email_client"]],
                 subject="[VTC Meslé] Reservation confirmée",
                 template_name="template_mail_client.html",
-                context=context_client,
+                context=context_client | ctx,
                 attachments=ics_attachment
             )
 
@@ -167,7 +174,7 @@ def paiement_resultat(request, client_ref):  # SUM UP WIDGET REDIRIGE ICI APRÈS
             context = context | context_client
             return render(request, "success.html", context=context)
         else:
-            times.sleep(2)
+            sleep(2)
             paiement = Trajet.objects.get(checkout_id=checkout_id)  # ou .filter
             tries += 1
     return render(request, "echec.html", context=context)
@@ -185,17 +192,16 @@ def sumup_webhook(request):
     if not checkout_id:
         return HttpResponse("Missing id", status=400)
 
-    paiement = Trajet.objects.filter(checkout_id=checkout_id).first()
+    paiement = Trajet.objects.filter(checkout_id=checkout_id).last()
 
     if not paiement:
         return HttpResponse("Unknown checkout_id", status=404)
     
-
     paiement.checkout_status = status
     paiement.save()
 
     send_email_template(
-        emails=mails,
+        emails=[contact_email],
         subject="[VTC] Reservation confirmée",
         template_name="template_mail_owner.html",
         context={"checkout_id": checkout_id,
@@ -220,3 +226,15 @@ def download_pdf(request, client_ref):
         raise Http404("PDF non trouvé")
 
     return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')
+
+def full_refund(request, client_ref):
+    trajet = Trajet.objects.get(checkout_reference=client_ref)
+    transaction_id = get_transaction_id(trajet.checkout_id, sumup_api_key)
+    # full_refund_sumup(sumup_api_key, transaction_id)
+    return HttpResponse("Trajet remboursé totalement")
+
+def partial_refund(request, client_ref):
+    trajet = Trajet.objects.get(checkout_reference=client_ref)
+    transaction_id = get_transaction_id(trajet.checkout_id, sumup_api_key)
+    partial_refund_sumup(sumup_api_key, transaction_id, trajet.price_euros)
+    return HttpResponse("Trajet remboursé partiellement")
