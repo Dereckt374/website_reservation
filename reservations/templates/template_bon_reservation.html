@@ -7,20 +7,26 @@
     <link rel="stylesheet" href="{% static 'css/style_bon.css' %}">
 </head>
 <body>
-    <!-- Logo -->
-    <header>
-        <img  src="/static/images/logo_SM.jpg" alt="~~Logo VTC MESLE" class="logo">
-    </header>
-    <!-- Texte 1 -->
-    <p class="text-small">Vos trajets en toute séténité</p>
-
-    <!-- Texte 2 -->
-    <div class="container">
-    <p class="text-normal">Exploitant de Véhicule de transport avec chauffeur - Entreprise individuelle - SIRET : {{siret}}</p>
-    <p class="text-normal">Entreprise déclaré au RNE non assujetti à la TVA</p><br>
-    <p class="text-normal">{{adresse}}</p>
-    <p class="text-normal"><b>{{telephone}}</b> - <b>{{mail}}</b></p>
+<header class="header-block">
+    <!-- Colonne gauche : logo -->
+    <div class="header-left">
+        <img src="/static/images/logo_SM.jpg"
+             alt="Logo VTC MESLE"
+             class="logo">
+        <p class="text-small slogan">Vos trajets en toute sérénité</p>
     </div>
+
+    <!-- Colonne droite : texte -->
+    <div class="header-right">
+        <p class="text-normal">
+            Exploitant de Véhicule de transport avec chauffeur</p><br>
+        <p class="text-normal">Entreprise individuelle - SIRET : {{ siret }}</p><br>
+        <p class="text-normal">Entreprise déclarée au RNE - non assujettie à la TVA</p><br>
+        <p class="text-normal">{{ adresse }}</p><br>
+        <p class="text-normal"><b>{{ telephone }}</b> - <b>{{ mail }}</b></p>
+    </div>
+</header>
+
     <!-- Bandeau 1 -->
     <section class="bandeau">
         <h1>BON DE RÉSERVATION</h1>
@@ -78,7 +84,7 @@
     <section class="bandeau">
         <h2>PRESTATION</h2>
     </section>
-    <p class="text-normal"> <b>chauffeur:</b> {{driver}}</p>
+    <p class="text-normal"> <b>Chauffeur:</b> {{driver}}</p>
     <p class="text-normal"> <b>Véhicule:</b> {{vehicle}} </p>
     <p class="text-normal"> <b>Immatriculation véhicule :</b> {{vehicle_immatriculation}} </p> 
     <!-- Deux cadres côte à côte -->

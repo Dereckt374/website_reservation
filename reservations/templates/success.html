@@ -7,26 +7,35 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <div class="container">
+    <br>
       <nav>
       <a href="/admin/">Admin</a> |
       <a href="/welcome/">Page d'accueil</a> | 
-      <a href="/paiement/">Paiement</a> | 
       <a href="/">Reset</a>
     </nav>
-
+    </div>
+    <div class="box-highlight-ok">
     <div class="success-icon">✓</div>
 
     <h2>
         Commande validée,<br>
-        merci Monsieur {{ nom_client }}.
+        merci M. {{ client_name }}.
     </h2>
 
-    <a href="{% url 'download_pdf' client_ref=client_ref %}" class="btn btn-primary">
+    <p class="note_center">
+        Un email de confirmation a été envoyé à {{ email_client }}.<br>
+        Votre référence client est : <strong>{{ client_ref }}</strong><br><br>
+        Vous pouvez maintenant télécharger vos documents ci dessous :
+    </p>
+    <div class="action-buttons">
+    <a  class="btn-link" href="{% url 'download_pdf_reservation' client_ref=client_ref %}">
         Télécharger le bon de réservation
     </a>
-    <button class="btn-secondary">Générer une facture</button>
+
+    <a  class="btn-link" href="{% url 'facture_generation' client_ref=client_ref %}">Demander une facture</a>
     </div>
-
-
+    </div>
+    </div>
 </body>
 </html>

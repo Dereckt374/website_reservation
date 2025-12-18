@@ -5,7 +5,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 
 def default_date():
-    return (datetime.now() + timedelta(minutes=10)).replace(microsecond=0).isoformat()
+    return (datetime.now() + timedelta(minutes=10)).replace(microsecond=0, second=0).isoformat()
 
 class Trajet(models.Model):
     requested_at = models.DateTimeField("Heure de la Demande", default=default_date) #auto_now_add=True
@@ -14,7 +14,7 @@ class Trajet(models.Model):
     adresse_arrivee = models.TextField("Adresse d'arrivée", max_length=500,  default='Valence, France')
 
     date_aller = models.DateTimeField("Date et heure de prise en charge", default= default_date)
-    date_retour = models.DateTimeField("Date et heure de prise en charge retour", null=True, blank=True,help_text="Optionnel",
+    date_retour = models.DateTimeField("Date et heure de prise en charge retour", null=True, blank=True,help_text="Optionnel - Laisser vide pour un aller simple.",
 )
     type_trajet = models.TextField("Type de trajet", max_length=50, default='Aller Simple')
     # Contraintes numériques
@@ -56,13 +56,13 @@ class Trajet(models.Model):
     commentaire_client = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return f"{self.adresse_depart.replace(', France','')} → {self.adresse_arrivee.replace(', France','')} ({self.price_euros}€ - {self.type_trajet})"
+        return f"{self.adresse_depart.replace(', France','')} → {self.adresse_arrivee.replace(', France','')} ({self.distance_km}km - {self.price_euros}€ - {self.type_trajet})"
     
 class ContactClient(models.Model):
-    nom_client = models.CharField(max_length=100, default='Mickael')
-    prenom_client = models.CharField(max_length=100, default='Jackson')
+    nom_client = models.CharField("Nom", max_length=100, default='Mickael')
+    prenom_client = models.CharField("Prenom", max_length=100, default='Jackson')
 
-    telephone_client = models.CharField(
+    telephone_client = models.CharField("Telephone",
         max_length=10,
         validators=[
             RegexValidator(
@@ -73,17 +73,19 @@ class ContactClient(models.Model):
         default='0601020304'
     )
 
-    email_client = models.EmailField(
+    email_client = models.EmailField("Email",
+                                     max_length=254,
         validators=[EmailValidator(message="Format d'email invalide.")],
         default='virgil.mesle@gmail.com'
     )
 
-    passagers = models.TextField(
+    passagers = models.TextField("Information sur les passagers",
         help_text="Format : Nom numéro de téléphone, Nom numéro de téléphone, ...",
         default='Mme Durand - 0611122233, M. Martin - 064445556',
         blank=True, null=True
     )
 
+    client_adress = models.CharField("Adresse", max_length=500, default='', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

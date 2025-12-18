@@ -15,7 +15,6 @@
     <nav>
       <a href="/admin/">Admin</a> |
       <a href="/welcome/">Page d'accueil</a> | 
-      <a href="/paiement/">Paiement</a> | 
       <a href="/">Reset</a>
     </nav>
 
@@ -31,6 +30,8 @@
 {% if trajet %}
   <div class="trajet-container">
     <div id="apercu">
+      <div id="map"></div>
+      <br>
       <h3>Votre prestation</h3>
       <p>Trajet : {{ trajet.type_trajet }}</p>
       {% if form.info_message %}
@@ -43,7 +44,6 @@
       <p>Durée {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min_aller }} min</p>
       <p>Coût estimé : {{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
     </div>
-    <div id="map"></div>
   </div>
 {% endif %}
 

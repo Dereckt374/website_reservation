@@ -8,20 +8,21 @@
 </head>
 <body>
   <div class="container">
-  <h1>Confirmation de la commande</h1>
+  <h2>Echec de la commande</h2>
       <nav>
-      <a href="/admin/">Admin</a> |
       <a href="/welcome/">Page d'accueil</a> | 
-      <a href="/paiement/">Paiement</a> | 
-      <a href="/">Reset</a>
+      <a href="{% url 'paiement' client_ref=client_ref %}">Retour à la page de paiement</a> | 
+      <a href="/">Recommencer la réservation</a>
     </nav>
-    <h2>checkout ID</h2>
-  <p>{{ checkout_id }}</p><br>
-  <p>{{ checkout_status }}</p><br>
-  
+
+  <div class="box-highlight-nok">
+
   <div class="error-icon">x</div>
-  <p>Echec du paiement</p>
-</div>  
+  <h1>Echec du paiement</h1>
+  <p>Malheureusement, votre paiement n'a pas pu être traité.</p>
+  <p>Veuillez vérifier vos informations de paiement et réessayer.</p>
+</div> 
+</div> 
 
 </body>
 </html>

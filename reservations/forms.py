@@ -23,8 +23,8 @@ class TrajetForm(forms.ModelForm):
             "commentaire_client"
         ]
         widgets = {
-            'date_aller': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'date_retour': forms.DateTimeInput(attrs={'type': 'datetime-local'}),                    
+            'date_aller': forms.DateTimeInput(attrs={'type': 'datetime-local', 'step': 60, 'class': 'datetime-input',}, format='%Y-%m-%dT%H:%M'),
+            'date_retour': forms.DateTimeInput(attrs={'type': 'datetime-local', 'step': 60,'class': 'datetime-input',}, format='%Y-%m-%dT%H:%M'),                    
         }
     def add_info(self, msg):
         self.info_message = msg
@@ -137,4 +137,16 @@ class ContactClientForm(forms.ModelForm):
                 "rows": 2,
                 "placeholder": "Martin Dupont 06111111, Joseph Dubois 06222222"
             }),
+        }
+        
+class AdressClientForm(forms.ModelForm):
+
+    class Meta:
+        model = ContactClient
+        fields = [
+            "client_adress",
+        ]
+
+        widgets = {
+            "client_adress": forms.TextInput(attrs={"class": "form-control"}),
         }

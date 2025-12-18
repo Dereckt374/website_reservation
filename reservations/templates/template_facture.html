@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture {{ invoice.number }}</title>
+    <link rel="stylesheet" href="{% static 'css/style_facture.css' %}">
+</head>
+
+<body>
+<div class="header">
+    <div class="company">
+        <h2>{{ company.name }}</h2>
+        {{ company.address }}<br>
+        {{ company.country }}<br>
+        <br>
+        SIRET : {{ company.siret }}<br>
+        TVA : {{ company.vat_number }}<br>
+        Email : {{ company.email }}<br>
+        Téléphone : {{ company.phone }}
+    </div>
+
+    <div class="client">
+        <h2>Facturé à</h2>
+        {{ client.full_name }}<br>
+        {{ client.address }}<br>
+        {{ client.zip_code }} {{ client.city }}<br>
+        {{ client.country }}<br>
+        <br>
+        Téléphone : {{ client.phone }}<br>
+        Email : {{ client.email }}
+    </div>
+</div>
+
+<h1>Facture</h1>
+
+<div class="meta">
+    Numéro de facture : <strong>{{ invoice.number }}</strong><br>
+    Date d'émission : {{ invoice.issue_date }}<br>
+    Date de réservation : {{ reservation.date }}<br>
+    Référence réservation : {{ reservation.reference }}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Désignation</th>
+            <th>Date</th>
+            <th>Quantité</th>
+            <th>Prix unitaire HT (€)</th>
+            <th>Total HT (€)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in invoice.items %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.date }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unit_price_ht |floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="totals">
+    <tr class="total">
+        <td>Total TTC</td>
+        <td style="text-align:right;">{{ invoice.total_ttc |floatformat:2 }} €</td>
+    </tr>
+</table>
+
+<div style="clear:both;"></div>
+
+{% if payment %}
+<div class="meta">
+    Mode de paiement : {{ payment.method }}<br>
+    Statut : {{ payment.status }}<br>
+    Date de paiement : {{ payment.date }}<br>
+    Référence paiement : {{ payment.reference }}
+</div>
+{% endif %}
+
+Nous vous remercions de votre confiance.
+
+<div class="footer">
+    Facture émise par {{ company.name }} - Document généré électroniquement, valable sans signature.
+</div>
+
+</body>
+</html>

@@ -498,7 +498,7 @@ def partial_refund_sumup(transaction_id: str, original_amount: float, ratio: flo
     response = ''
 
     print(f"""
-    🟥 Fonction - PARTIAL REFUND
+    🟥 Fonction - PARTIAL REFUND (DISABLED)
         Remboursement partiel :
         Transaction ID : {transaction_id}
         Montant original : {original_amount} EUR
@@ -516,7 +516,7 @@ def partial_refund_sumup(transaction_id: str, original_amount: float, ratio: flo
     return response
 
 
-def refund_full_sumup(transaction_id: str):
+def full_refund_sumup(transaction_id: str):
     """Remboursement total."""
     url = f"{base_url_sumup}/v0.1/me/refund/{transaction_id}"
     headers = {"Authorization": f"Bearer {sumup_api_key}"}
@@ -524,7 +524,7 @@ def refund_full_sumup(transaction_id: str):
     # response = requests.post(url, headers=headers)
 
     print(f"""
-    🟥 Fonction - FULL REFUND
+    🟥 Fonction - FULL REFUND (DISABLED)
         Remboursement partiel :
         Transaction ID : {transaction_id}
         URL : {url}
