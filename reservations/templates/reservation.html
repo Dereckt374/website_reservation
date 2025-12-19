@@ -13,9 +13,9 @@
   <div class="container">
     <h1>Réservation de trajet</h1>
     <nav>
-      <a href="/admin/">Admin</a> |
+      <a href="/administrator-acess/">Admin</a> |
       <a href="/welcome/">Page d'accueil</a> | 
-      <a href="/">Reset</a>
+      <a href="/">Nouvelle Demande</a>
     </nav>
 
     <!-- Messages Django -->
@@ -32,17 +32,17 @@
     <div id="apercu">
       <div id="map"></div>
       <br>
-      <h3>Votre prestation</h3>
-      <p>Trajet : {{ trajet.type_trajet }}</p>
+      <h2>Votre prestation</h2>
+      <p><b>Trajet : </b>{{ trajet.type_trajet }}</p>
       {% if form.info_message %}
     <div class="alert alert-info">{{ form.info_message }}</div>
       {% endif %}
-      <p>Heure : {{ trajet.date_aller }}</p>
-      <p>Départ : {{ trajet.adresse_depart }}</p>
-      <p>Arrivée : {{ trajet.adresse_arrivee }}</p>
-      <p>Distance {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.distance_km }} km</p>
-      <p>Durée {% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min_aller }} min</p>
-      <p>Coût estimé : {{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
+      <p><b>Heure : </b>{{ trajet.date_aller }}</p>
+      <p><b>Départ : </b>{{ trajet.adresse_depart }}</p>
+      <p><b>Arrivée : </b>{{ trajet.adresse_arrivee }}</p>
+      <p><b>Distance </b>{% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.distance_km }} km</p>
+      <p><b>Durée </b>{% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min_aller }} min</p>
+      <p><b>Coût estimé : </b>{{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
     </div>
   </div>
 {% endif %}

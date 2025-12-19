@@ -13,9 +13,9 @@
         <h2>{{ company.name }}</h2>
         {{ company.address }}<br>
         {{ company.country }}<br>
-        <br>
         SIRET : {{ company.siret }}<br>
-        TVA : {{ company.vat_number }}<br>
+        {{ company.vat_number }}<br>
+        <br>
         Email : {{ company.email }}<br>
         Téléphone : {{ company.phone }}
     </div>
@@ -27,8 +27,8 @@
         {{ client.zip_code }} {{ client.city }}<br>
         {{ client.country }}<br>
         <br>
-        Téléphone : {{ client.phone }}<br>
         Email : {{ client.email }}
+        Téléphone : {{ client.phone }}<br>
     </div>
 </div>
 
@@ -36,9 +36,10 @@
 
 <div class="meta">
     Numéro de facture : <strong>{{ invoice.number }}</strong><br>
+    Référence réservation : {{ reservation.reference }}<br>
+    <br>
     Date d'émission : {{ invoice.issue_date }}<br>
     Date de réservation : {{ reservation.date }}<br>
-    Référence réservation : {{ reservation.reference }}
 </div>
 
 <table>
@@ -48,7 +49,6 @@
             <th>Date</th>
             <th>Quantité</th>
             <th>Prix unitaire HT (€)</th>
-            <th>Total HT (€)</th>
         </tr>
     </thead>
     <tbody>
@@ -77,10 +77,9 @@
     Mode de paiement : {{ payment.method }}<br>
     Statut : {{ payment.status }}<br>
     Date de paiement : {{ payment.date }}<br>
-    Référence paiement : {{ payment.reference }}
 </div>
 {% endif %}
-
+<br><br>
 Nous vous remercions de votre confiance.
 
 <div class="footer">

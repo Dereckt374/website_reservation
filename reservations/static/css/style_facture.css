@@ -15,22 +15,23 @@
         }
 
         .company {
-            width: 48%;
+            width: 62%;
             display: inline-block;
             vertical-align: top;
         }
 
         .client {
-            width: 48%;
+            width: 34%;
             display: inline-block;
             vertical-align: top;
             margin: 0 auto;      /* centre le bloc horizontalement */
-            text-align: left;    /* aligne le texte à gauche */
+            text-align: right;    /* aligne le texte à gauche */
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 32px;
             margin-bottom: 5px;
+            color: #757575; 
         }
 
         h2 {

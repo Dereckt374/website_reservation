@@ -20,10 +20,12 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary mt-3">Envoyer</button>
     <br>
+    <br>
     <p class="note"> En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement dans le cadre de ma réservation</p>
 </form>
 
 {% if success_message %}
+  <p>{{ success_message }}</p>
   <div>
       <a href="{% url 'download_pdf_facture' client_ref=client_ref %}" class="btn-link">
         Télécharger la facture au format PDF

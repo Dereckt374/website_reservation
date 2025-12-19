@@ -59,8 +59,9 @@ CONSTANCE_CONFIG = {
     "driver" : ("Stéphane", "Nom du chauffeur"),
     "vehicle" : ("Polestar 2 - Edition 2022, Véhicule Electrique, 5 places, coupé 4 portes", "Description du véhicule utilisé"),
     "vehicle_immatriculation" : ("XX-XXX-XX", "Imatriculation du véhicule"),
+    "contact_name": ("VTC MESLE Valence", "Nom de l'entreprise de réservation"),
     "contact_email": ("stephane@mesle-entreprises.fr",   "Email de contact pour les réservations"),
-    "contact_phone": ("+33 6 44 72 39 35", "Numéro de téléphone de contact pour les réservations"),
+    "contact_phone": ("0644723935", "Numéro de téléphone de contact pour les réservations"),
     "contact_address": ("38, rue Albert Varnet résidence Helios - 26000 VALENCE", "Adresse de contact pour les réservations"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
 }

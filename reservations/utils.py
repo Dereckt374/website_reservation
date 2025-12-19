@@ -465,6 +465,65 @@ def get_client_context(checkout_id):
         context["heure_arrivee_estimee_retour"] = time_arrivee_estimee_str
     return context
 
+def generate_invoice_number(client_ref):
+    current_year = datetime.now().year
+    invoice_number = f"{current_year}-FAC-{client_ref}"
+    return invoice_number
+
+def get_facture_context(client_ref):
+    current_trajet = Trajet.objects.get(checkout_reference=client_ref)
+    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
+    context_facture = {
+    "company": {
+        "name": config.contact_name,
+        "address": config.contact_address,
+        "country": "France",
+        "siret": config.contact_siret,
+        "vat_number": "TVA non applicable - Article 293B du code général des impôts",
+        "email": config.contact_email,
+        "phone": config.contact_phone,
+    },
+
+    "client": {
+        "full_name": client.nom_client + " " + client.prenom_client,
+        "address": client.client_adress,
+        "phone": client.telephone_client,
+        "email": client.email_client,
+    },
+
+    "reservation": {
+        "reference": current_trajet.checkout_reference,
+        "date": current_trajet.requested_at,
+        "departure": current_trajet.adresse_depart,
+        "arrival": current_trajet.adresse_arrivee,
+    },
+
+    "invoice": {
+        "number": generate_invoice_number(client_ref),
+        "issue_date": timezone.now(),
+        "items": [
+            {
+                "description": str(current_trajet),
+                "date": current_trajet.date_aller,
+                "quantity": 1,
+                "unit_price_ht": current_trajet.price_euros,
+            }
+        
+        ],
+        "total_ttc": current_trajet.price_euros,
+    },
+
+    "payment": {
+        "method": "Carte bancaire",
+        "status": current_trajet.checkout_status,
+        "date": "",
+        "reference": current_trajet.checkout_id,
+    }
+}
+    return context_facture
+            
+
+
 def get_transaction_id(checkout_id: str, sumpup_api_key: str) -> str | None:
     """
     Récupère un checkout SumUp via son id_checkout

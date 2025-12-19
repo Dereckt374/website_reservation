@@ -257,69 +257,20 @@ def partial_refund(request, client_ref):
 
 def facture_generation(request, client_ref):
     context = context_init.copy()
-    current_trajet = Trajet.objects.get(checkout_reference=client_ref)
-    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
     context['form'] = AdressClientForm()
     context['client_ref'] = client_ref
-    price = current_trajet.price_euros
 
     if request.method == "POST":
         form = AdressClientForm(request.POST)
-        if form.is_valid():    
+        if form.is_valid(): 
+            current_trajet = Trajet.objects.get(checkout_reference=client_ref)
+            client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
             adress = form.cleaned_data["client_adress"]
             client.client_adress = adress
             client.save()
             context['form'] = form
-            context['success_message'] = "Adresse enregistrée avec succès !"
-
-            context_facture = {
-            "company": {
-                "name": "VTC MESLE via son site de réservation",
-                "address": config.contact_address,
-                "country": "France",
-                "siret": config.contact_siret,
-                "vat_number": "TVA non applicable selon l'article 293B du code général des impôts",
-                "email": config.contact_email,
-                "phone": config.contact_phone,
-            },
-
-            "client": {
-                "full_name": client.nom_client + client.prenom_client,
-                "address": client.client_adress,
-                "phone": client.telephone_client,
-                "email": client.email_client,
-            },
-
-            "reservation": {
-                "reference": current_trajet.checkout_reference,
-                "date": current_trajet.requested_at,
-                "departure": current_trajet.adresse_depart,
-                "arrival": current_trajet.adresse_arrivee,
-            },
-
-            "invoice": {
-                "number": "XXX",
-                "issue_date": timezone.now(),
-                "items": [
-                    {
-                        "description": str(current_trajet),
-                        "date": current_trajet.date_aller,
-                        "quantity": 1,
-                        "unit_price_ht": price,
-                    }
-                
-                ],
-                "total_ttc": price,
-            },
-
-            "payment": {
-                "method": "Carte bancaire",
-                "status": "Payé",
-                "date": "2025-12-11",
-                "reference": current_trajet.checkout_id,
-            }
-        }
-            
+            context['success_message'] = "Adresse enregistrée avec succès, ci-joint la facture correspondante."
+            context_facture = get_facture_context(client_ref)
             make_pdf(f"facture_n{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
 
     return render(request, 'facture_generation.html', context)
