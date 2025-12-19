@@ -5,7 +5,7 @@
 }
 
 p {
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.5;
     color: #3c3c3c;
     margin: auto;
@@ -20,177 +20,17 @@ body {
     padding: 0;
 }
 
-/* ---- Titre principal ---- */
+/* ---- Titres ---- */
 h1 {
     text-align: center;
     color: #333333;
     margin-top: 30px;
 }
 
-/* ---- Liens navigation ---- */
-a {
-    color: #383838;
-    text-decoration: none;
-    font-weight: bold;
-    margin: 0 10px;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* ---- Messages Django ---- */
-.success {
-    color: green;
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
     text-align: center;
-    background: #e7f9ee;
-    border: 1px solid #bde5c8;
-    border-radius: 6px;
-    padding: 10px;
-    margin: 10px auto;
-    width: 50%;
-}
-
-.error {
-    color: red;
-    text-align: center;
-    background: #fdeaea;
-    border: 1px solid #f5b7b1;
-    border-radius: 6px;
-    padding: 10px;
-    margin: 10px auto;
-    width: 50%;
-}
-
-.note {
-    color: rgb(82, 82, 82);
-    text-align: left;
-    font-style: italic;
-    font-size: 14px;
-}
-
-.note_center{
-    color: rgb(82, 82, 82);
-    text-align: center;
-    font-style: italic;
-    font-size: 14px;
-
-}
-
-
-/* ---- Formulaire principal ---- */
-#trajetForm {
-    width: 50%;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* ---- Labels ---- */
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #444;
-}
-
-/* ---- Inputs ---- */
-input[type="text"],
-input[type="number"],
-input[type="time"],
-textarea,
-select {
-    width: 90%;
-    padding: 5px 16px;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #007BFF;
-    box-shadow: 0 0 5px rgba(0,123,255,0.5);
-    outline: none;
-}
-
-.datetime-input {
-    width: 90%;
-    padding: 5px 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-family: inherit;
-}
-
-/* ---- Textarea ---- */
-textarea {
-    height: 30px;
-    resize: none;
-    line-height: 1.2;
-}
-
-/* ---- Boutons ---- */
-button,
-input[type="submit"] {
-    margin-top: 10px;
-    background-color: #007BFF;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-
-}
-
-
-button:hover,
-input[type="submit"]:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
-}
-
-
-#apercu h3 {
-    text-align: center;
-    color: #222222;
-    margin-bottom: 10px;
-}
-
-/* ---- Tableaux (si utilisés) ---- */
-table {
-    margin: 20px auto;
-    border-collapse: collapse;
-}
-
-td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #ccc;
-}
-
-/* ---- Conteneur central ---- */
-.container {
-    width: 80%;
-    margin: 0 auto;
-    text-align: center;
-}
-
-/* ---- Pied de page ---- */
-footer {
-    text-align: center;
-    font-size: 13px;
-    color: #888;
-    margin-top: 40px;
-    padding: 10px;
 }
 
 /* ---- Page d'accueil ---- */
@@ -209,126 +49,123 @@ header nav a {
     font-weight: bold;
 }
 
-header nav a:hover {
+/* ---- Pied de page ---- */
+footer {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin-top: 40px;
+    padding: 10px;
+}
+
+/* ---- Liens ---- */
+a {
+    color: #383838;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+a:hover {
     text-decoration: underline;
 }
 
-.intro {
-    margin-bottom: 30px;
-}
-
-.vehicle {
-    margin-top: 40px;
-}
-
-.vehicle-gallery {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.vehicle-gallery img {
-    width: 500px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
-}
-
-.vehicle-gallery img:hover {
-    transform: scale(1.15);
-}
-
-.vehicle-description {
-    max-width: 700px;
-    margin: 0 auto;
+/* ---- Messages Django ---- */
+.success,
+.error {
     text-align: center;
-    font-size: 15px;
-    color: #444;
-    line-height: 1.6;
+    border-radius: 6px;
+    padding: 10px;
+    margin: 10px auto;
+    width: min(90%, 600px);
 }
 
-.cta {
+.success {
+    color: green;
+    background: #e7f9ee;
+    border: 1px solid #bde5c8;
+}
+
+.error {
+    color: red;
+    background: #fdeaea;
+    border: 1px solid #f5b7b1;
+}
+
+.note,
+.note_center {
+    color: rgb(82, 82, 82);
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
+.note_center {
     text-align: center;
-    margin: 50px 0;
 }
 
-.cta-button {
-    display: inline-block;
-    background-color: #9e9e9e;
-    color: white;
-    padding: 12px 25px;
+.success-icon {
+    font-size: 70px;
+    color: #34a853; /* vert succès */
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 70px;
+    color: #c32020; /* rouge echec */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* ---- Formulaire ---- */
+#trajetForm {
+    width: min(95%, 800px);
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 18px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* ---- Labels ---- */
+label {
+    display: block;
     font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.2s;
+    margin-bottom: 5px;
+    color: #444;
 }
 
-.cta-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+/* ---- Champs ---- */
+input[type="text"],
+input[type="number"],
+input[type="time"],
+textarea,
+select,
+.datetime-input,
+.form-control {
+    width: 90%;
+    padding: 8px 16px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    line-height: 1.4;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    height: 42px;              /* même hauteur qu’un input */
+    min-height: 42px;
+    max-height: 42px;
+    resize: none;
+    overflow: hidden;          /* pas de scrollbar */
+    white-space: nowrap;       /* force une seule ligne */
+    text-overflow: ellipsis;
 }
 
-
-.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space:nowrap; }
-.hidden { display: none; }
-.field-row { margin: .5rem 0; }
-
-.trajet-container {
-  justify-content: space-between;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-/* Bloc texte */
-#apercu {
-  text-align: center;
-  padding: 35px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  min-width: 300px; /* pour éviter qu’il s’écrase */
-}
-
-/* Carte */
-#map {
-  margin: auto;
-  height: 450px;
-  width: 100%; /* 👈 important pour le rendu Google Maps */
-  border-radius: 75px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  overflow: hidden;
-}
-
-/* État replié */
-#formCollapse.collapsed {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-}
-
-/* État déplié */
-#formCollapse {
-  opacity: 1;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-}
-
-.errorlist {
-    color: #df0000;           /* rouge sérieux */
-    background-color: #ffecec;
-    font-weight: 600;
-    margin: 5px 0;
-    padding: 0;
-    list-style: none;
-}
-
-.errorlist li {
-    margin-left: 0;
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    outline: none;
 }
 
 .helptext {
@@ -349,134 +186,220 @@ header nav a:hover {
     width : 70%;
 }
 
-.box-highlight-ok {
-    background-color: #ffffff;
-    margin:  40px auto;
-    border: 2px solid #2e7d32;   /* vert soutenu */
-    border-radius: 12px;
-    padding: 28px 16px;
-    box-shadow: 0 2px 6px #a1cba3;
-    box-sizing: border-box;
-    width: 50%;
-}
-
-.box-highlight-nok {
-    background-color: #ffffff;
-    margin:  40px auto;
-    border: 2px solid #a32626;   /* vert soutenu */
-    border-radius: 12px;
-    padding: 28px 16px;
-    box-shadow: 0 2px 6px #c69e9e;
-    box-sizing: border-box;
-    width: 50%;
-}
-
-.success-icon {
-    font-size: 70px;
-    color: #34a853; /* vert succès */
-    text-align: center;
-}
-
-
-.error-icon {
-    font-size: 70px;
-    color: #c32020; /* rouge echec */
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-h2 {
-    font-size: 24px;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-
-.actions {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    text-align: center;
-}
-
-button {
-    padding: 12px 20px;
-    border-radius: 6px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn-primary {
-    background-color: #0077ff;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #005fcc;
-}
-
-.btn-secondary {
-    background-color: #e5e5e5;
-    color: #333;
-}
-
-.btn-secondary:hover {
-    background-color: #d0d0d0;
-}
-
-.form-control {
-    width: 90%;
-    padding: 5px 16px;
-
-    border: 1px solid #b4babf;
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-family: inherit;
-    line-height: 1.4;
-    transition: border-color 0.3s, box-shadow 0.3s;
-
-}
-
-.action-buttons {
-    display: flex;
-    gap: 12px;              /* espace entre les boutons */
-    margin-top: 10px;
-    margin: auto;
-    width: 70%;
-}
-
+/* ---- Boutons ---- */
+button,
+input[type="submit"],
 .btn-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
+    margin-top: 10px;
+    margin-bottom: 10px;
     background-color: #007BFF;
     color: white;
-
     padding: 12px 20px;
+    border: none;
     border-radius: 6px;
-
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: bold;
-
-    text-decoration: none;
     cursor: pointer;
-
     transition: background-color 0.3s, transform 0.1s;
 }
 
+button:hover,
+input[type="submit"]:hover,
 .btn-link:hover {
     background-color: #0056b3;
+    transform: scale(1.02);
 }
 
+button:active,
 .btn-link:active {
     transform: scale(0.97);
 }
-.action-buttons .btn-link {
-    flex: 1;          /* boutons de même largeur */
+
+/* ---- Conteneurs ---- */
+.container {
+    width: min(95%, 1000px);
+    margin: 0 auto;
     text-align: center;
+}
+
+.trajet-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* ---- Aperçu ---- */
+#apercu {
+    text-align: center;
+    padding: 35px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* ---- Carte ---- */
+#map {
+    margin: auto;
+    height: 450px;
+    width: 100%;
+    border-radius: 25px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+
+/* État replié */
+#formCollapse.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+/* État déplié */
+#formCollapse {
+  opacity: 1;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+
+.errorlist {
+    color: #df0000;           /* rouge sérieux */
+    background-color: #ffecec;
+    font-weight: 600;
+    margin: 5px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.errorlist li {
+    margin-left: 0;
+}
+
+/* ---- Galerie ---- */
+.vehicle-gallery {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.vehicle-gallery img {
+    width: min(100%, 500px);
+    height: auto;
+    aspect-ratio: 5 / 2;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+
+.vehicle-gallery img:hover {
+    transform: scale(1.05);
+}
+
+/* ---- CTA ---- */
+.cta {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #9e9e9e;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* ---- Actions ---- */
+.actions,
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: min(100%, 700px);
+    margin: auto;
+}
+
+.action-buttons .btn-link {
+    flex: 1;
+    text-align: center;
+    margin: auto;
+}
+
+/* ---- Boîtes état ---- */
+.box-highlight-ok,
+.box-highlight-nok {
+    background-color: #ffffff;
+    margin: 40px auto;
+    border-radius: 12px;
+    padding: 28px 16px;
+    width: min(95%, 800px);
+}
+
+.box-highlight-ok {
+    border: 2px solid #2e7d32;
+    box-shadow: 0 2px 6px #a1cba3;
+}
+
+.box-highlight-nok {
+    border: 2px solid #a32626;
+    box-shadow: 0 2px 6px #c69e9e;
+}
+
+/* ---- Accessibilité ---- */
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+.hidden { display: none; }
+
+/* ---- Responsive mobile ---- */
+@media (max-width: 768px) {
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+
+    #map { height: 300px; }
+
+    .trajet-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    footer {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    button,
+    .btn-link {
+        font-size: 0.875rem;
+        padding: 10px 14px;
+    }
+
+    #apercu {
+        padding: 20px;
+    }
 }
