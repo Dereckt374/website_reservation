@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 
 # Charger les variables d'environnement depuis un fichier .env si présent
-load_dotenv()
+load_dotenv(dotenv_path = '.venv/.env_prod')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,10 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment or fallback to the existing (development) key
-SECRET_KEY = 'django-insecure-h@8(7f_7h8vvrg!t*s5zfdx0d_0h6u+4&o!fk7df=8tuk4gc7r' #os.getenv("django_secret_key")
+print(os.getenv("django_secret_key"))
+SECRET_KEY = os.getenv("django_secret_key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False")
 
 # Hosts allowed (read from env, comma-separated)
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("django_allowed_hosts", "").split(",") if h.strip()]
