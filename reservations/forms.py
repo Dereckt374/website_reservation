@@ -3,11 +3,10 @@ from django.utils import timezone
 from .models import Trajet, ContactClient
 from datetime import timedelta
 from .utils import *
-from constance import config
+# from constance import config
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
 
-adresse_base = config.contact_address
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 
@@ -86,13 +85,13 @@ class TrajetForm(forms.ModelForm):
                                "❌ La durée du trajet aller est trop longue (plus de 4h).")
 
         # if cleaned_data.get("adresse_depart") : 
-        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_depart"],adresse_base,now)
+        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_depart"],config.contact_address,now)
         #     if distance_km > 500:
         #         self.add_error("adresse_depart",
         #                        "❌ L'adresse de départ est trop éloigné.")
                 
         # if cleaned_data.get("adresse_arrivee") : 
-        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_arrivee"],adresse_base,now)
+        #     duree_min,distance_km,_ =  evaluer_trajet(cleaned_data["adresse_arrivee"],config.contact_address,now)
         #     if distance_km > 500:
         #         self.add_error("adresse_arrivee",
         #                        "❌ L'adresse d'arrivée est trop éloigné.")

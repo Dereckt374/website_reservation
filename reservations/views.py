@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.template.loader import render_to_string, get_template
 from django.urls import reverse
-from constance import config
+# from constance import config
 import json
 from time import sleep
 import os
@@ -33,22 +33,15 @@ id_agenda_reservations = os.getenv("id_agenda_reservations")
 
 context_init = {
         "api_key" : googlemaps_api_key,
-        "vehicle" : config.vehicle,
-        "vehicle_immatriculation" : config.vehicle_immatriculation,
-        "name" : config.driver,
-        "messages" : [
-        # request.POST,   # Données du formulaire
-        # request.user,   # Utilisateur connecté
-        # request.body,   # Corps brut JSON si fetch()
-        # request.path,
-        # TrajetForm(request.POST).get_context,
-        ],
         "current_year" : current_year,
     }
 
 # Create your views here.
 def index(request):
     context = context_init.copy()
+    context['name'] = config.driver
+    context['vehicle_immatriculation'] = config.vehicle_immatriculation
+    context['vehicle'] = config.vehicle
     if request.method == "POST":
         form = TrajetForm(request.POST)
  
