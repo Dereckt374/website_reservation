@@ -1,15 +1,12 @@
 from datetime import datetime, timedelta
 import pytz
-import zoneinfo
 import uuid
-import json
 import os
 import requests
 import googlemaps
 from .models import Trajet, ContactClient
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.templatetags.static import static
 from django.conf import settings
 from constance import config
 from sumup import Sumup

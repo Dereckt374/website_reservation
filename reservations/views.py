@@ -5,11 +5,8 @@ from .forms import TrajetForm, ContactClientForm, AdressClientForm
 from .models import Trajet, ContactClient
 from .utils import *
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
-from django.utils.dateparse import parse_datetime
-from django.template.loader import render_to_string, get_template
 from django.urls import reverse
 # from constance import config
 import json
@@ -17,8 +14,6 @@ from time import sleep
 import os
 import requests
 import googlemaps
-from sumup import Sumup
-from sumup.checkouts import CreateCheckoutBody
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
 
