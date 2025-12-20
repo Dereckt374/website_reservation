@@ -414,12 +414,12 @@ def get_client_context(checkout_id):
     current_trajet = Trajet.objects.get(checkout_id=checkout_id)  # ou .filter
     client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
 
-    asked_date_str = current_trajet.requested_at.strftime("%d/%m/%Y à %H:%M:%S")
-    date_aller_str = current_trajet.date_aller.strftime("%d/%m/%Y")
-    time_aller_str = current_trajet.date_aller.strftime("%H:%M")
+    asked_date_str = timezone.localtime(current_trajet.requested_at).strftime("%d/%m/%Y à %H:%M")
+    date_aller_str = timezone.localtime(current_trajet.date_aller).strftime("%d/%m/%Y")
+    time_aller_str = timezone.localtime(current_trajet.date_aller).strftime("%H:%M")
     datetime_arrivee_estimee_dt = current_trajet.date_aller + timedelta(minutes=current_trajet.duree_min_aller)
-    date_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%d/%m/%Y")
-    time_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%H:%M")
+    date_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%d/%m/%Y")
+    time_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%H:%M")
     duree_human_readable = humaniser_duree(current_trajet.duree_min_aller)
     commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
 
@@ -454,11 +454,11 @@ def get_client_context(checkout_id):
         "aller_retour" : current_trajet.type_trajet,
     }
     if current_trajet.date_retour != None:
-        date_retour_str = current_trajet.date_retour.strftime("%d/%m/%Y")
-        time_retour_str = current_trajet.date_retour.strftime("%H:%M")
+        date_retour_str = timezone.localtime(current_trajet.date_retour).strftime("%d/%m/%Y")
+        time_retour_str = timezone.localtime(current_trajet.date_retour).strftime("%H:%M")
         datetime_arrivee_estimee_dt = current_trajet.date_retour + timedelta(minutes=current_trajet.duree_min_retour)
-        date_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%d/%m/%Y")
-        time_arrivee_estimee_str = datetime_arrivee_estimee_dt.strftime("%H:%M")
+        date_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%d/%m/%Y")
+        time_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%H:%M")
         context["date_retour"] = date_retour_str
         context["heure_retour"] = time_retour_str
         context["date_arrivee_estimee_retour"] = date_arrivee_estimee_str
