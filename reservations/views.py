@@ -8,7 +8,6 @@ from django.conf import settings
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-# from constance import config
 import json
 from time import sleep
 import os
@@ -30,8 +29,6 @@ context_init = {
         "api_key" : googlemaps_api_key,
         "current_year" : current_year,
     }
-
-# Create your views here.
 def index(request):
     context = context_init.copy()
     context['name'] = config.driver
@@ -40,7 +37,6 @@ def index(request):
     if request.method == "POST":
         form = TrajetForm(request.POST)
  
-        ## CAS PREVISUALISATION 
         if "btnConfirmer" not in request.POST and form.is_valid():
             trajet = form.save(commit=False) 
 
@@ -163,7 +159,7 @@ def sumup_webhook(request):
     d_ = ["Reservation confirmée, voici les détails:"]
     d_.append("\n".join(f"{k} : {v}" for k, v in context_client.items()))
 
-    # create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_aller, end_dt=datetime_arrivee_estimee_dt, description='\n'.join(d_), location=paiement.adresse_depart )
+    create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_aller, end_dt=datetime_arrivee_estimee_dt, description='\n'.join(d_), location=paiement.adresse_depart )
 
     ics_attachment = [{
         "filename": "reservation_aller.ics",
@@ -178,7 +174,7 @@ def sumup_webhook(request):
         "mimetype": "text/calendar",
         "content": creer_ics(paiement.date_retour, date_retour_fin, f"Trajet VTC direction {paiement.adresse_depart}") 
         })
-        # create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_retour, end_dt=date_retour_fin, description='\n'.join(d_), location=paiement.adresse_arrivee )
+        create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_retour, end_dt=date_retour_fin, description='\n'.join(d_), location=paiement.adresse_arrivee )
 
     ctx = {
         "partial_refund_link": request.build_absolute_uri(
@@ -194,25 +190,25 @@ def sumup_webhook(request):
             full_refund_link : {ctx['full_refund_link']}
             """)
 
-    # send_email_template(
-    #     emails=[context_client["email_client"]],
-    #     subject="[VTC Meslé] Reservation confirmée",
-    #     template_name="template_mail_client.html",
-    #     context=context_client | ctx,
-    #     attachments=ics_attachment
-    # )
+    send_email_template(
+        emails=[context_client["email_client"]],
+        subject="[VTC Meslé] Reservation confirmée",
+        template_name="template_mail_client.html",
+        context=context_client | ctx,
+        attachments=ics_attachment
+    )
 
 
-    # send_email_template(
-        # emails=[config.contact_email],
-        # subject="[VTC] Reservation confirmée",
-        # template_name="template_mail_owner.html",
-        # context={"checkout_id": checkout_id,
-        #             "status" : status,
-        #             "request" : request,
-        #             "data" : data
-        #             }
-        # )
+    send_email_template(
+        emails=[config.contact_email],
+        subject="[VTC] Reservation confirmée",
+        template_name="template_mail_owner.html",
+        context={"checkout_id": checkout_id,
+                    "status" : status,
+                    "request" : request,
+                    "data" : data
+                    }
+        )
     
     make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
     

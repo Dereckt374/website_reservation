@@ -13,9 +13,9 @@
   <div class="container">
     <h1>Réservation de trajet</h1>
     <nav>
-      <a href="/administrator-acess/">Admin</a> |
-      <a href="/welcome/">Page d'accueil</a> | 
-      <a href="/">Nouvelle Demande</a>
+      <a href="{% url 'admin-access' %}">Admin</a> |
+      <a href="{% url 'welcome' %}">Page d'accueil</a> | 
+      <a href="{% url 'reservation' %}">Nouvelle Demande</a>
     </nav>
 
     <!-- Messages Django -->

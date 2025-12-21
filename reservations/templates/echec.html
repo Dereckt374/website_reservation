@@ -10,9 +10,9 @@
   <div class="container">
   <h2>Echec de la commande</h2>
       <nav>
-      <a href="/welcome/">Page d'accueil</a> | 
+      <a href="{% url 'welcome' %}">Page d'accueil</a> | 
       <a href="{% url 'paiement' client_ref=client_ref %}">Retour à la page de paiement</a> | 
-      <a href="/">Recommencer la réservation</a>
+      <a href="{% url 'reservation' %}">Recommencer la réservation</a>
     </nav>
 
   <div class="box-highlight-nok">
