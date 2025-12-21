@@ -17,7 +17,8 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
 
 site_domain = os.getenv("site_domain")
-googlemaps_api_key = os.getenv("google_api_key")
+googlemaps_api_key = os.getenv("GOOGLE_MAPS_BACKEND_KEY")
+googlemaps_api_key_frontend = os.getenv("GOOGLE_MAPS_FRONTEND_KEY")
 sumup_api_key = os.getenv("sumup_api_key")
 merchant_code_official = os.getenv("merchant_code_official")
 gmaps = googlemaps.Client(key=googlemaps_api_key)
@@ -27,6 +28,7 @@ id_agenda_reservations = os.getenv("id_agenda_reservations")
 
 context_init = {
         "api_key" : googlemaps_api_key,
+        "googlemaps_api_key_frontend": googlemaps_api_key_frontend,
         "current_year" : current_year,
     }
 def index(request):
