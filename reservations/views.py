@@ -273,3 +273,94 @@ def download_pdf_facture(request, client_ref):
 def temp_trigger_webhook(request, client_ref):
     checkout_id = fct_test()
     return redirect('paiement_resultat', client_ref=client_ref)
+
+
+def welcome2(request):
+    context = {
+    'company': {
+        'name': 'Elite VTC Services',
+        'tagline': 'Premium Chauffeur Services for Discerning Travelers',
+        'description': 'Experience luxury transportation with professional drivers, premium vehicles, and unparalleled service quality.'
+    },
+    
+    'contact': {
+        'phone': '+33 1 23 45 67 89',
+        'email': 'contact@elitevtc.com',
+        'address': '123 Avenue des Champs-Élysées, Paris, France'
+    },
+    
+    'highlights': [
+        {
+            'id': 1,
+            'title': 'Professional Drivers',
+            'description': 'Experienced, licensed chauffeurs with impeccable service standards and local expertise.',
+            'icon': 'user-check'
+        },
+        {
+            'id': 2,
+            'title': 'Punctuality Guaranteed',
+            'description': 'We value your time. On-time pickups and efficient routes to ensure timely arrivals.',
+            'icon': 'clock'
+        },
+        {
+            'id': 3,
+            'title': 'Luxury Fleet',
+            'description': 'Premium vehicles including Mercedes S-Class, BMW 7 Series, and luxury SUVs.',
+            'icon': 'car'
+        },
+        {
+            'id': 4,
+            'title': '24/7 Availability',
+            'description': 'Round-the-clock service for airport transfers, business trips, and special events.',
+            'icon': 'phone-call'
+        },
+        {
+            'id': 5,
+            'title': 'Comfort & Safety',
+            'description': 'Impeccably maintained vehicles with premium amenities and comprehensive insurance.',
+            'icon': 'shield-check'
+        },
+        {
+            'id': 6,
+            'title': 'Discretion Assured',
+            'description': 'Professional and confidential service tailored to your privacy requirements.',
+            'icon': 'lock'
+        }
+    ],
+    
+    'vehicles': [
+        {
+            'id': 1,
+            'name': 'Mercedes-Benz S-Class',
+            'category': 'Luxury Sedan',
+            'passengers': 'Up to 3 passengers',
+            'luggage': '2 large suitcases',
+            'image': 'https://images.unsplash.com/photo-1764089859662-7b4773dff85b',
+            'features': ['Leather seats', 'Climate control', 'WiFi', 'Bottled water']
+        },
+        {
+            'id': 2,
+            'name': 'BMW 7 Series',
+            'category': 'Executive Sedan',
+            'passengers': 'Up to 3 passengers',
+            'luggage': '2 large suitcases',
+            'image': 'https://images.unsplash.com/photo-1764090317825-9b76e437c8d8',
+            'features': ['Premium sound', 'Massage seats', 'Privacy glass', 'Phone chargers']
+        }
+    ],
+    
+    'services': [
+        'Airport Transfers',
+        'Business Transportation',
+        'Special Events',
+        'City Tours',
+        'Long Distance Travel',
+        'Corporate Accounts'
+    ],
+    
+    'reservation_url': 'https://reservation.elitevtc.com/book',
+    
+    'driver_image': 'https://images.unsplash.com/photo-1607642857266-88f5f03e66c6'
+    }
+
+    return render(request, 'vtc_landing.html', context)

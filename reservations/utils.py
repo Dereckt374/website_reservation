@@ -80,6 +80,7 @@ def get_merchant_code(sumup_api_key : str) -> str:
     merchant = client.merchant.get()
     merchant_code = merchant.merchant_profile.merchant_code
     return merchant_code
+
 def create_checkout(sumup_api_key : str, merchant_code : str, price : float, description: str = "") -> str:
     client = Sumup(api_key=sumup_api_key)
     client_reference = str(uuid.uuid4()).split('-')[0]
