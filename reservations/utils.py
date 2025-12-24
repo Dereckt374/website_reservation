@@ -85,7 +85,6 @@ def get_merchant_code(sumup_api_key : str) -> str:
 def create_checkout(sumup_api_key : str, merchant_code : str, price : float, description: str = "") -> str:
     client = Sumup(api_key=sumup_api_key)
     client_reference = ''.join(random.sample(string.ascii_uppercase * 6, 6))
-
     try:
         checkout = client.checkouts.create(
             body=CreateCheckoutBody(
@@ -114,6 +113,8 @@ def create_checkout(sumup_api_key : str, merchant_code : str, price : float, des
 
 
     return checkout
+
+
 def old_create_checkout(api_key_application : str, merchant_code : str, price : float, description: str = "") -> str: 
 
     headers = {
