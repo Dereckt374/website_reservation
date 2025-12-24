@@ -94,7 +94,7 @@ def create_checkout(sumup_api_key : str, merchant_code : str, price : float, des
                 merchant_code=merchant_code,
                 description=description,
                 redirect_url=f"https://{site_domain}/{client_reference}/paiement/resultat/",
-                return_url=f"https://{site_domain}/webhook/"
+                return_url=f"https://{site_domain}/webhook-zRRjhnl549/"
             )
         )
     except Exception as e:
