@@ -11,7 +11,8 @@ from django.conf import settings
 from constance import config
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
-import uuid
+import random, string
+# import uuid
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -83,18 +84,26 @@ def get_merchant_code(sumup_api_key : str) -> str:
 
 def create_checkout(sumup_api_key : str, merchant_code : str, price : float, description: str = "") -> str:
     client = Sumup(api_key=sumup_api_key)
-    client_reference = str(uuid.uuid4()).split('-')[0]
-    checkout = client.checkouts.create(
-        body=CreateCheckoutBody(
-            amount=price,
-            currency="EUR",
-            checkout_reference=client_reference,
-            merchant_code=merchant_code,
-            description=description,
-            redirect_url=f"{site_domain}/{client_reference}/paiement/resultat/",
-            return_url=f"{site_domain}/webhook/"
+    client_reference = ''.join(random.sample(string.ascii_uppercase * 6, 6))
+    try:
+        checkout = client.checkouts.create(
+            body=CreateCheckoutBody(
+                amount=price,
+                currency="EUR",
+                checkout_reference=client_reference,
+                merchant_code=merchant_code,
+                description=description,
+                redirect_url=f"https://{site_domain}/{client_reference}/paiement/resultat/",
+                return_url=f"https://{site_domain}/webhook-zRRjhnl549/"
+            )
         )
-    )
+    except Exception as e:
+        print(e)
+        if hasattr(e, "response"):
+            print(e.response)
+            print(e.response.text)
+        raise
+    
 
     print(f"""
         🟠 Fonction - CREATE CHECKOUT
@@ -104,6 +113,8 @@ def create_checkout(sumup_api_key : str, merchant_code : str, price : float, des
 
 
     return checkout
+
+
 def old_create_checkout(api_key_application : str, merchant_code : str, price : float, description: str = "") -> str: 
 
     headers = {
@@ -522,12 +533,12 @@ def get_facture_context(client_ref):
             
 
 
-def get_transaction_id(checkout_id: str, sumpup_api_key: str) -> str | None:
+def get_transaction_id(checkout_id: str, sumup_api_key: str) -> str | None:
     """
     Récupère un checkout SumUp via son id_checkout
     et renvoie le transaction_id associé.
     """
-    client = Sumup(api_key=sumpup_api_key)
+    client = Sumup(api_key=sumup_api_key)
     # Récupération du checkout
     checkout = client.checkout.get(checkout_id)
 
