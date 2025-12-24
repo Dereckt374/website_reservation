@@ -8,6 +8,7 @@ from .models import Trajet, ContactClient
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.templatetags.static import static  # utile pour générer l'URL statique côté Python
 from constance import config
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
@@ -478,6 +479,85 @@ def generate_invoice_number(client_ref):
     current_year = datetime.now().year
     invoice_number = f"{current_year}-FAC-{client_ref}"
     return invoice_number
+
+def get_welcome_context():
+    context = {
+    'front_image': static('images/fond3_2.jpg'),
+    'company': {
+        'name': config.contact_name,
+        'tagline': 'Services de chauffeur haut de gamme',
+        'description': "Profitez de votre transport en toute tranquilité, avec un véhicule haut de gamme et une qualité de service inégalée."
+    },
+    
+    'contact': {
+        'phone': config.contact_phone,
+        'email': config.contact_email,
+        'address': config.contact_address
+    },
+    
+    'highlights': [
+        {
+            'id': 1,
+            'title': 'Professional Drivers',
+            'description': 'Experienced, licensed chauffeurs with impeccable service standards and local expertise.',
+            'icon': 'user-check'
+        },
+        {
+            'id': 2,
+            'title': 'Punctuality Guaranteed',
+            'description': 'We value your time. On-time pickups and efficient routes to ensure timely arrivals.',
+            'icon': 'clock'
+        },
+        {
+            'id': 3,
+            'title': 'Luxury Fleet',
+            'description': 'Premium vehicles including Mercedes S-Class, BMW 7 Series, and luxury SUVs.',
+            'icon': 'car'
+        },
+        {
+            'id': 4,
+            'title': '24/7 Availability',
+            'description': 'Round-the-clock service for airport transfers, business trips, and special events.',
+            'icon': 'phone-call'
+        },
+        {
+            'id': 5,
+            'title': 'Comfort & Safety',
+            'description': 'Impeccably maintained vehicles with premium amenities and comprehensive insurance.',
+            'icon': 'shield-check'
+        },
+        {
+            'id': 6,
+            'title': 'Discretion Assured',
+            'description': 'Professional and confidential service tailored to your privacy requirements.',
+            'icon': 'lock'
+        }
+    ],
+    
+    'vehicles': [
+        {
+            'id': 1,
+            'name': config.vehicle,
+            'category': 'Berline de luxe électrique',
+            'passengers': '4 passengers',
+            'luggage': '4 bagages cabine',
+            'image': static('images/fond6_2.jpeg'),
+            'features': ['Leather seats', 'Climate control', 'WiFi', 'Bottled water']
+        },
+    ],
+    
+    'services': [
+        'Airport Transfers',
+        'Business Transportation',
+        'Special Events',
+        'City Tours',
+        'Long Distance Travel',
+        'Corporate Accounts'
+    ],
+
+    'driver_image': 'https://images.unsplash.com/photo-1607642857266-88f5f03e66c6'
+    }
+    return context
 
 def get_facture_context(client_ref):
     current_trajet = Trajet.objects.get(checkout_reference=client_ref)

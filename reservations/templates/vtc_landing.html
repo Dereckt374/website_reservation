@@ -21,7 +21,7 @@
                         <a href="#services" class="nav-link">Services</a>
                         <a href="#fleet" class="nav-link">Notre Flotte</a>
                         <a href="#contact" class="nav-link">Contact</a>
-                        <a href="{{ reservation_url }}" target="_blank" class="reserve-btn-header">Réserver Maintenant</a>
+                        <a href="{% url 'reservation' %}" target="_blank" class="reserve-btn-header">Réserver Maintenant</a>
                     </nav>
                 </div>
             </div>
@@ -30,7 +30,7 @@
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="hero-overlay"></div>
-            <div class="hero-image" style="background-image: url('{{ vehicles.0.image }}');"></div>
+            <div class="hero-image" style="background-image: url('{{ front_image }}');"></div>
             <div class="container hero-container">
                 <div class="hero-content">
                     <h2 class="hero-title">{{ company.name }}</h2>
@@ -105,8 +105,8 @@
         <section id="fleet" class="fleet-section">
             <div class="container">
                 <div class="section-header">
-                    <h2 class="section-title">Notre Flotte Premium</h2>
-                    <p class="section-subtitle">Des véhicules de luxe pour chaque occasion</p>
+                    <h2 class="section-title">Un véhicule Premium</h2>
+                    <p class="section-subtitle">Berline de luxe electrique</p>
                 </div>
                 <div class="fleet-grid">
                     {% for vehicle in vehicles %}
