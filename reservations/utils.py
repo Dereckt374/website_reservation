@@ -483,6 +483,7 @@ def generate_invoice_number(client_ref):
 def get_welcome_context():
     context = {
     'front_image': static('images/fond3_2.jpg'),
+    'logo_image': static('images/logo_SM_transp.png'),
     'company': {
         'name': config.contact_name,
         'tagline': 'Services de chauffeur haut de gamme',

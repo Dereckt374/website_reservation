@@ -82,12 +82,12 @@ body {
   left: 0;
   width: 0;
   height: 2px;
-  background: #1e40af;
+  background: #009fe3;
   transition: width 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #1e40af;
+  color: #009fe3;
 }
 
 .nav-link:hover::after {
@@ -95,7 +95,7 @@ body {
 }
 
 .reserve-btn-header {
-  background: #1e40af;
+  background: #009fe3;
   color: white;
   padding: 0.625rem 1.5rem;
   font-family: 'Inter', sans-serif;
@@ -108,7 +108,7 @@ body {
 }
 
 .reserve-btn-header:hover {
-  background: #1e3a8a;
+  background: #006c9b;
   transform: translateY(-1px);
 }
 
@@ -187,7 +187,7 @@ body {
 }
 
 .hero-cta {
-  background: #1e40af;
+  background: #009fe3;
   color: white;
   padding: 1rem 2.5rem;
   font-family: 'Inter', sans-serif;
@@ -203,7 +203,7 @@ body {
 }
 
 .hero-cta:hover {
-  background: #1e3a8a;
+  background: #006c9b;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(30, 64, 175, 0.4);
 }
@@ -268,7 +268,7 @@ body {
 .highlight-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-  border-color: #1e40af;
+  border-color: #009fe3;
 }
 
 .highlight-icon {
@@ -279,13 +279,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1e40af;
+  color: #009fe3;
   margin-bottom: 1.5rem;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .highlight-card:hover .highlight-icon {
-  background: #1e40af;
+  background: #009fe3;
   color: white;
   transform: scale(1.05);
 }
@@ -362,7 +362,7 @@ body {
 .vehicle-category {
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
-  color: #1e40af;
+  color: #009fe3;
   font-weight: 500;
   margin-bottom: 1.5rem;
 }
@@ -400,7 +400,7 @@ body {
 }
 
 .feature-item svg {
-  color: #1e40af;
+  color: #009fe3;
   flex-shrink: 0;
 }
 
@@ -474,7 +474,7 @@ body {
 }
 
 .quality-item svg {
-  color: #1e40af;
+  color: #009fe3;
   flex-shrink: 0;
 }
 
@@ -526,7 +526,7 @@ body {
 .contact-icon {
   width: 56px;
   height: 56px;
-  background: #1e40af;
+  background: #009fe3;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -537,7 +537,7 @@ body {
 }
 
 .contact-item:hover .contact-icon {
-  background: #1e3a8a;
+  background: #006c9b;
   transform: scale(1.05);
 }
 
@@ -561,7 +561,7 @@ body {
 }
 
 a.contact-value:hover {
-  color: #1e40af;
+  color: #009fe3;
 }
 
 /* CTA Box */
@@ -596,7 +596,7 @@ a.contact-value:hover {
 }
 
 .cta-button {
-  background: #1e40af;
+  background: #0089c4;
   color: white;
   padding: 1rem 2.5rem;
   font-family: 'Inter', sans-serif;
@@ -611,7 +611,7 @@ a.contact-value:hover {
 }
 
 .cta-button:hover {
-  background: #1e3a8a;
+  background: #006c9b;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(30, 64, 175, 0.4);
 }
@@ -736,4 +736,43 @@ a.contact-value:hover {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
+}
+
+
+/* Bloc logo + titre */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Image logo */
+.company-logo-img {
+    height: 96px;        /* desktop */
+    width: auto;
+    object-fit: contain;
+}
+
+/* Titre */
+.company-logo {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .brand {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .company-logo-img {
+        height: 36px;
+    }
+
+    .company-logo {
+        font-size: 1.4rem;
+    }
 }

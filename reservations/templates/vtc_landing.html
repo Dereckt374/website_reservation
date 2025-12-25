@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ company.name }} - {{ company.tagline }}</title>
+    <title>{{ company.name }}</title>
     <link rel="stylesheet" href="{% static 'css/vtc_landing.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,12 +16,17 @@
         <header class="header">
             <div class="container">
                 <div class="header-content">
-                    <h1 class="company-logo">{{ company.name }}</h1>
+                    <div class="brand">
+                        <img src=" {{ logo_image }}" 
+                        alt="Logo {{ company.name }}" 
+                        class="company-logo-img">
+                        <h1 class="company-logo">{{ company.name }}</h1>
+                    </div>
                     <nav class="nav-links">
                         <a href="#services" class="nav-link">Services</a>
                         <a href="#fleet" class="nav-link">Notre Flotte</a>
                         <a href="#contact" class="nav-link">Contact</a>
-                        <a href="{% url 'reservation' %}" target="_blank" class="reserve-btn-header">Réserver Maintenant</a>
+                        <a href="{% url 'reservation' %}" class="reserve-btn-header">Réserver Maintenant</a>
                     </nav>
                 </div>
             </div>
@@ -36,7 +41,7 @@
                     <h2 class="hero-title">{{ company.name }}</h2>
                     <p class="hero-tagline">{{ company.tagline }}</p>
                     <p class="hero-description">{{ company.description }}</p>
-                    <a href="{{ reservation_url }}" target="_blank" class="hero-cta">
+                    <a href="{% url 'reservation' %}" class="hero-cta">
                         Réserver Votre Course
                         <svg class="ml-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
