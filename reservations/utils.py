@@ -67,14 +67,14 @@ def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_dep
     price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min/60) ,1)    
 
     print(f"""
-        🔴 Fonction - EVALUER TRAJET 
-        DATE ALLER : {date_aller}
-        DEPART : {depart}
-        ARRIVEE : {arrivee}
-        DUREE : {duree_min} MIN
-        DISTANCE : {distance_km} KM
-        FACTEUR TEMPS : {time_multiplier}
-        PRIX : {price} €
+🔴 Fonction - EVALUER TRAJET 
+    DATE ALLER : {date_aller}
+    DEPART : {depart}
+    ARRIVEE : {arrivee}
+    DUREE : {duree_min} MIN
+    DISTANCE : {distance_km} KM
+    FACTEUR TEMPS : {time_multiplier}
+    PRIX : {price} €
             """)
     
     return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
@@ -108,9 +108,9 @@ def create_checkout(sumup_api_key : str, merchant_code : str, price : float, des
     
 
     print(f"""
-        🟠 Fonction - CREATE CHECKOUT
-        Checkout ID: {checkout.id}
-        Checkout Reference: {checkout.checkout_reference}
+🟠 Fonction - CREATE CHECKOUT
+    Checkout ID: {checkout.id}
+    Checkout Reference: {checkout.checkout_reference}
           """)
 
 
@@ -154,7 +154,7 @@ def send(emails, subject, content):
         service.sendmail(os.getenv("email_appli"), email, msg.as_string())
 
     print(f"""
-    🟢 Fonction - SEND MAIL
+🟢 Fonction - SEND MAIL
     To : {emails}
     Subject : {subject}
     ✅ Mail sent
@@ -191,7 +191,7 @@ def send_attachments(emails, subject, content, attachments=None):
         service.sendmail(os.getenv("email_appli"), email, msg.as_string())
 
     print(f"""
-    🟢 Fonction - SEND MAIL ICS
+🟢 Fonction - SEND MAIL ICS
     To : {emails}
     Subject : {subject}
     Attachments : {len(attachments) if attachments else 0}
@@ -242,12 +242,12 @@ def send_email_template(emails, subject, template_name, context=None, attachment
                 
         service.sendmail(os.getenv("email_appli"), email, msg.as_string())
         print(f"""
-        🟢 Fonction - SEND MAIL HTML TEMPLATED
-        To : {emails}
-        Subject : {subject}
-        Template : {template_name}
-        Attachments : {len(attachments) if attachments else 0}
-        ✅ Mail sent
+🟢 Fonction - SEND MAIL HTML TEMPLATED
+    To : {emails}
+    Subject : {subject}
+    Template : {template_name}
+    Attachments : {len(attachments) if attachments else 0}
+    ✅ Mail sent
         """)
     service.quit()
 def get_services(json_creds_file=json_service_account_file,impersonated_user=None):
@@ -368,10 +368,10 @@ def is_slot_available(calendar_id : str,
     items = events.get("items", [])
 
     print(f"""
-    ⚪ Fonction - CHECK AVAILABILITIES
-        date event : {start_dt.isoformat().split('+')[0]},
-        duration event (min) : {duration_min},
-        boolean test (True if available) : {len(items) == 0} 
+⚪ Fonction - CHECK AVAILABILITIES
+    date event : {start_dt.isoformat().split('+')[0]},
+    duration event (min) : {duration_min},
+    boolean test (True if available) : {len(items) == 0} 
     """)
     return len(items) == 0  # zéro signifie libre, car pas d'evenement présents : "créneau disponible"
 def create_event(calendar_id, start_dt, end_dt, summary="Reservation", description="", location=""):
@@ -390,13 +390,13 @@ def create_event(calendar_id, start_dt, end_dt, summary="Reservation", descripti
     ).execute()
     
     print(f"""
-    🟣 Fonction - CREATE EVENT
-        summary": {summary},
-        description": {description},
-        location": {location}, 
-        start: {start_dt.isoformat()},
-        date end: {end_dt.isoformat()},
-        ✅ Envent created
+🟣 Fonction - CREATE EVENT
+    summary": {summary},
+    description": {description},
+    location": {location}, 
+    start: {start_dt.isoformat()},
+    date end: {end_dt.isoformat()},
+    ✅ Envent created
     """)
     return event.get("id")
 def humaniser_duree(duree_min: int) -> str:
@@ -429,11 +429,11 @@ def make_pdf(pdf_name, template_html, context, path_output, css=None):
     )
     output_path = os.path.join(path_output,pdf_name)
     print(f"""
-    🟦 Fonction - MAKE PDF
-        PDF généré : {pdf_name},
-        Template utilisé : {template_html},
-        Chemin de sortie : {output_path}
-        ✅ Rapport généré
+🟦 Fonction - MAKE PDF
+    PDF généré : {pdf_name},
+    Template utilisé : {template_html},
+    Chemin de sortie : {output_path}
+    ✅ Rapport généré
     """)
     return output_path
 
@@ -665,15 +665,15 @@ def partial_refund_sumup(transaction_id: str, original_amount: float, ratio: flo
     response = ''
 
     print(f"""
-    🟥 Fonction - PARTIAL REFUND (DISABLED)
-        Remboursement partiel :
-        Transaction ID : {transaction_id}
-        Montant original : {original_amount} EUR
-        Ratio de remboursement : {ratio*100:.2f}%
-        Montant remboursé : {refund_amount} EUR
-        URL : {url}
-        HTTP response : {response.status_code}
-        ✅ Refund processed
+🟥 Fonction - PARTIAL REFUND
+    Remboursement partiel :
+    Transaction ID : {transaction_id}
+    Montant original : {original_amount} EUR
+    Ratio de remboursement : {ratio*100:.2f}%
+    Montant remboursé : {refund_amount} EUR
+    URL : {url}
+    HTTP response : {response.status_code}
+    🚫 Refund not processed (DISABLED)
     """)
 
     # if response.status_code == 204:
@@ -692,12 +692,12 @@ def full_refund_sumup(transaction_id: str):
     # response = requests.post(url, headers=headers)
 
     print(f"""
-    🟥 Fonction - FULL REFUND (DISABLED)
-        Remboursement partiel :
-        Transaction ID : {transaction_id}
-        URL : {url}
-        HTTP response : {response.status_code}
-        ✅ Refund processed
+🟥 Fonction - FULL REFUND
+    Remboursement partiel :
+    Transaction ID : {transaction_id}
+    URL : {url}
+    HTTP response : {response.status_code}
+    🚫 Refund not processed (DISABLED)
     """)
 
     # if response.status_code == 204:
@@ -774,11 +774,11 @@ def upload_file_to_drive(
 
 
         print(f"""
-        🟫 Fonction - UPLOAD FILE IN G DRIVE
-        File ID: {uploaded["id"]}
-        Local path : {local_path}
-        Drive targeted folder : {drive_folder_name}
-        ✅ File uploaded
+🟫 Fonction - UPLOAD FILE IN G DRIVE
+    File ID: {uploaded["id"]}
+    Local path : {local_path}
+    Drive targeted folder : {drive_folder_name}
+    ✅ File uploaded
             """)
 
         return uploaded["id"]

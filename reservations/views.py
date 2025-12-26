@@ -180,14 +180,9 @@ def sumup_webhook(request):
         create_event(id_agenda_reservations,summary=f"VTC Reservation", start_dt=paiement.date_retour, end_dt=date_retour_fin, description='\n'.join(d_), location=paiement.adresse_arrivee )
 
     ctx = {
-        "partial_refund_link": request.build_absolute_uri(
-        reverse("partial_refund", args=[paiement.checkout_reference, checkout_id])
-    ),
-        "full_refund_link": request.build_absolute_uri(
-        reverse("full_refund", args=[paiement.checkout_reference, checkout_id])
-    ),
+        "partial_refund_link": "https://{site_domain}" + reverse("partial_refund", args=[paiement.checkout_reference, checkout_id]),
+        "full_refund_link": "https://{site_domain}" + reverse("full_refund", args=[paiement.checkout_reference, checkout_id]),
     }
-
     print(f"""
             partial_refund_link : {ctx['partial_refund_link']}
             full_refund_link : {ctx['full_refund_link']}
