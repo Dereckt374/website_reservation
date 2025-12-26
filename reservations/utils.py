@@ -21,6 +21,7 @@ from email.mime.multipart import MIMEMultipart
 from email import encoders
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from weasyprint import HTML, CSS
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
@@ -156,6 +157,7 @@ def send(emails, subject, content):
     🟢 Fonction - SEND MAIL
     To : {emails}
     Subject : {subject}
+    ✅ Mail sent
     """)
     service.quit()
 def send_attachments(emails, subject, content, attachments=None):
@@ -193,6 +195,7 @@ def send_attachments(emails, subject, content, attachments=None):
     To : {emails}
     Subject : {subject}
     Attachments : {len(attachments) if attachments else 0}
+    ✅ Mail sent
     """)
     service.quit()
 def send_email_template(emails, subject, template_name, context=None, attachments=None):
@@ -244,14 +247,26 @@ def send_email_template(emails, subject, template_name, context=None, attachment
         Subject : {subject}
         Template : {template_name}
         Attachments : {len(attachments) if attachments else 0}
+        ✅ Mail sent
         """)
     service.quit()
-def get_service(json_creds_file=json_service_account_file):
-    SCOPES = ["https://www.googleapis.com/auth/calendar"]
+def get_services(json_creds_file=json_service_account_file,impersonated_user=None):
+    services = {}
+    SCOPES = [
+        "https://www.googleapis.com/auth/calendar",
+        "https://www.googleapis.com/auth/drive.file"
+        ]
     creds = service_account.Credentials.from_service_account_file(
         json_creds_file, scopes=SCOPES
     )
-    return build("calendar", "v3", credentials=creds)
+    if impersonated_user:
+        creds_drive = creds.with_subject(impersonated_user)
+        services['drive'] = build("drive", "v3", credentials=creds_drive)
+
+    services['calendar'] = build("calendar", "v3", credentials=creds)
+
+    return services
+
 def creer_ics(start_dt, end_dt, titre="Reservation"):
     """
     Génère une chaîne .ics pour un événement unique.
@@ -297,7 +312,7 @@ def get_events_current_week(calendar_id):
     en utilisant un service account Google Calendar.
     """
 
-    service = get_service()
+    service = get_services()['calendar']
     week_start,week_end, time_min, time_max = get_week_date_range()
 
     events_result = service.events().list(
@@ -340,7 +355,7 @@ def is_slot_available(calendar_id : str,
     """
     end_dt = start_dt + timedelta(minutes=duration_min)
 
-    service = get_service()
+    service = get_services()['calendar']
 
     events = service.events().list(
         calendarId=calendar_id,
@@ -360,7 +375,7 @@ def is_slot_available(calendar_id : str,
     """)
     return len(items) == 0  # zéro signifie libre, car pas d'evenement présents : "créneau disponible"
 def create_event(calendar_id, start_dt, end_dt, summary="Reservation", description="", location=""):
-    service = get_service()
+    service = get_services()['calendar']
 
     event_body = {
         "summary": summary,
@@ -381,6 +396,7 @@ def create_event(calendar_id, start_dt, end_dt, summary="Reservation", descripti
         location": {location}, 
         start: {start_dt.isoformat()},
         date end: {end_dt.isoformat()},
+        ✅ Envent created
     """)
     return event.get("id")
 def humaniser_duree(duree_min: int) -> str:
@@ -411,13 +427,15 @@ def make_pdf(pdf_name, template_html, context, path_output, css=None):
     base_url=settings.STATIC_ROOT,
     stylesheets=[CSS(css)] if css else None
     )
+    output_path = os.path.join(path_output,pdf_name)
     print(f"""
     🟦 Fonction - MAKE PDF
         PDF généré : {pdf_name},
         Template utilisé : {template_html},
-        Chemin de sortie : {os.path.join(path_output,pdf_name)}
-    ✅ Rapport généré
+        Chemin de sortie : {output_path}
+        ✅ Rapport généré
     """)
+    return output_path
 
 
 def get_client_context(checkout_id):
@@ -655,6 +673,7 @@ def partial_refund_sumup(transaction_id: str, original_amount: float, ratio: flo
         Montant remboursé : {refund_amount} EUR
         URL : {url}
         HTTP response : {response.status_code}
+        ✅ Refund processed
     """)
 
     # if response.status_code == 204:
@@ -678,6 +697,7 @@ def full_refund_sumup(transaction_id: str):
         Transaction ID : {transaction_id}
         URL : {url}
         HTTP response : {response.status_code}
+        ✅ Refund processed
     """)
 
     # if response.status_code == 204:
@@ -686,3 +706,86 @@ def full_refund_sumup(transaction_id: str):
     #     print(f"Echec du remboursement : {response.text}")
     
     return response
+
+from googleapiclient.http import MediaFileUpload
+import os
+
+
+def upload_file_to_drive(
+    local_path: str,
+    drive_folder_name: str,
+    inpersonated_user: str,
+) -> str:
+    """
+    Upload un fichier dans le Drive de l'utilisateur impersonné,
+    dans le dossier spécifié (créé s'il n'existe pas).
+
+    :param local_path: chemin local du fichier
+    :param drive_folder_name: nom du dossier Drive cible
+    :return: file_id Google Drive
+    """
+
+    if not os.path.isfile(local_path):
+        raise FileNotFoundError(local_path)
+
+    drive = get_services(impersonated_user=inpersonated_user)["drive"]
+
+    try:
+        # 1️⃣ Recherche du dossier DANS LE DRIVE UTILISATEUR
+        query = (
+            f"name='{drive_folder_name}' and "
+            "mimeType='application/vnd.google-apps.folder' and "
+            "trashed=false"
+        )
+
+        res = drive.files().list(
+            q=query,
+            spaces="drive",
+            fields="files(id, name)",
+        ).execute()
+
+        if res.get("files"):
+            folder_id = res["files"][0]["id"]
+        else:
+            # 2️⃣ Création du dossier dans le Drive utilisateur
+            folder = drive.files().create(
+                body={
+                    "name": drive_folder_name,
+                    "mimeType": "application/vnd.google-apps.folder",
+                },
+                fields="id",
+            ).execute()
+            folder_id = folder["id"]
+
+        # 3️⃣ Upload du fichier
+        media = MediaFileUpload(
+            local_path,
+            resumable=True,
+        )
+
+        uploaded = drive.files().create(
+            body={
+                "name": os.path.basename(local_path),
+                "parents": [folder_id],
+            },
+            media_body=media,
+            fields="id",
+        ).execute()
+
+
+        print(f"""
+        🟫 Fonction - UPLOAD FILE IN G DRIVE
+        File ID: {uploaded["id"]}
+        Local path : {local_path}
+        Drive targeted folder : {drive_folder_name}
+        ✅ File uploaded
+            """)
+
+        return uploaded["id"]
+
+    except HttpError as e:
+        # Diagnostic clair en logs
+        raise RuntimeError(
+            f"Google Drive upload failed ({e.resp.status}): {e.error_details}"
+        ) from e
+

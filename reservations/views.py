@@ -99,7 +99,7 @@ def paiement(request, client_ref):
 def fct_test():
     # Simulation d'un webhook SUM UP pour les tests en local
     with open(r".venv/temp_txt", "r") as f: checkout_id = f.read().strip()
-    url = f"{site_domain}/webhook/"
+    url = "http://127.0.0.1:8000" + reverse("webhook")
     payload = {
         "id": checkout_id,
         "status": "PAID" #"FAILED"
@@ -213,14 +213,10 @@ def sumup_webhook(request):
                     }
         )
     
-    make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
-    
+    output_path = make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
+    upload_file_to_drive(output_path, "BonsDeCommande", inpersonated_user=config.contact_email)
+
     return HttpResponse("OK", status=200)
-
-def welcome(request):
-    context = context_init.copy()
-
-    return render(request, 'welcome.html', context)
 
 def download_pdf_reservation(request, client_ref):
     pdf_path = os.path.join(settings.MEDIA_ROOT, "reservations/output/bons_de_reservations", f"bon_de_reservation_{client_ref}.pdf")
@@ -258,8 +254,8 @@ def facture_generation(request, client_ref):
             context['form'] = form
             context['success_message'] = "Adresse enregistrée avec succès, ci-joint la facture correspondante."
             context_facture = get_facture_context(client_ref)
-            make_pdf(f"facture_n{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
-
+            output_path = make_pdf(f"facture_{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
+            upload_file_to_drive(output_path, "Factures",  inpersonated_user=config.contact_email)
     return render(request, 'facture_generation.html', context)
 
 
