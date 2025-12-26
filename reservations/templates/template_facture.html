@@ -9,26 +9,33 @@
 
 <body>
 <div class="header">
-    <div class="company">
-        <h2>{{ company.name }}</h2>
-        {{ company.address }}<br>
-        {{ company.country }}<br>
-        SIRET : {{ company.siret }}<br>
-        {{ company.vat_number }}<br>
-        <br>
-        Email : {{ company.email }}<br>
-        Téléphone : {{ company.phone }}
+     <div class="company-block">
+
+        <!-- Logo -->
+        <div class="company-logo">
+            <img src="file://{{ logo_image }}"
+                 alt="Logo {{ company.name }}">
+        </div>
+        <!-- Infos société -->
+        <div class="company">
+            <h2>{{ company.name }}</h2>
+            {{ company.address }}, {{ company.country }}<br>
+            SIRET : {{ company.siret }}<br>
+            {{ company.vat_number }}<br>
+            <br>
+            Email : {{ company.email }}<br>
+            Téléphone : {{ company.phone }}
+        </div>
+
     </div>
 
     <div class="client">
         <h2>Facturé à</h2>
         {{ client.full_name }}<br>
         {{ client.address }}<br>
-        {{ client.zip_code }} {{ client.city }}<br>
-        {{ client.country }}<br>
         <br>
-        Email : {{ client.email }}
-        Téléphone : {{ client.phone }}<br>
+        Email : {{ client.email }}<br>
+        Téléphone : {{ client.phone }}
     </div>
 </div>
 

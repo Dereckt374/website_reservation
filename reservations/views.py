@@ -255,7 +255,7 @@ def facture_generation(request, client_ref):
 
 
 def download_pdf_facture(request, client_ref):
-    pdf_path = os.path.join(settings.MEDIA_ROOT, "reservations/output/factures", f"facture_n{client_ref}.pdf")
+    pdf_path = os.path.join(settings.MEDIA_ROOT, "reservations/output/factures", f"facture_{client_ref}.pdf")
 
     if not os.path.exists(pdf_path):
         raise Http404("PDF non trouvé")

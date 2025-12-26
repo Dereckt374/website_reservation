@@ -35,6 +35,12 @@ current_year = datetime.now().year
 json_service_account_file = os.getenv("json_service_account_file")
 base_url_sumup = "https://api.sumup.com"
 
+logo_path = os.path.join(
+    settings.STATIC_ROOT,
+    "images/logo_SM_transp.png"
+)
+
+
 def get_tarif_multiplier(hour):
     """Renvoie le multiplicateur horaire selon la période (jour/soir/nuit)."""
 
@@ -452,6 +458,7 @@ def get_client_context(checkout_id):
     commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
 
     context = {
+        'logo_image': logo_path,
         "reference_dossier" : current_trajet.checkout_reference, 
         "asked_date":asked_date_str,
         "mode_reservation": "Internet",
@@ -582,6 +589,7 @@ def get_facture_context(client_ref):
     current_trajet = Trajet.objects.get(checkout_reference=client_ref)
     client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
     context_facture = {
+    'logo_image': logo_path,
     "company": {
         "name": config.contact_name,
         "address": config.contact_address,

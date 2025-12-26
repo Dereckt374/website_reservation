@@ -1,13 +1,12 @@
+
 body {
     font-family: Arial, sans-serif;
     font-size: 12px;
     color: #222;
-    margin: 10px 10px 40px 15px;
+    margin: 40px;
 }
 
-/* Header / Footer */
-.header,
-.footer {
+.header, .footer {
     width: 100%;
 }
 
@@ -15,65 +14,39 @@ body {
     margin-bottom: 30px;
 }
 
-/* Bloc société + logo */
-.company-block {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-}
-
-/* Logo */
-.company-logo img {
-    max-width: 180px;
-    max-height: 150px;
-    object-fit: contain;
-}
-.company-logo {
-    margin: 0;
-    padding: 0;
-}
-.company-block {
-    align-items: flex-start;
-}
-
-
-/* Infos société */
 .company {
-    font-size: 12px;
-    line-height: 1.5;
-    max-width: 420px;
+    width: 62%;
+    display: inline-block;
+    vertical-align: top;
 }
 
-.company h2 {
-    margin-top: 0;
-    font-size: 15px;
+.client {
+    width: 34%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 auto;      /* centre le bloc horizontalement */
+    text-align: right;    /* aligne le texte à gauche */
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 5px;
+    color: #757575; 
+}
+
+h2 {
+    font-size: 14px;
     margin-bottom: 5px;
     text-transform: uppercase;
 }
 
-/* Client */
-.client {
-    font-size: 12px;
-    line-height: 1.5;
-    text-align: right;
-}
-
-/* Titres */
-h1 {
-    font-size: 28px;
-    margin-bottom: 5px;
-    color: #757575;
-}
-
-/* Tables */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-table th,
-table td {
+table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
 }
@@ -83,11 +56,10 @@ table th {
     text-align: left;
 }
 
-/* Totaux */
 .totals {
     margin-top: 20px;
     width: 40%;
-    margin-left: auto;
+    float: right;
 }
 
 .totals td {
@@ -100,22 +72,46 @@ table th {
     border-top: 2px solid #000;
 }
 
-/* Meta */
 .meta {
     margin-top: 10px;
     font-size: 11px;
 }
 
-/* Footer */
 .footer {
     position: fixed;
-    bottom: 20px;
+    bottom: 30px;
     font-size: 10px;
     text-align: center;
     color: #777;
 }
 
-/* Responsive (écran uniquement) */
+.company-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.company-logo img {
+    max-width: 120px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.company-logo img {
+    max-width: 120px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.company {
+    font-size: 14px;
+    line-height: 1.5;
+}
+.client {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 @media (max-width: 600px) {
     .company-block {
         flex-direction: column;
@@ -126,9 +122,11 @@ table th {
         max-width: 100px;
         margin-bottom: 10px;
     }
+}
 
-    .client {
-        text-align: left;
-        margin-top: 20px;
-    }
+.company h2 {
+    margin-top: 0;
+}
+.company {
+    max-width: 420px;
 }
