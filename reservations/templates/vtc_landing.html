@@ -10,6 +10,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+<!-- SCRIPT A RETIRER POUR REACTIVER LES LIENS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("click", function (event) {
+
+        const anchor = event.target.closest("a");
+
+        if (anchor) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("Navigation désactivée :", anchor.href);
+        }
+
+    }, true); // capture phase
+
+});
+</script>
 <body>
     <div class="landing-page">
         <!-- Header -->
