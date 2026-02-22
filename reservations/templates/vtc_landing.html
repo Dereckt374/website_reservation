@@ -59,6 +59,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     <h2 class="hero-title">{{ company.name }}</h2>
                     <p class="hero-tagline">{{ company.tagline }}</p>
                     <p class="hero-description">{{ company.description }}</p>
+                    <div id="maintenance-overlay"> 
+                        <div class="maintenance-box"> <!-- A ENLEVER QUAND PROD  -->
+                            🚧 SITE EN MAINTENANCE 🚧<br>
+                            Bientôt opérationnel !<br>
+                            Site en cours de construction,<br>
+                            merci pour votre patience. <br>
+                        </div>
+                    </div>
                     <a href="{% url 'reservation' %}" class="hero-cta">
                         Réserver Votre Course
                         <svg class="ml-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
