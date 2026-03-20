@@ -208,8 +208,8 @@ def sumup_webhook(request):
                     }
         )
     
-    output_path = make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
-    upload_file_to_drive(output_path, "BonsDeCommande", inpersonated_user=config.contact_email)
+    # output_path = make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
+    # upload_file_to_drive(output_path, "BonsDeCommande", inpersonated_user=config.contact_email)
 
     return HttpResponse("OK", status=200)
 
@@ -249,8 +249,8 @@ def facture_generation(request, client_ref):
             context['form'] = form
             context['success_message'] = "Adresse enregistrée avec succès, ci-joint la facture correspondante."
             context_facture = get_facture_context(client_ref)
-            output_path = make_pdf(f"facture_{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
-            upload_file_to_drive(output_path, "Factures",  inpersonated_user=config.contact_email)
+            # output_path = make_pdf(f"facture_{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
+            # upload_file_to_drive(output_path, "Factures",  inpersonated_user=config.contact_email)
     return render(request, 'facture_generation.html', context)
 
 
@@ -268,6 +268,9 @@ def temp_trigger_webhook(request, client_ref):
 
 
 def welcome2(request):
-    context = get_welcome_context()
-
-    return render(request, 'vtc_landing.html', context)
+    context = {
+        "image1" : static('images/fond1.jpg'),
+        "image2" : static('images/fond2.jpg'),
+        "image3" : static('images/fond3_2.jpg'),
+    }
+    return render(request, 'landing_page_2.html', context)

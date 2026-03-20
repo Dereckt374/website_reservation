@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>MESLÉ VTC</title>
+<link rel="stylesheet" href="{% static 'css/vtc_landing_2.css' %}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">MESLÉ VTC</div>
+    <a href="#" class="btn">Réserver</a>
+</header>
+
+<p class="subtitle">
+    Privatisez un véhicule avec chauffeur pour des trajets en toute sérénité
+</p>
+
+<!-- SLIDER -->
+<section class="slider">
+    <div class="slides" id="slides">
+
+        <div class="slide">
+            <img src="{{ image1 }}">
+            <div class="slide-text">Accueil avec un sourire</div>
+        </div>
+
+        <div class="slide">
+            <img src="{{ image2 }}">
+            <div class="slide-text">Service premium</div>
+        </div>
+
+        <div class="slide">
+            <img src="{{ image2 }}">
+            <div class="slide-text">Ponctualité garantie</div>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="phone">📞 06 44 72 39 35 <span>en direct</span></div>
+    <div class="socials">
+        <span>Suivez notre actualité</span>
+        <div class="icons">
+            <a href="#">W</a>
+            <a href="#">F</a>
+            <a href="#">I</a>
+            <a href="#">G+</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+let index = 0;
+const slides = document.getElementById("slides");
+const total = document.querySelectorAll(".slide").length;
+
+setInterval(() => {
+    index = (index + 1) % total;
+    slides.style.transform = `translateX(-${index * 100}%)`;
+}, 5000);
+</script>
+
+</body>
+</html>
