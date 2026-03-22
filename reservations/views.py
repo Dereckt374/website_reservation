@@ -272,8 +272,9 @@ def welcome2(request):
     img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
 
     image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
+    image_path_list = [static(os.path.join(images_bank_path, image)) for image in image_list]
 
     context = {
-        "image_list" : [static(os.path.join(images_bank_path, image)) for image in image_list],
+        "image_dict" : dict(zip([''.join(name.split('.')[:-1]) for name in image_list], image_path_list)),
     }
     return render(request, 'landing_page_2.html', context)

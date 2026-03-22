@@ -22,10 +22,10 @@
 <section class="slider">
     <div class="slides" id="slides">
 
-    {% for img in image_list %}
+    {% for text, path in image_dict.items %}
         <div class="slide">
-            <img src="{{ img }}">
-            <div class="slide-text">Texte dynamique</div>
+            <img src="{{ path }}">
+            <div class="slide-text">{{ text }} </div>
         </div>
     {% endfor %}
 
@@ -34,14 +34,18 @@
 
 <!-- FOOTER -->
 <footer class="footer">
-    <div class="phone">📞 06 44 72 39 35 <span>en direct</span></div>
+    
+    <div class="num">
+    <img class=icon src="{% static 'images/icons/appel-telephonique.png' %}" alt="appel telephonique">
+    <div class="phone">06 44 72 39 35 <span>en direct</span></div>
+    </div>
+    
+    
     <div class="socials">
         <span>Suivez notre actualité</span>
+
         <div class="icons">
-            <a href="#">W</a>
-            <a href="#">F</a>
-            <a href="#">I</a>
-            <a href="#">G+</a>
+            <a href="#"><img src="{% static 'images/icons/facebook.png' %}" class=icon alt="facebook"></a>
         </div>
     </div>
 </footer>
