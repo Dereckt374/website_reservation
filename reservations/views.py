@@ -268,9 +268,12 @@ def temp_trigger_webhook(request, client_ref):
 
 
 def welcome2(request):
+    images_bank_path = "images/landing_page"
+    img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
+
+    image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
+
     context = {
-        "image1" : static('images/fond1.jpg'),
-        "image2" : static('images/fond2.jpg'),
-        "image3" : static('images/fond3_2.jpg'),
+        "image_list" : [static(os.path.join(images_bank_path, image)) for image in image_list],
     }
     return render(request, 'landing_page_2.html', context)

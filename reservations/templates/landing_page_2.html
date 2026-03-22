@@ -10,7 +10,7 @@
 <body>
 
 <header class="topbar">
-    <div class="logo">MESLÉ VTC</div>
+    <div class="logo">MESL[é] VTC</div>
     <a href="#" class="btn">Réserver</a>
 </header>
 
@@ -22,20 +22,12 @@
 <section class="slider">
     <div class="slides" id="slides">
 
+    {% for img in image_list %}
         <div class="slide">
-            <img src="{{ image1 }}">
-            <div class="slide-text">Accueil avec un sourire</div>
+            <img src="{{ img }}">
+            <div class="slide-text">Texte dynamique</div>
         </div>
-
-        <div class="slide">
-            <img src="{{ image2 }}">
-            <div class="slide-text">Service premium</div>
-        </div>
-
-        <div class="slide">
-            <img src="{{ image2 }}">
-            <div class="slide-text">Ponctualité garantie</div>
-        </div>
+    {% endfor %}
 
     </div>
 </section>
