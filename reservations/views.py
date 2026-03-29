@@ -32,6 +32,41 @@ context_init = {
         "googlemaps_api_key_frontend": googlemaps_api_key_frontend,
         "current_year" : current_year,
     }
+
+def contact(request):
+    """Page de contact générale accessible depuis la landing page"""
+    context = context_init.copy()
+    context['entreprise_name'] = config.driver
+    context['entreprise_sirte'] = config.sirte if hasattr(config, 'sirte') else "Non disponible"
+    context['type_vehicule'] = config.vehicle
+    context['telephone'] = config.phone if hasattr(config, 'phone') else "06 44 72 39 35"
+    context['horaires_reservation'] = config.horaires if hasattr(config, 'horaires') else "Sur demande"
+    
+    if request.method == "POST":
+        form = ContactClientForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Merci pour votre message ! Nous vous recontacterons rapidement.")
+            return redirect('landing_page')
+    else:
+        form = ContactClientForm()
+    
+    context['form'] = form
+    return render(request, "contact.html", context=context)
+
+def landing_page(request):
+    """Page d'accueil landing page avec slider"""
+    images_bank_path = "images/landing_page"
+    img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
+
+    image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
+    image_path_list = [static(os.path.join(images_bank_path, image)) for image in image_list]
+
+    context = context_init.copy()
+    context["image_dict"] = dict(zip([''.join(name.split('.')[:-1]) for name in image_list], image_path_list))
+    
+    return render(request, 'landing_page_2.html', context)
+
 def index(request):
     context = context_init.copy()
     context['name'] = config.driver

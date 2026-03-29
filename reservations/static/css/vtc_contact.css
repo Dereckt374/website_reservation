@@ -1,0 +1,132 @@
+/* CONTACT PAGE STYLES */
+
+.contact-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.contact-info {
+    background-color: var(--light-gray);
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.contact-info h2 {
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.info-block {
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-weight: bold;
+    color: var(--dark-text);
+    font-size: 1.1rem;
+}
+
+.info-value {
+    color: var(--dark-gray);
+    margin-left: 10px;
+    font-size: 1rem;
+}
+
+.form-section {
+    background-color: var(--light-gray);
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.form-section h2 {
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: var(--dark-text);
+}
+
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid var(--border-gray);
+    border-radius: 5px;
+    font-family: 'Helvetica';
+    font-size: 1rem;
+}
+
+form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+form button {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: opacity 0.3s ease;
+}
+
+form button:hover {
+    opacity: 0.9;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.note {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .contact-container {
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .contact-info,
+    .form-section {
+        padding: 20px;
+    }
+
+    .contact-info h2,
+    .form-section h2 {
+        font-size: 1.4rem;
+    }
+
+    .info-label,
+    .info-value {
+        display: block;
+        margin-left: 0;
+    }
+}
