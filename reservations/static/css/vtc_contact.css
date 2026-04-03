@@ -1,9 +1,11 @@
 /* CONTACT PAGE STYLES */
 
+
 .contact-container {
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
+    text-align: center;
 }
 
 .contact-info {
@@ -94,6 +96,7 @@ form button:hover {
     color: var(--primary-blue);
     text-decoration: none;
     font-weight: bold;
+    font-size: 1rem;
 }
 
 .back-link:hover {
@@ -117,6 +120,7 @@ form button:hover {
     .contact-info,
     .form-section {
         padding: 20px;
+        ;
     }
 
     .contact-info h2,

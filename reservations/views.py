@@ -35,11 +35,12 @@ context_init = {
 
 def contact(request):
     """Page de contact générale accessible depuis la landing page"""
-    context = context_init.copy()
-    context['entreprise_name'] = config.driver
-    context['entreprise_sirte'] = config.sirte if hasattr(config, 'sirte') else "Non disponible"
+    context = {}
+    context['entreprise_name'] = config.contact_name
+    context['entreprise_siret'] = config.contact_siret
     context['type_vehicule'] = config.vehicle
-    context['telephone'] = config.phone if hasattr(config, 'phone') else "06 44 72 39 35"
+    context['telephone'] = config.contact_phone
+    context['email'] = config.contact_email
     context['horaires_reservation'] = config.horaires if hasattr(config, 'horaires') else "Sur demande"
     
     if request.method == "POST":

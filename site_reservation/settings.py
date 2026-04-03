@@ -64,6 +64,7 @@ CONSTANCE_CONFIG = {
     "contact_phone": ("0644723935", "Numéro de téléphone de contact pour les réservations"),
     "contact_address": ("26000, VALENCE", "Adresse de contact pour les réservations"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
+    "horaires": ("9h-18h du lundi au vendredi", "Horaires de réservation"),
 }
 
 MIDDLEWARE = [
