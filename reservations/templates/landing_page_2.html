@@ -12,9 +12,9 @@
 <header class="topbar">
     <a href="{% url 'contact' %}" class="logo" title="Page de contact">MESL[é] VTC</a>
     <p class="subtitle">
-        Privatisez un véhicule avec chauffeur pour des trajets en toute sérénité
+        Privatisez un véhicule avec chauffeur<br>Vos trajets en toute sérénité
     </p>
-    <a href="{% url 'reservation' %}" class="btn">Réserver</a>
+    <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
 </header>
 
 <!-- SLIDER -->
@@ -36,7 +36,7 @@
     
     <div class="num">
         <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
-        <div class="phone">06 44 72 39 35 <span>en direct</span></div>
+        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
     </div>
     
     <div class="socials">

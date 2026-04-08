@@ -69,30 +69,33 @@ body {
 /* SLIDER */
 .slider {
     overflow: hidden;
-    height: 400px;
+    background-color: var(--medium-gray);
 }
 
 .slides {
     display: flex;
     transition: transform 0.6s ease-in-out;
-    height: 100%;
+    height: auto;
 }
 
 .slide {
     display: flex;
     flex-direction: column;
     min-width: 100%;
-    height: 100%;
+    height: auto;
+    align-items: stretch;
 }
 
 .slide img {
     width: 100%;
+    height: auto;
+    display: block;
     object-fit: cover;
 }
 
 .slide-text {
     width: 100%;
-    flex: 1;
+    flex: 0 0 auto;
     min-height: 80px;
     background: var(--primary-blue);
     display: flex;
@@ -118,7 +121,10 @@ body {
 
 .phone {
     font-size: 2.5em;
+    color: #000;
+    text-decoration: none;
 }
+
 
 .phone span {
     font-size: 1.2rem;
@@ -189,9 +195,6 @@ body {
         width: 100%;
         max-width: 400px;
         text-align: center;
-    }
-
-    .btn {
         margin-top: 8px;
     }
 

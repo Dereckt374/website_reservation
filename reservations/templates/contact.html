@@ -16,7 +16,7 @@
     <p class="subtitle">
         Contactez-nous pour vos trajets
     </p>
-    <a href="{% url 'reservation' %}" class="btn">Réserver</a>
+    <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
 </header>
 
 <!-- CONTACT CONTENT -->
@@ -55,7 +55,7 @@
 
     <!-- CONTACT FORM -->
     <div class="form-section">
-        <h2>Formulaire de contact</h2>
+        <h2>Nous contacter</h2>
         
         <form id="contactForm" method="post" novalidate>
             {% csrf_token %}
@@ -89,7 +89,7 @@
     
     <div class="num">
         <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
-        <div class="phone">{{ telephone }} <span>en direct</span></div>
+        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
     </div>
     
     <div class="socials">

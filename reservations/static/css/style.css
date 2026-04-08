@@ -396,7 +396,7 @@ button:active,
 @media (max-width: 740px) {
     /* Augmenter la taille générale */
     body {
-        font-size: 18px;
+        font-size: 18px;    
     }
 
     p {
