@@ -10,8 +10,8 @@ def default_date():
 class Trajet(models.Model):
     requested_at = models.DateTimeField("Heure de la Demande", default=default_date) #auto_now_add=True
 
-    adresse_depart = models.TextField("Adresse de départ", max_length=500, default='Pôle bus, Avenue Félix Faure, Valence, France')
-    adresse_arrivee = models.TextField("Adresse d'arrivée", max_length=500,  default='Valence, France')
+    adresse_depart = models.TextField("Adresse de départ", max_length=500, default='')
+    adresse_arrivee = models.TextField("Adresse d'arrivée", max_length=500,  default='')
 
     date_aller = models.DateTimeField("Date et heure de prise en charge", default= default_date)
     date_retour = models.DateTimeField("Date et heure de prise en charge retour", null=True, blank=True,help_text="Optionnel - Laisser vide pour un aller simple.",
@@ -59,8 +59,8 @@ class Trajet(models.Model):
         return f"{self.adresse_depart.replace(', France','')} → {self.adresse_arrivee.replace(', France','')} ({self.distance_km}km - {self.price_euros}€ - {self.type_trajet})"
     
 class ContactClient(models.Model):
-    nom_client = models.CharField("Nom", max_length=100, default='Mickael')
-    prenom_client = models.CharField("Prenom", max_length=100, default='Jackson')
+    nom_client = models.CharField("Nom", max_length=100, default='')
+    prenom_client = models.CharField("Prenom", max_length=100, default='')
 
     telephone_client = models.CharField("Telephone",
         max_length=10,
@@ -70,18 +70,18 @@ class ContactClient(models.Model):
                 message="Le numéro doit être au format 06XXXXXXX."
             )
         ],
-        default='0601020304'
+        default=''
     )
 
     email_client = models.EmailField("Email",
                                      max_length=254,
         validators=[EmailValidator(message="Format d'email invalide.")],
-        default='virgil.mesle@gmail.com'
+        default=''
     )
 
     passagers = models.TextField("Information sur les passagers",
         help_text="Format : Nom numéro de téléphone, Nom numéro de téléphone, ...",
-        default='Mme Durand - 0611122233, M. Martin - 064445556',
+        default='',
         blank=True, null=True
     )
 
