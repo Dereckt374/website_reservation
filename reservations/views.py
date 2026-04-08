@@ -32,6 +32,42 @@ context_init = {
         "googlemaps_api_key_frontend": googlemaps_api_key_frontend,
         "current_year" : current_year,
     }
+
+def contact(request):
+    """Page de contact générale accessible depuis la landing page"""
+    context = {}
+    context['entreprise_name'] = config.contact_name
+    context['entreprise_siret'] = config.contact_siret
+    context['type_vehicule'] = config.vehicle
+    context['telephone'] = config.contact_phone
+    context['email'] = config.contact_email
+    context['horaires_reservation'] = config.horaires if hasattr(config, 'horaires') else "Sur demande"
+    
+    if request.method == "POST":
+        form = ContactClientForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Merci pour votre message ! Nous vous recontacterons rapidement.")
+            return redirect('landing_page')
+    else:
+        form = ContactClientForm()
+    
+    context['form'] = form
+    return render(request, "contact.html", context=context)
+
+def landing_page(request):
+    """Page d'accueil landing page avec slider"""
+    images_bank_path = "images/landing_page"
+    img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
+
+    image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
+    image_path_list = [static(os.path.join(images_bank_path, image)) for image in image_list]
+
+    context = context_init.copy()
+    context["image_dict"] = dict(zip([''.join(name.split('.')[:-1]) for name in image_list], image_path_list))
+    
+    return render(request, 'landing_page_2.html', context)
+
 def index(request):
     context = context_init.copy()
     context['name'] = config.driver
@@ -208,8 +244,8 @@ def sumup_webhook(request):
                     }
         )
     
-    output_path = make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
-    upload_file_to_drive(output_path, "BonsDeCommande", inpersonated_user=config.contact_email)
+    # output_path = make_pdf(f"bon_de_reservation_{paiement.checkout_reference}.pdf","template_bon_reservation.html", context_client,"reservations/output/bons_de_reservations","reservations/static/css/style_bon.css")
+    # upload_file_to_drive(output_path, "BonsDeCommande", inpersonated_user=config.contact_email)
 
     return HttpResponse("OK", status=200)
 
@@ -249,8 +285,8 @@ def facture_generation(request, client_ref):
             context['form'] = form
             context['success_message'] = "Adresse enregistrée avec succès, ci-joint la facture correspondante."
             context_facture = get_facture_context(client_ref)
-            output_path = make_pdf(f"facture_{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
-            upload_file_to_drive(output_path, "Factures",  inpersonated_user=config.contact_email)
+            # output_path = make_pdf(f"facture_{client_ref}.pdf","template_facture.html", context_facture,"reservations/output/factures","reservations/static/css/style_facture.css")
+            # upload_file_to_drive(output_path, "Factures",  inpersonated_user=config.contact_email)
     return render(request, 'facture_generation.html', context)
 
 
@@ -268,6 +304,13 @@ def temp_trigger_webhook(request, client_ref):
 
 
 def welcome2(request):
-    context = get_welcome_context()
+    images_bank_path = "images/landing_page"
+    img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
 
-    return render(request, 'vtc_landing.html', context)
+    image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
+    image_path_list = [static(os.path.join(images_bank_path, image)) for image in image_list]
+
+    context = {
+        "image_dict" : dict(zip([''.join(name.split('.')[:-1]) for name in image_list], image_path_list)),
+    }
+    return render(request, 'landing_page_2.html', context)

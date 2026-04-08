@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>MESLÉ VTC</title>
+<link rel="stylesheet" href="{% static 'css/vtc_landing_2.css' %}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <a href="{% url 'contact' %}" class="logo" title="Page de contact">MESL[é] VTC</a>
+    <p class="subtitle">
+        Privatisez un véhicule avec chauffeur<br>Vos trajets en toute sérénité
+    </p>
+    <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
+</header>
+
+<!-- SLIDER -->
+<section class="slider">
+    <div class="slides" id="slides">
+
+    {% for text, path in image_dict.items %}
+        <div class="slide">
+            <img src="{{ path }}">
+            <div class="slide-text">{{ text }} </div>
+        </div>
+    {% endfor %}
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    
+    <div class="num">
+        <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
+        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
+    </div>
+    
+    <div class="socials">
+        <span>Suivez notre actualité</span>
+
+        <div class="icon_socials">
+            <a href="https://facebook.com" title="Suivez-nous sur Facebook" aria-label="Facebook"><img src="{% static 'images/icons/facebook.png' %}" class="icon_socials" alt="Facebook"></a>
+            <a href="https://instagram.com" title="Suivez-nous sur Instagram" aria-label="Instagram"><img src="{% static 'images/icons/instagram.png' %}" class="icon_socials" alt="Instagram"></a>
+            <a href="https://whatsapp.com" title="Connectez-nous sur WhatsApp" aria-label="WhatsApp"><img src="{% static 'images/icons/whatsapp.png' %}" class="icon_socials" alt="WhatsApp"></a>
+            <a href="#" title="Autre réseau social" aria-label="Réseau social"><img src="{% static 'images/icons/social.png' %}" class="icon_socials" alt="Réseau social"></a>
+        </div>
+    </div>
+</footer>
+
+<!-- LEGAL MENTIONS -->
+<section class="legal">
+    <p>&copy; 2026 MESLÉ VTC. Tous droits réservés. Reproduction, diffusion et utilisation interdites sans autorisation.</p>
+</section>
+
+<script>
+let index = 0;
+const slides = document.getElementById("slides");
+const total = document.querySelectorAll(".slide").length;
+
+setInterval(() => {
+    index = (index + 1) % total;
+    slides.style.transform = `translateX(-${index * 100}%)`;
+}, 5000);
+</script>
+
+</body>
+</html>

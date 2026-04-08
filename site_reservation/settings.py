@@ -57,13 +57,14 @@ CONSTANCE_CONFIG = {
     "evening_factor" : (20, "Majoration soirée (%)"),
     "night_factor" : (40, "Majoration nuit (%)"),
     "driver" : ("Stéphane", "Nom du chauffeur"),
-    "vehicle" : ("Polestar 2 - Edition 2022, Véhicule Electrique, 5 places, coupé 4 portes", "Description du véhicule utilisé"),
-    "vehicle_immatriculation" : ("XX-XXX-XX", "Imatriculation du véhicule"),
+    "vehicle" : ("Polestar 2 - Edition 2026, Véhicule Electrique, 5 places, coupé 4 portes", "Description du véhicule utilisé"),
+    "vehicle_immatriculation" : ("HJ-663-EX", "Imatriculation du véhicule"),
     "contact_name": ("VTC MESLE Valence", "Nom de l'entreprise de réservation"),
     "contact_email": ("stephane@mesle-entreprises.fr",   "Email de contact pour les réservations"),
     "contact_phone": ("0644723935", "Numéro de téléphone de contact pour les réservations"),
     "contact_address": ("26000, VALENCE", "Adresse de contact pour les réservations"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
+    "horaires": ("Disponibilité 24/24 7/7, sous réserve de disponibilité", "Horaires de réservation"),
 }
 
 MIDDLEWARE = [

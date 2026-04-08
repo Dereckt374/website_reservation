@@ -3,27 +3,111 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Formulaire de contact</title>
-    <!-- On relie ton CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Contact - MESLÉ VTC</title>
+    <link rel="stylesheet" href="{% static 'css/vtc_landing_2.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vtc_contact.css' %}">
 </head>
+
 <body>
-<div class="container">
 
-  <h1>Formulaire de Contact</h1>
-    <nav>
-      <a href="{% url 'reservation' %}">← Retour à l'aperçu</a>
-    </nav>
+<!-- HEADER -->
+<header class="topbar">
+    <a href="{% url 'contact' %}" class="logo" title="Page de contact">MESL[é] VTC</a>
+    <p class="subtitle">
+        Contactez-nous pour vos trajets
+    </p>
+    <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
+</header>
 
-<form id="trajetForm" method="post" novalidate>
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary mt-3">Envoyer</button>
-    <br>
-    <br>
-    <p class="note"> En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement dans le cadre de ma réservation</p>
-</form>
+<!-- CONTACT CONTENT -->
+<div class="contact-container">
+    <a href="{% url 'landing_page' %}" class="back-link">Retour à l'accueil</a>
 
+    <!-- COMPANY INFO -->
+    <div class="contact-info">
+        <h2>Informations de contact</h2>
+        
+        <div class="info-block">
+            <span class="info-label">Entreprise:</span>
+            <span class="info-value">{{ entreprise_name }}</span>
+        </div>
+
+        <div class="info-block">
+            <span class="info-label">SIRET:</span>
+            <span class="info-value">{{ entreprise_siret }}</span>
+        </div>
+
+        <div class="info-block">
+            <span class="info-label">Téléphone:</span>
+            <span class="info-value"><a href="tel:{{ telephone }}" style="color: inherit;">{{ telephone }}</a></span>
+        </div>
+
+        <div class="info-block">
+            <span class="info-label">Type de véhicule:</span>
+            <span class="info-value">{{ type_vehicule }}</span>
+        </div>
+
+        <div class="info-block">
+            <span class="info-label">Horaires de réservation:</span>
+            <span class="info-value">{{ horaires_reservation }}</span>
+        </div>
+    </div>
+
+    <!-- CONTACT FORM -->
+    <div class="form-section">
+        <h2>Nous contacter</h2>
+        
+        <form id="contactForm" method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div style="color: red; margin-bottom: 15px;">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: red; font-size: 0.9rem;">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn_submit">Envoyer le message</button>
+            <p class="note">En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement pour traiter ma demande de contact.</p>
+        </form>
+    </div>
 </div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    
+    <div class="num">
+        <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
+        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
+    </div>
+    
+    <div class="socials">
+        <span>Suivez notre actualité</span>
+
+        <div class="icon_socials">
+            <a href="https://facebook.com" title="Suivez-nous sur Facebook" aria-label="Facebook"><img src="{% static 'images/icons/facebook.png' %}" class="icon_socials" alt="Facebook"></a>
+            <a href="https://instagram.com" title="Suivez-nous sur Instagram" aria-label="Instagram"><img src="{% static 'images/icons/instagram.png' %}" class="icon_socials" alt="Instagram"></a>
+            <a href="https://whatsapp.com" title="Connectez-nous sur WhatsApp" aria-label="WhatsApp"><img src="{% static 'images/icons/whatsapp.png' %}" class="icon_socials" alt="WhatsApp"></a>
+            <a href="#" title="Autre réseau social" aria-label="Réseau social"><img src="{% static 'images/icons/social.png' %}" class="icon_socials" alt="Réseau social"></a>
+        </div>
+    </div>
+</footer>
+
+<!-- LEGAL MENTIONS -->
+<section class="legal">
+    <p>&copy; 2026 MESLÉ VTC. Tous droits réservés. Reproduction, diffusion et utilisation interdites sans autorisation.</p>
+</section>
+
 </body>
 </html>

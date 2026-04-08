@@ -22,7 +22,7 @@ from email import encoders
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from weasyprint import HTML, CSS
+# from weasyprint import HTML, CSS
 from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
 
@@ -427,6 +427,7 @@ def humaniser_duree(duree_min: int) -> str:
     return " et ".join(segments)
 
 def make_pdf(pdf_name, template_html, context, path_output, css=None):
+    # from weasyprint import HTML, CSS
     html_string = render_to_string(template_html, context)
     HTML(string=html_string).write_pdf(
     os.path.join(path_output,pdf_name),
