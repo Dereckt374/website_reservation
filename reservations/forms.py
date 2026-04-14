@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import RegexValidator
 from django.utils import timezone
 from .models import Trajet, ContactClient
 from datetime import timedelta
@@ -149,3 +150,39 @@ class AdressClientForm(forms.ModelForm):
         widgets = {
             "client_adress": forms.TextInput(attrs={"class": "form-control"}),
         }
+
+
+class ContactForm(forms.Form):
+    nom = forms.CharField(
+        label="Nom",
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Votre nom"})
+    )
+    prenom = forms.CharField(
+        label="Prénom",
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Votre prénom"})
+    )
+    telephone = forms.CharField(
+        label="Téléphone",
+        max_length=10,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "06XXXXXXXX"}),
+        validators=[
+            RegexValidator(
+                regex=r"^0[1-9]\d{8}$",
+                message="Le numéro doit être au format 0XXXXXXXX."
+            )
+        ]
+    )
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "votre.email@example.com"})
+    )
+    message = forms.CharField(
+        label="Message",
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "rows": 4,
+            "placeholder": "Votre message..."
+        })
+    )

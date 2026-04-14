@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import TrajetForm, ContactClientForm, AdressClientForm
+from .forms import TrajetForm, ContactClientForm, AdressClientForm, ContactForm
 from .models import Trajet, ContactClient
 from .utils import *
 from django.conf import settings
@@ -44,13 +44,51 @@ def contact(request):
     context['horaires_reservation'] = config.horaires if hasattr(config, 'horaires') else "Sur demande"
     
     if request.method == "POST":
-        form = ContactClientForm(request.POST)
+        form = ContactForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Merci pour votre message ! Nous vous recontacterons rapidement.")
-            return redirect('landing_page')
+            # Get form data
+            nom = form.cleaned_data['nom']
+            prenom = form.cleaned_data['prenom']
+            telephone = form.cleaned_data['telephone']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            
+            # Send email to owner
+            context_owner = {
+                'nom': nom,
+                'prenom': prenom,
+                'telephone': telephone,
+                'email': email,
+                'message': message,
+            }
+            send_email_template(
+                emails=[config.contact_email],
+                subject="Nouveau message de contact",
+                template_name="contact_mail_owner.html",
+                context=context_owner
+            )
+            
+            # Send email to client if email provided
+            if email:
+                context_client = {
+                    'nom': nom,
+                    'prenom': prenom,
+                    'telephone': telephone,
+                    'email': email,
+                    'message': message,
+                }
+                send_email_template(
+                    emails=[email],
+                    subject="Confirmation de votre message",
+                    template_name="contact_mail_client.html",
+                    context=context_client
+                )
+            
+            messages.success(request, "Message bien envoyé, vous serez contacté d'ici peu.")
+            # Reinitialize form
+            form = ContactForm()
     else:
-        form = ContactClientForm()
+        form = ContactForm()
     
     context['form'] = form
     return render(request, "contact.html", context=context)
