@@ -248,7 +248,7 @@ body {
 }
 
 /* DESKTOP */
-@media (min-width: 768px) {
+@media (min-width: 1441px) {
     .slide {
         flex-direction: row;
     }
