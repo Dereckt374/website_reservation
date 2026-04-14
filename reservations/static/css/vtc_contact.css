@@ -134,7 +134,7 @@ form button:hover {
 }
 
 /* MOBILE */
-@media (max-width: 767px) {
+@media (max-width: 1441px) {
     .contact-container {
         margin: 20px auto;
         padding: 10px;

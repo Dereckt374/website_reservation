@@ -393,7 +393,7 @@ button:active,
 }
 
 /* ---- Mobile optimisé pour le formulaire (écrans < 600px) ---- */
-@media (max-width: 740px) {
+@media (max-width: 1441px) {
     /* Augmenter la taille générale */
     body {
         font-size: 18px;    

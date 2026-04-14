@@ -116,7 +116,7 @@ table th {
 }
 
 /* Responsive (écran uniquement) */
-@media (max-width: 600px) {
+@media (max-width: 1441px) {
     .company-block {
         flex-direction: column;
         align-items: flex-start;
