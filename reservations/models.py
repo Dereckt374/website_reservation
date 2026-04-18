@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator, EmailValidator
 from decimal import Decimal
 from datetime import datetime, timedelta
+from django.conf import settings
 
 def default_date():
     return (datetime.now() + timedelta(minutes=10)).replace(microsecond=0, second=0).isoformat()
@@ -26,7 +27,7 @@ class Trajet(models.Model):
 
     # Choix limités
     VEHICULES = [
-        ("berline", "Polestar 2 - 2022 - coupé 4 portes"),
+        ("berline", "Polestar 2 - Edition 2026"),
     ]
     vehicule = models.CharField(
         "Type de véhicule",

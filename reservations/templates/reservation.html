@@ -66,13 +66,25 @@
   <p class="note">{{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
   
 
-    <button name="btnPrevisualiser" type="submit">Prévisualiser la course</button>
+    <button type="button" id="btnPrevisualiser">Prévisualiser la course</button>
     </div>  <!-- fin collapsible -->
 </form>
 
   <footer>
     &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const previewBtn = document.getElementById('btnPrevisualiser');
+      if (previewBtn) {
+        previewBtn.addEventListener('click', function(event) {
+          event.preventDefault();
+          alert('Indisponible pour le moment : site en maintenance.');
+        });
+      }
+    });
+  </script>
 
   <!-- <script async src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key_frontend }}&libraries=places&callback=initMap"></script>
   <script src="{% static 'script.js' %}"></script> -->
