@@ -12,8 +12,10 @@
 
 <!-- HEADER -->
 <header class="topbar">
-    <a href="{% url 'contact' %}" class="logo" title="Page de contact">MESL[é] VTC</a>
-    <p class="subtitle">
+    <a href="{% url 'contact' %}" class="logo" title="Page de contact">
+        <img src="{% static 'images/logo_E_transp.png' %}" alt="Logo MESLÉ VTC">
+    </a>
+        <p class="subtitle">
         Contactez-nous pour vos trajets
     </p>
     <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
@@ -23,74 +25,76 @@
 <div class="contact-container">
     <a href="{% url 'landing_page' %}" class="back-link">Retour à l'accueil</a>
 
-    <!-- COMPANY INFO -->
-    <div class="contact-info">
-        <h2>Informations de contact</h2>
-        
-        <div class="info-block">
-            <span class="info-label">Entreprise:</span>
-            <span class="info-value">{{ entreprise_name }}</span>
-        </div>
-
-        <div class="info-block">
-            <span class="info-label">SIRET:</span>
-            <span class="info-value">{{ entreprise_siret }}</span>
-        </div>
-
-        <div class="info-block">
-            <span class="info-label">Téléphone:</span>
-            <span class="info-value"><a href="tel:{{ telephone }}" style="color: inherit;">{{ telephone }}</a></span>
-        </div>
-
-        <div class="info-block">
-            <span class="info-label">Type de véhicule:</span>
-            <span class="info-value">{{ type_vehicule }}</span>
-        </div>
-
-        <div class="info-block">
-            <span class="info-label">Horaires de réservation:</span>
-            <span class="info-value">{{ horaires_reservation }}</span>
-        </div>
-    </div>
-
-    <!-- CONTACT FORM -->
-    <div class="form-section">
-        <h2>Nous contacter</h2>
-        
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        
-        <form id="contactForm" method="post" novalidate>
-            {% csrf_token %}
+    <div class="contact-row">
+        <!-- COMPANY INFO -->
+        <div class="contact-info">
+            <h2>Informations de contact</h2>
             
-            {% if form.non_field_errors %}
-                <div style="color: red; margin-bottom: 15px;">
-                    {{ form.non_field_errors }}
+            <div class="info-block">
+                <span class="info-label">Entreprise:</span>
+                <span class="info-value">{{ entreprise_name }}</span>
+            </div>
+
+            <div class="info-block">
+                <span class="info-label">SIRET:</span>
+                <span class="info-value">{{ entreprise_siret }}</span>
+            </div>
+
+            <div class="info-block">
+                <span class="info-label">Téléphone:</span>
+                <span class="info-value"><a href="tel:{{ telephone }}" style="color: inherit;">{{ telephone }}</a></span>
+            </div>
+
+            <div class="info-block">
+                <span class="info-label">Type de véhicule:</span>
+                <span class="info-value">{{ type_vehicule }}</span>
+            </div>
+
+            <div class="info-block">
+                <span class="info-label">Horaires de réservation:</span>
+                <span class="info-value">{{ horaires_reservation }}</span>
+            </div>
+        </div>
+
+        <!-- CONTACT FORM -->
+        <div class="form-section">
+            <h2>Nous contacter</h2>
+            
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
+            
+            <form id="contactForm" method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div style="color: red; margin-bottom: 15px;">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
 
-            {% for field in form %}
-                <div>
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.errors %}
-                        <div style="color: red; font-size: 0.9rem;">
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                {% for field in form %}
+                    <div>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div style="color: red; font-size: 0.9rem;">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
 
-            <button type="submit" class="btn_submit">Envoyer le message</button>
-            <p class="note">En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement pour traiter ma demande de contact.</p>
-        </form>
+                <button type="submit" class="btn_submit">Envoyer le message</button>
+                <p class="note">En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement pour traiter ma demande de contact.</p>
+            </form>
+        </div>
     </div>
 </div>
 

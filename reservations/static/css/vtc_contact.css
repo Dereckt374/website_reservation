@@ -157,3 +157,19 @@ form button:hover {
         margin-left: 0;
     }
 }
+
+/* DESKTOP */
+@media (min-width: 1200px) {
+    .contact-row {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .contact-info,
+    .form-section {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
