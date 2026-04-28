@@ -6,6 +6,7 @@
     <title>Réservation d'un trajets</title>
     <!-- On relie ton CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 </head>
 
 
@@ -66,7 +67,7 @@
   <p class="note">{{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
   
 
-    <button type="button" id="btnPrevisualiser">Prévisualiser la course</button>
+    <button type="submit" id="btnPrevisualiser">Prévisualiser la course</button>
     </div>  <!-- fin collapsible -->
 </form>
 
@@ -74,20 +75,8 @@
     &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const previewBtn = document.getElementById('btnPrevisualiser');
-      if (previewBtn) {
-        previewBtn.addEventListener('click', function(event) {
-          event.preventDefault();
-          alert('Indisponible pour le moment : site en maintenance.');
-        });
-      }
-    });
-  </script>
-
-  <!-- <script async src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key_frontend }}&libraries=places&callback=initMap"></script>
-  <script src="{% static 'script.js' %}"></script> -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/sp8=" crossorigin=""></script>
+  <script src="{% static 'script.js' %}"></script>
 </body>
 
 </html>

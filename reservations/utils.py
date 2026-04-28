@@ -3,7 +3,6 @@ import pytz
 import uuid
 import os
 import requests
-import googlemaps
 from .models import Trajet, ContactClient
 from django.utils import timezone
 from django.template.loader import render_to_string
@@ -27,10 +26,9 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path = '.venv/.env_prod')
 
 site_domain = os.getenv("site_domain")
-googlemaps_api_key = os.getenv("GOOGLE_MAPS_BACKEND_KEY")
+ors_api_key = os.getenv("ORS_API_KEY")
 sumup_api_key = os.getenv("sumup_api_key")
 merchant_code_official = os.getenv("merchant_code_official")
-gmaps = googlemaps.Client(key=googlemaps_api_key)
 current_year = datetime.now().year
 json_service_account_file = os.getenv("json_service_account_file")
 base_url_sumup = "https://api.sumup.com"
@@ -56,24 +54,41 @@ def get_tarif_multiplier(hour):
         coef = 1.0 + (config.night_factor/100)
         commentaire = "Tarification de nuit"
         return {"coef": coef, "commentaire":commentaire} 
-def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_depart"], form.cleaned_data["adresse_arrivee"], form.cleaned_data['date_aller']
+def _geocoder_adresse(adresse):
+    """Géocode une adresse via Nominatim, retourne (lat, lon)."""
+    url = "https://nominatim.openstreetmap.org/search"
+    params = {"q": adresse, "format": "json", "limit": 1, "countrycodes": "fr,mc,be,ch,lu"}
+    headers = {"User-Agent": "site-reservation-vtc/1.0 contact@example.com"}
+    resp = requests.get(url, params=params, headers=headers, timeout=10)
+    resp.raise_for_status()
+    results = resp.json()
+    if not results:
+        raise ValueError(f"Adresse introuvable : {adresse}")
+    return float(results[0]["lat"]), float(results[0]["lon"])
 
-    # Si la date est dans le passé, on la remplace par maintenant
-    if date_aller < timezone.now(): date_aller = timezone.now()
 
-    directions_result = gmaps.directions(depart, 
-                                        arrivee,
-                                         mode="driving",
-                                         departure_time=date_aller)
+def evaluer_trajet(depart, arrivee, date_aller):
+    if date_aller < timezone.now():
+        date_aller = timezone.now()
 
-    duree_min = round(directions_result[0]['legs'][0]['duration']['value']/60 ,1)
-    distance_km = round(directions_result[0]['legs'][0]['distance']['value']/1000 ,1)
+    lat_dep, lon_dep = _geocoder_adresse(depart)
+    lat_arr, lon_arr = _geocoder_adresse(arrivee)
 
-    time_multiplier = get_tarif_multiplier(date_aller.hour)['coef']
-    price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min/60) ,1)    
+    url = "https://api.openrouteservice.org/v2/directions/driving-car"
+    headers = {"Authorization": ors_api_key, "Content-Type": "application/json"}
+    body = {"coordinates": [[lon_dep, lat_dep], [lon_arr, lat_arr]]}
+    resp = requests.post(url, json=body, headers=headers, timeout=15)
+    resp.raise_for_status()
+    summary = resp.json()["routes"][0]["summary"]
+
+    duree_min = round(summary["duration"] / 60, 1)
+    distance_km = round(summary["distance"] / 1000, 1)
+
+    time_multiplier = get_tarif_multiplier(date_aller.hour)["coef"]
+    price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min / 60), 1)
 
     print(f"""
-🔴 Fonction - EVALUER TRAJET 
+🔴 Fonction - EVALUER TRAJET (ORS)
     DATE ALLER : {date_aller}
     DEPART : {depart}
     ARRIVEE : {arrivee}
@@ -82,8 +97,8 @@ def evaluer_trajet(depart, arrivee, date_aller): #form.cleaned_data["adresse_dep
     FACTEUR TEMPS : {time_multiplier}
     PRIX : {price} €
             """)
-    
-    return {"duree_min" :duree_min,"distance_km": distance_km, "price_euros":price}
+
+    return {"duree_min": duree_min, "distance_km": distance_km, "price_euros": price}
 def get_merchant_code(sumup_api_key : str) -> str:
     client = Sumup(api_key=sumup_api_key)
     merchant = client.merchant.get()
