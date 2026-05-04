@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Demande envoyée — VTC</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+      .merci-box {
+        max-width: 560px;
+        margin: 60px auto;
+        text-align: center;
+        padding: 40px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 0 16px rgba(0,0,0,0.08);
+      }
+      .merci-box .icon { font-size: 3rem; margin-bottom: 12px; }
+      .merci-box h1   { color: #16a34a; margin-bottom: 12px; }
+      .merci-box p    { color: #555; line-height: 1.7; }
+      .merci-box a.btn-home {
+        display: inline-block;
+        margin-top: 28px;
+        padding: 12px 28px;
+        background: #1a73e8;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .merci-box a.btn-home:hover { background: #1558b0; }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="merci-box">
+      <div class="icon">🎉</div>
+      <h1>Demande bien reçue !</h1>
+      <p>
+        Votre demande de réservation a été transmise avec succès.<br>
+        Vous recevrez un email de confirmation dès que votre trajet sera validé par notre équipe,
+        généralement dans les plus brefs délais.
+      </p>
+      <p>
+        En cas d'urgence, vous pouvez nous joindre directement par téléphone.
+      </p>
+      <a href="{% url 'welcome' %}" class="btn-home">← Retour à l'accueil</a>
+    </div>
+
+    <footer>
+      &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+    </footer>
+  </div>
+</body>
+</html>

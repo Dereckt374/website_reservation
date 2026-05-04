@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vos coordonnées — Réservation VTC</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Vos coordonnées</h1>
+    <nav>
+      <a href="{% url 'welcome' %}">Page d'accueil</a> |
+      <a href="{% url 'reservation' %}">Nouvelle Demande</a>
+    </nav>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="{{ message.tags }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <div id="apercu" style="margin-bottom: 24px;">
+      <p>
+        Votre trajet a bien été estimé. Renseignez vos coordonnées ci-dessous pour transmettre
+        votre demande. Notre équipe vous confirmera la réservation par email dans les meilleurs délais.
+      </p>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <p class="note">Vos données sont utilisées uniquement pour la prise en charge de votre trajet.</p>
+
+      <button type="submit">Transmettre ma demande →</button>
+    </form>
+
+    <footer>
+      &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+    </footer>
+  </div>
+</body>
+</html>

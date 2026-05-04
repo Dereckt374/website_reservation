@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import TrajetForm, ContactClientForm, AdressClientForm, ContactForm
@@ -113,15 +113,13 @@ def index(request):
 
             context['trajet'] = trajet
 
-        elif "btnConfirmer" in request.POST and form.is_valid(): # Cas où on confirme la reservation
+        elif "btnConfirmer" in request.POST and form.is_valid():
+            reference = ''.join(random.sample(string.ascii_uppercase * 6, 6))
             trajet = form.save(commit=False)
-            checkout = create_checkout(sumup_api_key, merchant_code_official, form.cleaned_data["price_euros"], description=str(trajet))
-            trajet.checkout_id = checkout.id
-            trajet.checkout_status = checkout.status
-            trajet.checkout_reference = checkout.checkout_reference
+            trajet.checkout_reference = reference
             trajet.save()
-            request.session["checkout_id"] = checkout.id
-            return redirect('contact', client_ref=checkout.checkout_reference)
+            request.session["trajet_id"] = trajet.id
+            return redirect('contact_form', client_ref=reference)
                 
         else:
             messages.error(request, "Erreur dans le formulaire ❌")
@@ -134,23 +132,169 @@ def index(request):
 
 def contact_form_view(request, client_ref):
     context = context_init.copy()
-    checkout_id = request.session.get("checkout_id")
-    context["checkout_id"] = checkout_id
     context["client_ref"] = client_ref
+
+    trajet_id = request.session.get("trajet_id")
+    if not trajet_id:
+        messages.error(request, "Session expirée. Veuillez recommencer votre réservation.")
+        return redirect("reservation")
+    try:
+        current_trajet = Trajet.objects.get(id=trajet_id)
+    except Trajet.DoesNotExist:
+        messages.error(request, "Réservation introuvable.")
+        return redirect("reservation")
+
     if request.method == "POST":
         form = ContactClientForm(request.POST)
-        context['form'] = form
+        context["form"] = form
         if form.is_valid():
-            telephone = form.cleaned_data["telephone_client"]
-            current_trajet = Trajet.objects.get(checkout_id=checkout_id)
+            telephone  = form.cleaned_data["telephone_client"]
+            email_cl   = form.cleaned_data["email_client"]
+            nom        = form.cleaned_data["nom_client"]
+            prenom     = form.cleaned_data["prenom_client"]
+            passagers  = form.cleaned_data.get("passagers", "")
+
             current_trajet.telephone_client = telephone
             current_trajet.save()
             form.save()
-            return redirect("paiement/")
-    else:
-        context['form'] = ContactClientForm()
 
-    return render(request, "contact.html", context=context)
+            # Calcul distance approche
+            approche = calculer_approche(current_trajet.adresse_depart, current_trajet.date_aller)
+
+            # URL de validation pour le propriétaire
+            validation_url = request.build_absolute_uri(
+                reverse("valider_reservation", kwargs={"token": current_trajet.token_validation})
+            )
+
+            date_aller_str  = timezone.localtime(current_trajet.date_aller).strftime("%d/%m/%Y")
+            heure_aller_str = timezone.localtime(current_trajet.date_aller).strftime("%H:%M")
+
+            email_context = {
+                "reference":            current_trajet.checkout_reference,
+                "nom_client":           nom,
+                "prenom_client":        prenom,
+                "telephone_client":     telephone,
+                "email_client":         email_cl,
+                "passagers":            passagers,
+                "date_aller":           date_aller_str,
+                "heure_aller":          heure_aller_str,
+                "adresse_depart":       current_trajet.adresse_depart,
+                "adresse_arrivee":      current_trajet.adresse_arrivee,
+                "type_trajet":          current_trajet.type_trajet,
+                "distance_km":          current_trajet.distance_km,
+                "duree_min_aller":      current_trajet.duree_min_aller,
+                "price_euros":          current_trajet.price_euros,
+                "commentaire_client":   current_trajet.commentaire_client,
+                "approche_distance_km": approche["distance_km"],
+                "approche_duree_min":   approche["duree_min"],
+                "adresse_reference":    config.contact_address_private,
+                "validation_url":       validation_url,
+            }
+            if current_trajet.date_retour:
+                email_context["date_retour"]      = timezone.localtime(current_trajet.date_retour).strftime("%d/%m/%Y")
+                email_context["heure_retour"]     = timezone.localtime(current_trajet.date_retour).strftime("%H:%M")
+                email_context["duree_min_retour"] = current_trajet.duree_min_retour
+
+            try:
+                send_email_template(
+                    emails=[config.contact_email],
+                    subject=f"🚗 Nouvelle demande — Réf. {current_trajet.checkout_reference}",
+                    template_name="email_proprio_nouvelle_reservation.html",
+                    context=email_context,
+                )
+            except Exception as e:
+                print(f"⚠️ Erreur envoi email propriétaire : {e}")
+
+            return redirect("merci")
+    else:
+        context["form"] = ContactClientForm()
+
+    return render(request, "contact_reservation.html", context=context)
+
+
+def valider_reservation(request, token):
+    try:
+        trajet = Trajet.objects.get(token_validation=token)
+    except Trajet.DoesNotExist:
+        return HttpResponse("Réservation introuvable ou lien invalide.", status=404)
+
+    if trajet.statut == "confirme":
+        return render(request, "validation_ok.html", {"deja_confirme": True, "trajet": trajet})
+
+    trajet.statut = "confirme"
+    trajet.save()
+
+    client = ContactClient.objects.filter(telephone_client=trajet.telephone_client).last()
+
+    # Création de l'événement calendrier
+    date_fin = trajet.date_aller + timedelta(minutes=int(trajet.duree_min_aller or 60))
+    try:
+        create_event(
+            id_agenda_reservations,
+            trajet.date_aller,
+            date_fin,
+            summary=f"VTC — {client.prenom_client} {client.nom_client}",
+            description=(
+                f"Réf. {trajet.checkout_reference}\n"
+                f"Client : {client.nom_client} {client.prenom_client}\n"
+                f"Tél : {client.telephone_client} | Email : {client.email_client}\n"
+                f"Trajet : {trajet.adresse_depart} → {trajet.adresse_arrivee}\n"
+                f"Distance : {trajet.distance_km} km | Durée : {trajet.duree_min_aller} min\n"
+                f"Prix : {trajet.price_euros} €\n"
+                f"Type : {trajet.type_trajet}"
+            ),
+            location=trajet.adresse_depart,
+        )
+    except Exception as e:
+        print(f"⚠️ Erreur création événement calendrier : {e}")
+
+    # Email de confirmation au client
+    date_aller_str  = timezone.localtime(trajet.date_aller).strftime("%d/%m/%Y")
+    heure_aller_str = timezone.localtime(trajet.date_aller).strftime("%H:%M")
+    dt_arrivee      = trajet.date_aller + timedelta(minutes=int(trajet.duree_min_aller or 0))
+    heure_arrivee   = timezone.localtime(dt_arrivee).strftime("%H:%M")
+
+    email_context = {
+        "prenom_client":        client.prenom_client,
+        "nom_client":           client.nom_client,
+        "reference":            trajet.checkout_reference,
+        "date_aller":           date_aller_str,
+        "heure_aller":          heure_aller_str,
+        "heure_arrivee_est":    heure_arrivee,
+        "adresse_depart":       trajet.adresse_depart,
+        "adresse_arrivee":      trajet.adresse_arrivee,
+        "type_trajet":          trajet.type_trajet,
+        "distance_km":          trajet.distance_km,
+        "duree_min_aller":      trajet.duree_min_aller,
+        "price_euros":          trajet.price_euros,
+        "driver":               config.driver,
+        "vehicle":              config.vehicle,
+        "telephone_contact":    config.contact_phone,
+        "email_contact":        config.contact_email,
+    }
+    if trajet.date_retour:
+        email_context["date_retour"]  = timezone.localtime(trajet.date_retour).strftime("%d/%m/%Y")
+        email_context["heure_retour"] = timezone.localtime(trajet.date_retour).strftime("%H:%M")
+
+    try:
+        send_email_template(
+            emails=[client.email_client],
+            subject=f"✅ Votre réservation VTC est confirmée — Réf. {trajet.checkout_reference}",
+            template_name="email_client_reservation_confirmee.html",
+            context=email_context,
+        )
+    except Exception as e:
+        print(f"⚠️ Erreur envoi email client : {e}")
+
+    return render(request, "validation_ok.html", {
+        "deja_confirme": False,
+        "trajet": trajet,
+        "client": client,
+    })
+
+
+def merci(request):
+    return render(request, "merci.html", context_init.copy())
 
 def paiement(request, client_ref):
     context = context_init.copy()

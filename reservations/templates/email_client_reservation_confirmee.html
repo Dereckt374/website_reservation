@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body style="font-family: Arial, sans-serif; color:#333; line-height:1.6; padding:20px; background:#f5f5f5;">
+
+  <div style="max-width:640px; margin:auto; background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:30px;">
+
+    <!-- EN-TÊTE -->
+    <h2 style="color:#16a34a; margin-bottom:4px;">✅ Votre réservation est confirmée</h2>
+    <p style="margin-top:0;">
+      Bonjour <strong>{{ prenom_client }}</strong>,<br>
+      Nous avons le plaisir de vous confirmer votre réservation VTC.<br>
+      Référence dossier : <strong>{{ reference }}</strong>
+    </p>
+
+    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
+
+
+    <!-- SECTION TRAJET -->
+    <h3 style="margin-bottom:8px; color:#333;">📍 Votre trajet</h3>
+    <table style="width:100%; border-collapse:collapse;">
+      <tr>
+        <td style="padding:6px 0; width:210px; font-weight:bold;">Date et heure de prise en charge :</td>
+        <td style="padding:6px 0;"><strong>{{ date_aller }} à {{ heure_aller }}</strong></td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Arrivée estimée :</td>
+        <td style="padding:6px 0;">{{ heure_arrivee_est }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Adresse de départ :</td>
+        <td style="padding:6px 0;">{{ adresse_depart }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Adresse d'arrivée :</td>
+        <td style="padding:6px 0;">{{ adresse_arrivee }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Type de trajet :</td>
+        <td style="padding:6px 0;">{{ type_trajet }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Distance :</td>
+        <td style="padding:6px 0;">{{ distance_km }} km — {{ duree_min_aller }} min</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold; color:#1a73e8;">Prix total :</td>
+        <td style="padding:6px 0; font-weight:bold; color:#1a73e8;">{{ price_euros }} €</td>
+      </tr>
+    </table>
+
+    {% if date_retour %}
+    <div style="background:#f0f7ff; border-left:4px solid #1a73e8; padding:12px 16px; margin-top:16px; border-radius:4px;">
+      <strong>↩️ Trajet retour :</strong> {{ date_retour }} à {{ heure_retour }}
+    </div>
+    {% endif %}
+
+    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
+
+
+    <!-- SECTION CHAUFFEUR -->
+    <h3 style="margin-bottom:8px; color:#333;">🚘 Votre chauffeur</h3>
+    <table style="width:100%; border-collapse:collapse;">
+      <tr>
+        <td style="padding:6px 0; width:210px; font-weight:bold;">Chauffeur :</td>
+        <td style="padding:6px 0;">{{ driver }}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0; font-weight:bold;">Véhicule :</td>
+        <td style="padding:6px 0;">{{ vehicle }}</td>
+      </tr>
+    </table>
+
+    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
+
+
+    <!-- SECTION CONTACT -->
+    <h3 style="margin-bottom:8px; color:#333;">📞 Besoin d'aide ?</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <tr>
+        <td style="padding:5px 0; width:210px; font-weight:bold;">Téléphone :</td>
+        <td style="padding:5px 0;"><a href="tel:{{ telephone_contact }}" style="color:#1a73e8;">{{ telephone_contact }}</a></td>
+      </tr>
+      <tr>
+        <td style="padding:5px 0; font-weight:bold;">Email :</td>
+        <td style="padding:5px 0;"><a href="mailto:{{ email_contact }}" style="color:#1a73e8;">{{ email_contact }}</a></td>
+      </tr>
+    </table>
+
+    <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0;">
+
+    <p style="font-size:14px; color:#555; text-align:center;">
+      Merci pour votre confiance. Nous vous souhaitons un excellent trajet !
+    </p>
+    <p style="font-size:12px; color:#aaa; text-align:center;">
+      Message généré automatiquement — merci de ne pas répondre directement à cet email.
+    </p>
+
+  </div>
+
+</body>
+</html>

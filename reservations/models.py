@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 from decimal import Decimal
 from datetime import datetime, timedelta
 from django.conf import settings
+import uuid
 
 def default_date():
     return (datetime.now() + timedelta(minutes=10)).replace(microsecond=0, second=0).isoformat()
@@ -55,7 +56,25 @@ class Trajet(models.Model):
         null=True, blank=True
     ) 
     commentaire_client = models.TextField(blank=True, null=True)
-    
+
+    STATUTS = [
+        ("en_attente", "En attente de confirmation"),
+        ("confirme",   "Confirmé"),
+        ("annule",     "Annulé"),
+    ]
+    statut = models.CharField(
+        "Statut",
+        max_length=20,
+        choices=STATUTS,
+        default="en_attente"
+    )
+    token_validation = models.UUIDField(
+        "Token de validation",
+        default=uuid.uuid4,
+        unique=True,
+        editable=False
+    )
+
     def __str__(self):
         return f"{self.adresse_depart.replace(', France','')} → {self.adresse_arrivee.replace(', France','')} ({self.distance_km}km - {self.price_euros}€ - {self.type_trajet})"
     

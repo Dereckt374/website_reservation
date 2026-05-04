@@ -55,16 +55,16 @@ def get_tarif_multiplier(hour):
         commentaire = "Tarification de nuit"
         return {"coef": coef, "commentaire":commentaire} 
 def _geocoder_adresse(adresse):
-    """Géocode une adresse via Nominatim, retourne (lat, lon)."""
-    url = "https://nominatim.openstreetmap.org/search"
-    params = {"q": adresse, "format": "json", "limit": 1, "countrycodes": "fr,mc,be,ch,lu"}
-    headers = {"User-Agent": "site-reservation-vtc/1.0 contact@example.com"}
-    resp = requests.get(url, params=params, headers=headers, timeout=10)
+    """Géocode une adresse via l'API ORS, retourne (lat, lon)."""
+    url = "https://api.openrouteservice.org/geocode/search"
+    params = {"api_key": ors_api_key, "text": adresse, "size": 1, "boundary.country": "FRA,MCO,BEL,CHE,LUX"}
+    resp = requests.get(url, params=params, timeout=10)
     resp.raise_for_status()
-    results = resp.json()
-    if not results:
+    features = resp.json().get("features", [])
+    if not features:
         raise ValueError(f"Adresse introuvable : {adresse}")
-    return float(results[0]["lat"]), float(results[0]["lon"])
+    lon, lat = features[0]["geometry"]["coordinates"]
+    return float(lat), float(lon)
 
 
 def evaluer_trajet(depart, arrivee, date_aller):
@@ -99,6 +99,18 @@ def evaluer_trajet(depart, arrivee, date_aller):
             """)
 
     return {"duree_min": duree_min, "distance_km": distance_km, "price_euros": price}
+
+
+def calculer_approche(adresse_depart, date_aller):
+    """Distance/durée depuis config.contact_address_private jusqu'à l'adresse de départ."""
+    try:
+        result = evaluer_trajet(config.contact_address_private, adresse_depart, date_aller)
+        return {"distance_km": result["distance_km"], "duree_min": result["duree_min"]}
+    except Exception as e:
+        print(f"⚠️ Erreur calcul approche : {e}")
+        return {"distance_km": "N/A", "duree_min": "N/A"}
+
+
 def get_merchant_code(sumup_api_key : str) -> str:
     client = Sumup(api_key=sumup_api_key)
     merchant = client.merchant.get()

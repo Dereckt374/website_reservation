@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Validation réservation — VTC</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+      .box {
+        max-width: 580px;
+        margin: 60px auto;
+        text-align: center;
+        padding: 40px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 0 16px rgba(0,0,0,0.08);
+      }
+      .box .icon { font-size: 3rem; margin-bottom: 12px; }
+      .box h1    { margin-bottom: 12px; }
+      .box table { text-align: left; width: 100%; border-collapse: collapse; margin-top: 20px; }
+      .box td    { padding: 6px 8px; }
+      .box td:first-child { font-weight: bold; width: 200px; }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box">
+      {% if deja_confirme %}
+        <div class="icon">ℹ️</div>
+        <h1 style="color:#1a73e8;">Déjà confirmée</h1>
+        <p>Cette réservation a déjà été confirmée. L'email client a été envoyé lors de la première validation.</p>
+      {% else %}
+        <div class="icon">✅</div>
+        <h1 style="color:#16a34a;">Réservation confirmée !</h1>
+        <p>
+          L'événement a été ajouté à votre agenda et un email de confirmation a été envoyé à
+          <strong>{{ client.prenom_client }} {{ client.nom_client }}</strong>
+          (<a href="mailto:{{ client.email_client }}">{{ client.email_client }}</a>).
+        </p>
+
+        <table>
+          <tr><td>Référence :</td><td>{{ trajet.checkout_reference }}</td></tr>
+          <tr><td>Trajet :</td><td>{{ trajet.adresse_depart }} → {{ trajet.adresse_arrivee }}</td></tr>
+          <tr><td>Date :</td><td>{{ trajet.date_aller }}</td></tr>
+          <tr><td>Prix :</td><td>{{ trajet.price_euros }} €</td></tr>
+        </table>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

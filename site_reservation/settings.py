@@ -62,7 +62,8 @@ CONSTANCE_CONFIG = {
     "contact_name": ("VTC MESLE Valence", "Nom de l'entreprise de réservation"),
     "contact_email": ("stephane@mesle-entreprises.fr",   "Email de contact pour les réservations"),
     "contact_phone": ("0644723935", "Numéro de téléphone de contact pour les réservations"),
-    "contact_address": ("26000, VALENCE", "Adresse de contact pour les réservations"),
+    "contact_address_public": ("26000, VALENCE", "Adresse de contact pour les réservations"),
+    "contact_address_private": ("38 Rue Albert Varnet, 26000, VALENCE", "Adresse de référence pour les calculs de trajets"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
     "horaires": ("Disponibilité 24/24 7/7, sous réserve de disponibilité", "Horaires de réservation"),
 }
