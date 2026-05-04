@@ -15,13 +15,14 @@
         <img src="{% static 'images/logo_E_transp.png' %}" alt="Logo MESLÉ VTC">
     </a>
     <p class="subtitle">
-        Privatisez un véhicule avec chauffeur<br>Vos trajets en toute sérénité
+        Vos trajets en toute sérénité
     </p>
     <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
 </header>
 
 <!-- SLIDER -->
 <section class="slider">
+  <div class="slider-viewport">
     <div class="slides" id="slides">
 
     {% for text, path in image_dict.items %}
@@ -32,6 +33,7 @@
     {% endfor %}
 
     </div>
+  </div>
 </section>
 
 <!-- FOOTER -->
