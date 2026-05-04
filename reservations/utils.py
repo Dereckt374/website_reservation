@@ -287,7 +287,7 @@ def get_services(json_creds_file=json_service_account_file,impersonated_user=Non
     services = {}
     SCOPES = [
         "https://www.googleapis.com/auth/calendar",
-        "https://www.googleapis.com/auth/drive.file"
+        "https://www.googleapis.com/auth/drive",
         ]
     creds = service_account.Credentials.from_service_account_file(
         json_creds_file, scopes=SCOPES
@@ -743,8 +743,148 @@ def full_refund_sumup(transaction_id: str):
     
     return response
 
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+import io
+import json
+import openpyxl
 import os
+from PIL import Image
+
+
+# Dimensions cibles pour le redimensionnement des images du slider
+SLIDER_TARGET_W = 1600
+SLIDER_TARGET_H = 900
+
+
+def _redimensionner_image(data: bytes, filename: str) -> bytes:
+    """
+    Redimensionne une image en 1600×900 px (cover + crop centré).
+    Retourne les bytes de l'image redimensionnée au format d'origine.
+    """
+    ext = os.path.splitext(filename)[1].lower()
+    fmt_map = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG", ".webp": "WEBP", ".gif": "GIF"}
+    fmt = fmt_map.get(ext, "JPEG")
+
+    img = Image.open(io.BytesIO(data)).convert("RGB")
+
+    # Scale pour couvrir la cible (cover)
+    scale = max(SLIDER_TARGET_W / img.width, SLIDER_TARGET_H / img.height)
+    new_w = int(img.width  * scale)
+    new_h = int(img.height * scale)
+    img = img.resize((new_w, new_h), Image.LANCZOS)
+
+    # Crop centré
+    left = (new_w - SLIDER_TARGET_W) // 2
+    top  = (new_h - SLIDER_TARGET_H) // 2
+    img  = img.crop((left, top, left + SLIDER_TARGET_W, top + SLIDER_TARGET_H))
+
+    buf = io.BytesIO()
+    save_kwargs = {"quality": 88, "optimize": True} if fmt == "JPEG" else {}
+    img.save(buf, format=fmt, **save_kwargs)
+    return buf.getvalue()
+
+
+def _telecharger_fichier_drive(drive, file_id: str) -> bytes:
+    """Télécharge un fichier Drive par son ID et retourne ses bytes."""
+    request = drive.files().get_media(fileId=file_id)
+    buffer = io.BytesIO()
+    downloader = MediaIoBaseDownload(buffer, request)
+    done = False
+    while not done:
+        _, done = downloader.next_chunk()
+    return buffer.getvalue()
+
+
+def _lister_fichiers_drive(drive, folder_id: str) -> list:
+    """Liste tous les fichiers (non supprimés) d'un dossier Drive."""
+    result = drive.files().list(
+        q=f"'{folder_id}' in parents and trashed=false",
+        fields="files(id, name, mimeType)",
+        pageSize=100,
+    ).execute()
+    return result.get("files", [])
+
+
+def sync_slider_from_drive() -> dict:
+    """
+    Synchronise le slider depuis Google Drive :
+      - Télécharge les images du dossier Drive → static/images/landing_page/
+      - Télécharge l'Excel de mapping nom_image→texte → slider_texts.json
+    Retourne un dict de résultat.
+    """
+    IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+    drive_user  = config.slider_drive_user
+    folder_id   = config.slider_drive_folder_id
+    excel_name  = config.slider_excel_name
+
+    if not drive_user or not folder_id:
+        raise ValueError("Configurez 'slider_drive_user' et 'slider_drive_folder_id' dans Constance.")
+
+    drive = get_services(impersonated_user=drive_user)["drive"]
+
+    # 1. Lister le contenu du dossier
+    files = _lister_fichiers_drive(drive, folder_id)
+    images       = [f for f in files if any(f["name"].lower().endswith(ext) for ext in IMAGE_EXTENSIONS)]
+    excel_files  = [f for f in files if f["name"].lower().endswith((".xlsx", ".xls"))]
+
+    # 2. Dossier local de destination
+    img_dir = os.path.join(settings.MEDIA_ROOT, "reservations", "static", "images", "landing_page")
+    os.makedirs(img_dir, exist_ok=True)
+
+    # 3. Supprimer les anciennes images locales
+    for existing in os.listdir(img_dir):
+        if any(existing.lower().endswith(ext) for ext in IMAGE_EXTENSIONS):
+            os.remove(os.path.join(img_dir, existing))
+
+    # 4. Télécharger et redimensionner les nouvelles images
+    downloaded = []
+    for img_file in images:
+        data = _telecharger_fichier_drive(drive, img_file["id"])
+        try:
+            data = _redimensionner_image(data, img_file["name"])
+            print(f"  🖼️  Redimensionnée : {img_file['name']} → {SLIDER_TARGET_W}×{SLIDER_TARGET_H}px")
+        except Exception as e:
+            print(f"  ⚠️  Redimensionnement échoué pour {img_file['name']} : {e} (image conservée telle quelle)")
+        with open(os.path.join(img_dir, img_file["name"]), "wb") as f:
+            f.write(data)
+        downloaded.append(img_file["name"])
+        print(f"  ✅ Image sauvegardée : {img_file['name']}")
+
+    # 5. Télécharger et parser l'Excel de mapping
+    texts_map = {}
+    excel_match = next((f for f in excel_files if f["name"] == excel_name), None) or \
+                  (excel_files[0] if excel_files else None)
+
+    if excel_match:
+        excel_data = _telecharger_fichier_drive(drive, excel_match["id"])
+        wb = openpyxl.load_workbook(io.BytesIO(excel_data))
+        ws = wb.active
+        for row in ws.iter_rows(min_row=2, values_only=True):   # ligne 1 = en-tête
+            if row[0] and row[1]:
+                texts_map[str(row[0]).strip()] = str(row[1]).strip()
+        print(f"  ✅ Excel parsé : {len(texts_map)} entrée(s)")
+    else:
+        print("  ⚠️  Aucun fichier Excel trouvé dans le dossier Drive.")
+
+    # 6. Sauvegarder le mapping JSON localement
+    json_path = os.path.join(img_dir, "slider_texts.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(texts_map, f, ensure_ascii=False, indent=2)
+
+    result = {
+        "images_count": len(downloaded),
+        "texts_count":  len(texts_map),
+        "images":       downloaded,
+    }
+    print(f"""
+🖼️  Fonction - SYNC SLIDER DRIVE
+    Dossier Drive : {folder_id}
+    Images : {len(downloaded)}
+    Textes : {len(texts_map)}
+    ✅ Sync terminée
+    """)
+    return result
 
 
 def upload_file_to_drive(

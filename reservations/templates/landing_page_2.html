@@ -25,10 +25,10 @@
   <div class="slider-viewport">
     <div class="slides" id="slides">
 
-    {% for text, path in image_dict.items %}
+    {% for slide in slides %}
         <div class="slide">
-            <img src="{{ path }}">
-            <div class="slide-text">{{ text }} </div>
+            <img src="{{ slide.path }}" alt="{{ slide.text }}">
+            <div class="slide-text">{{ slide.text }}</div>
         </div>
     {% endfor %}
 

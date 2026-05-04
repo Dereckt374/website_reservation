@@ -90,14 +90,31 @@ def contact(request):
 def landing_page(request):
     """Page d'accueil landing page avec slider"""
     images_bank_path = "images/landing_page"
-    img_dir = os.path.join(settings.MEDIA_ROOT,"reservations/static", images_bank_path)
+    img_dir = os.path.join(settings.MEDIA_ROOT, "reservations", "static", images_bank_path)
+    IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".gif", ".webp")
 
-    image_list = [f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png", ".jpeg"))]
-    image_path_list = [static(os.path.join(images_bank_path, image)) for image in image_list]
+    # Charger le mapping JSON généré par la sync Drive (si présent)
+    json_path = os.path.join(img_dir, "slider_texts.json")
+    texts_map = {}
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, encoding="utf-8") as f:
+                texts_map = json.load(f)
+        except Exception:
+            texts_map = {}
+
+    image_list = [f for f in os.listdir(img_dir) if f.lower().endswith(IMAGE_EXTS)]
+
+    slides = []
+    for name in image_list:
+        stem = os.path.splitext(name)[0]   # nom sans extension
+        text = texts_map.get(name) or texts_map.get(stem) or stem
+        path = static(os.path.join(images_bank_path, name))
+        slides.append({"text": text, "path": path})
 
     context = context_init.copy()
-    context["image_dict"] = dict(zip([''.join(name.split('.')[:-1]) for name in image_list], image_path_list))
-    
+    context["slides"] = slides
+
     return render(request, 'landing_page_2.html', context)
 
 def index(request):

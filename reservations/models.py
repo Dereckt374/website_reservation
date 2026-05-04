@@ -110,3 +110,19 @@ class ContactClient(models.Model):
 
     def __str__(self):
         return f"{self.nom_client} {self.prenom_client}"
+
+
+class SliderSync(models.Model):
+    """Historique des synchronisations du slider depuis Google Drive."""
+    synced_at    = models.DateTimeField("Date de sync", auto_now_add=True)
+    images_count = models.PositiveIntegerField("Images importées", default=0)
+    texts_count  = models.PositiveIntegerField("Textes importés", default=0)
+    status       = models.CharField("Statut", max_length=500, default="")
+
+    class Meta:
+        verbose_name        = "Synchronisation Slider"
+        verbose_name_plural = "Synchronisation Slider"
+        ordering            = ["-synced_at"]
+
+    def __str__(self):
+        return f"Sync {self.synced_at:%d/%m/%Y %H:%M} — {self.images_count} image(s)"

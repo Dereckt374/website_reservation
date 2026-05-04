@@ -66,6 +66,9 @@ CONSTANCE_CONFIG = {
     "contact_address_private": ("38 Rue Albert Varnet, 26000, VALENCE", "Adresse de référence pour les calculs de trajets"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
     "horaires": ("Disponibilité 24/24 7/7, sous réserve de disponibilité", "Horaires de réservation"),
+    "slider_drive_user":      ("stephane@mesle-entreprises.fr", "Email du compte Google Drive pour le slider (impersonation)"),
+    "slider_drive_folder_id": ("1t9fOFALNxtEy85LAgOAcLw6X26puizCg", "ID du dossier Google Drive contenant les images du slider"),
+    "slider_excel_name":      ("excel_test_exemple.xlsx", "Nom du fichier Excel image→texte dans ce même dossier Drive"),
 }
 
 MIDDLEWARE = [
@@ -97,7 +100,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'site_reservation.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -107,7 +109,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

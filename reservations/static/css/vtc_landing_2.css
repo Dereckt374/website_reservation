@@ -61,7 +61,7 @@ body {
 .topbar {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
+    padding: 10px;
     align-items: center;
 }
 
