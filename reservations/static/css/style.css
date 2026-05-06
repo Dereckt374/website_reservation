@@ -161,6 +161,16 @@ select,
     text-overflow: ellipsis;
 }
 
+textarea {
+    height: auto;
+    min-height: calc(2 * 1.4em + 16px); /* 2 lignes */
+    max-height: calc(2 * 1.4em + 16px);
+    white-space: normal;
+    overflow-y: auto;
+    text-overflow: clip;
+    resize: none;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
@@ -479,8 +489,9 @@ button:active,
     }
 
     textarea {
-        min-height: 120px;
-        resize: vertical;
+        min-height: calc(2 * 1.4em + 30px); /* 2 lignes en mobile */
+        max-height: calc(2 * 1.4em + 30px);
+        resize: none;
     }
 
     /* Texte d'aide plus grand */
