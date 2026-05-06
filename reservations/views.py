@@ -107,10 +107,24 @@ def landing_page(request):
 
     slides = []
     for name in image_list:
-        stem = os.path.splitext(name)[0]   # nom sans extension
-        text = texts_map.get(name) or texts_map.get(stem) or stem
+        stem = os.path.splitext(name)[0]
+        entry = texts_map.get(name) or texts_map.get(stem)
+
+        # Compatibilité ancien format (valeur = string) et nouveau (valeur = dict)
+        if isinstance(entry, dict):
+            text  = entry.get("texte") or stem
+            ordre = entry.get("ordre", 9999)
+        elif isinstance(entry, str):
+            text  = entry
+            ordre = 9999
+        else:
+            text  = stem
+            ordre = 9999
+
         path = static(os.path.join(images_bank_path, name))
-        slides.append({"text": text, "path": path})
+        slides.append({"text": text, "path": path, "ordre": ordre})
+
+    slides.sort(key=lambda s: s["ordre"])
 
     context = context_init.copy()
     context["slides"] = slides

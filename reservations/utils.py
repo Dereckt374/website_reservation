@@ -860,9 +860,26 @@ def sync_slider_from_drive() -> dict:
         excel_data = _telecharger_fichier_drive(drive, excel_match["id"])
         wb = openpyxl.load_workbook(io.BytesIO(excel_data))
         ws = wb.active
-        for row in ws.iter_rows(min_row=2, values_only=True):   # ligne 1 = en-tête
-            if row[0] and row[1]:
-                texts_map[str(row[0]).strip()] = str(row[1]).strip()
+
+        # Lecture de l'en-tête pour localiser les colonnes dynamiquement
+        headers = [str(c.value).strip().lower() if c.value else "" for c in next(ws.iter_rows(min_row=1, max_row=1))]
+        col_image  = next((i for i, h in enumerate(headers) if "image" in h or "nom" in h), 0)
+        col_texte  = next((i for i, h in enumerate(headers) if "texte" in h or "text" in h), 1)
+        col_ordre  = next((i for i, h in enumerate(headers) if "ordre" in h or "order" in h), None)
+
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            nom = row[col_image] if len(row) > col_image else None
+            texte = row[col_texte] if len(row) > col_texte else None
+            if not nom or not texte:
+                continue
+            entry = {"texte": str(texte).strip()}
+            if col_ordre is not None and len(row) > col_ordre and row[col_ordre] is not None:
+                try:
+                    entry["ordre"] = int(row[col_ordre])
+                except (ValueError, TypeError):
+                    pass
+            texts_map[str(nom).strip()] = entry
+
         print(f"  ✅ Excel parsé : {len(texts_map)} entrée(s)")
     else:
         print("  ⚠️  Aucun fichier Excel trouvé dans le dossier Drive.")
