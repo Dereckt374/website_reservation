@@ -33,8 +33,11 @@ body {
 .logo {
     background: transparent;
     color: inherit;
-    padding: 0;
+    padding: 6px 10px;
     min-height: auto;
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.3s ease, opacity 0.3s ease;
 }
 
 .logo img {
@@ -43,11 +46,33 @@ body {
     width: auto;
 }
 
+.logo::after {
+    content: 'Formulaire de contact';
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.70);
+    color: #fff;
+    font-size: 0.72rem;
+    font-style: italic;
+    white-space: nowrap;
+    padding: 4px 10px;
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 10;
+}
 
 .logo:hover {
-    opacity: 0.85;
+    background: rgba(0, 159, 227, 0.13);
+    opacity: 1;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+}
+
+.logo:hover::after {
+    opacity: 1;
 }
 
 .btn {
