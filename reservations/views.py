@@ -236,6 +236,35 @@ def contact_form_view(request, client_ref):
             except Exception as e:
                 print(f"⚠️ Erreur envoi email propriétaire : {e}")
 
+            # Confirmation immédiate au client
+            client_context = {
+                "prenom_client":      prenom,
+                "nom_client":         nom,
+                "reference":          current_trajet.checkout_reference,
+                "adresse_depart":     current_trajet.adresse_depart,
+                "adresse_arrivee":    current_trajet.adresse_arrivee,
+                "date_aller":         date_aller_str,
+                "heure_aller":        heure_aller_str,
+                "type_trajet":        current_trajet.type_trajet,
+                "distance_km":        current_trajet.distance_km,
+                "price_euros":        current_trajet.price_euros,
+                "telephone_contact":  config.contact_phone,
+                "email_contact":      config.contact_email,
+                "driver":             config.driver,
+                "contact_name":       config.contact_name,
+                "contact_address_public": config.contact_address_public,
+                "contact_siret":      config.contact_siret,
+            }
+            try:
+                send_email_template(
+                    emails=[email_cl],
+                    subject=f"✅ Votre demande de trajet a bien été reçue — Réf. {current_trajet.checkout_reference}",
+                    template_name="email_client_demande_recue.html",
+                    context=client_context,
+                )
+            except Exception as e:
+                print(f"⚠️ Erreur envoi email confirmation client : {e}")
+
             return redirect("merci")
     else:
         context["form"] = ContactClientForm()

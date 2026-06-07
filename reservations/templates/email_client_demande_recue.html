@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .wrapper { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .header { background: #009fe3; padding: 30px 40px; text-align: center; }
+        .header h1 { color: #ffffff; font-size: 1.5rem; margin: 0; letter-spacing: 0.05rem; }
+        .header p { color: #d0effa; font-size: 0.9rem; margin: 6px 0 0; }
+        .body { padding: 35px 40px; color: #3a3a3a; }
+        .body p { line-height: 1.7; margin: 0 0 16px; }
+        .recap { background: #f0f8fd; border-left: 4px solid #009fe3; border-radius: 6px; padding: 18px 22px; margin: 24px 0; }
+        .recap p { margin: 6px 0; font-size: 0.92rem; }
+        .recap strong { color: #007ab8; }
+        .footer { background: #f0f0f0; text-align: center; padding: 18px 40px; font-size: 0.78rem; color: #888; }
+        .footer a { color: #009fe3; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <div class="header">
+        <h1>Demande de trajet reçue ✅</h1>
+        <p>Nous revenons vers vous très rapidement</p>
+    </div>
+
+    <div class="body">
+        <p>Bonjour <strong>{{ prenom_client }} {{ nom_client }}</strong>,</p>
+
+        <p>Nous avons bien reçu votre demande de réservation VTC et nous vous en remercions.<br>
+        Notre équipe va étudier votre demande et vous recontactera <strong>dans les plus brefs délais</strong> pour confirmer votre trajet.</p>
+
+        <div class="recap">
+            <p><strong>Référence :</strong> {{ reference }}</p>
+            <p><strong>Trajet :</strong> {{ adresse_depart }} → {{ adresse_arrivee }}</p>
+            <p><strong>Date :</strong> {{ date_aller }} à {{ heure_aller }}</p>
+            <p><strong>Type :</strong> {{ type_trajet }}</p>
+            {% if distance_km %}<p><strong>Distance estimée :</strong> {{ distance_km }} km</p>{% endif %}
+            {% if price_euros %}<p><strong>Prix estimé :</strong> {{ price_euros }} €</p>{% endif %}
+        </div>
+
+        <p>Si vous avez des questions ou souhaitez modifier votre demande, n'hésitez pas à nous contacter :</p>
+        <p>
+            📞 <a href="tel:{{ telephone_contact }}">{{ telephone_contact }}</a><br>
+            ✉️ <a href="mailto:{{ email_contact }}">{{ email_contact }}</a>
+        </p>
+
+        <p>À très bientôt,<br><strong>{{ driver }} — {{ contact_name }}</strong></p>
+    </div>
+
+    <div class="footer">
+        <p>{{ contact_name }} — {{ contact_address_public }}<br>
+        SIRET : {{ contact_siret }}<br>
+        <a href="mailto:{{ email_contact }}">{{ email_contact }}</a></p>
+    </div>
+
+</div>
+</body>
+</html>
