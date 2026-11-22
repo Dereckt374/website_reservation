@@ -14,8 +14,10 @@ function initMap() {
   }
 
   map = L.map("map").setView([44.9321, 4.8911], 12);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+  // Tuiles OpenStreetMap standard : gratuites, sans clé (CARTO exige désormais une clé API).
+  // Politique d'usage : https://operations.osmfoundation.org/policies/tiles/ (attribution obligatoire)
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
   }).addTo(map);
 

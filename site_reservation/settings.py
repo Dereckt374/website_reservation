@@ -73,7 +73,7 @@ CONSTANCE_CONFIG = {
     "vehicle" : ("Polestar 2 - Edition 2026, Véhicule Electrique, 5 places, coupé 4 portes", "Description du véhicule utilisé"),
     "vehicle_immatriculation" : ("HJ-663-EX", "Imatriculation du véhicule"),
     "contact_name": ("VTC MESLE Valence", "Nom de l'entreprise de réservation"),
-    "contact_email": ("contact@mesle-entreprises.fr", "Email de contact pour les réservations"),
+    "contact_email": ("mesle.stephane@gmail.com", "Email de contact pour les réservations"),
     "contact_phone": ("0644723935", "Numéro de téléphone de contact pour les réservations"),
     "contact_address_public": ("26000, VALENCE", "Adresse de contact pour les réservations"),
     "contact_address_private": ("38 Rue Albert Varnet, 26000, VALENCE", "Adresse de référence pour les calculs de trajets"),
