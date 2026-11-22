@@ -122,7 +122,6 @@ class ContactClientForm(forms.ModelForm):
         required=True,
         label=mark_safe(
             'J\'ai lu et j\'accepte les <a href="/cgv/" target="_blank">conditions générales de vente</a> '
-            '(dont l\'absence de droit de rétractation pour une prestation de transport à date déterminée).'
         ),
         error_messages={"required": "Vous devez accepter les conditions générales de vente pour transmettre votre demande."},
     )
