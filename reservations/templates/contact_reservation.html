@@ -24,7 +24,7 @@
     <div id="apercu" style="margin-bottom: 24px;">
       <p>
         Votre trajet a bien été estimé. Renseignez vos coordonnées ci-dessous pour transmettre
-        votre demande. Notre équipe vous confirmera la réservation par email dans les meilleurs délais.
+        votre demande. Votre demande ne vaut pas réservation : celle-ci n'est ferme qu'à réception de notre email de confirmation.
       </p>
     </div>
 
@@ -33,13 +33,13 @@
 
       {{ form.as_p }}
 
-      <p class="note">Vos données sont utilisées uniquement pour la prise en charge de votre trajet.</p>
+      <p class="note">Vos données sont utilisées uniquement pour traiter votre demande et réaliser votre trajet. Si vous indiquez d'autres passagers, assurez-vous de les en avoir informés. <a href="{% url 'confidentialite' %}" target="_blank">Politique de confidentialité</a></p>
 
       <button type="submit">Transmettre ma demande →</button>
     </form>
 
     <footer>
-      &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+      {% include "_legal_links.html" %}
     </footer>
   </div>
 </body>

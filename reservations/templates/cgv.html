@@ -1,0 +1,104 @@
+{% extends "legal_base.html" %}
+{% block title %}Conditions générales de vente{% endblock %}
+{% block subtitle %}Conditions générales de vente{% endblock %}
+{% block content %}
+<h1>Conditions générales de vente</h1>
+<p class="updated">Dernière mise à jour : {{ legal.updated }}</p>
+
+<h2>1. Objet et prestataire</h2>
+<p>
+    Les présentes conditions régissent les prestations de transport de personnes en voiture de transport avec
+    chauffeur (VTC) réservées auprès de {{ legal.name }} ({{ legal.form }}), siège : {{ legal.address }},
+    SIRET {{ legal.siret }}, inscrit au registre des exploitants VTC sous le n° {{ legal.vtc_registry }}.
+    Contact : <a href="tel:{{ legal.phone }}">{{ legal.phone }}</a> — <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>.
+</p>
+
+<h2>2. Réservation préalable et formation du contrat</h2>
+<p>
+    Conformément au Code des transports (art. L3120-2), toute prise en charge se fait exclusivement sur
+    <strong>réservation préalable</strong>. Le client effectue une demande de trajet sur le site ; cette demande
+    ne vaut pas réservation. Le contrat est formé à la réception par le client de l'email de
+    <strong>confirmation</strong> envoyé par {{ legal.name }}, qui reprend le trajet, la date, l'heure et le prix.
+    {{ legal.name }} peut refuser une demande, notamment en cas d'indisponibilité.
+</p>
+
+<h2>3. Prix</h2>
+<p>
+    Le prix est déterminé lors de la réservation, avant la prestation, selon le mode de calcul suivant
+    (art. L3122-1 du Code des transports) :
+</p>
+<ul>
+    <li>{{ legal.price_per_km }} € par kilomètre parcouru (itinéraire calculé entre l'adresse de départ et l'adresse d'arrivée) ;</li>
+    <li>+ {{ legal.hourly_cost }} € de l'heure, au prorata de la durée estimée du trajet ;</li>
+    <li>la part horaire est majorée de {{ legal.evening_factor }} % pour les prises en charge entre 19 h et 23 h,
+        et de {{ legal.night_factor }} % entre 23 h et 6 h ;</li>
+    <li>pour un aller-retour, le prix de chaque trajet est calculé séparément puis additionné.</li>
+</ul>
+<p>
+    Les prix sont exprimés en euros, toutes taxes comprises ({{ legal.vat_mention }}). Le prix indiqué dans
+    l'email de confirmation est le prix de la prestation. Toute modification demandée par le client pendant la
+    course (arrêt supplémentaire, détour, changement de destination) fait l'objet d'un nouveau prix communiqué et
+    accepté avant d'être réalisée.
+</p>
+
+<h2>4. Paiement</h2>
+<p>
+    Le paiement s'effectue selon les modalités indiquées dans l'email de confirmation. Une facture est remise sur demande,
+    et systématiquement aux clients professionnels.
+</p>
+
+<h2>5. Annulation et absence du client</h2>
+<p>{{ legal.cancellation }}</p>
+<p>
+    En cas d'annulation par {{ legal.name }}, sauf cas de force majeure, les sommes éventuellement versées sont
+    intégralement remboursées.
+</p>
+
+<h2>6. Absence de droit de rétractation</h2>
+<p>
+    Conformément à l'article L221-28, 12° du Code de la consommation, le droit de rétractation ne s'applique pas aux
+    prestations de transport de passagers devant être fournies à une date ou une période déterminée.
+</p>
+
+<h2>7. Passagers et bagages</h2>
+<ul>
+    <li>Véhicule : {{ legal.vehicle }}. Au maximum 4 passagers.</li>
+    <li>Bagages acceptés : 1 bagage cabine par personne. Tout bagage supplémentaire doit être signalé lors de la demande.</li>
+    <li>Le port de la ceinture de sécurité est obligatoire pour tous les passagers. Les enfants doivent être signalés
+        lors de la réservation afin de prévoir le dispositif de retenue adapté.</li>
+    <li>Le chauffeur peut refuser ou interrompre une course en cas de comportement mettant en danger la sécurité
+        du véhicule ou des personnes.</li>
+</ul>
+
+<h2>8. Retards</h2>
+<p>
+    Les horaires d'arrivée communiqués sont des estimations. {{ legal.name }} ne saurait être tenu responsable des retards
+    dus à des circonstances extérieures (conditions de circulation, météo, accident, travaux). Le client qui a une
+    contrainte horaire (train, avion) est invité à prévoir une marge suffisante.
+</p>
+
+<h2>9. Responsabilité et assurance</h2>
+<p>
+    {{ legal.name }} est assuré pour le transport de personnes à titre onéreux : {{ legal.insurance }}.
+    Le client est responsable des dégradations qu'il cause volontairement au véhicule.
+</p>
+
+<h2>10. Données personnelles</h2>
+<p>
+    Les données collectées lors de la réservation sont traitées conformément à notre
+    <a href="{% url 'confidentialite' %}">politique de confidentialité</a>.
+</p>
+
+<h2>11. Réclamations et médiation</h2>
+<p>
+    Toute réclamation doit être adressée par écrit à <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>.
+    À défaut de solution amiable, le client consommateur peut saisir gratuitement le médiateur de la consommation
+    (art. L612-1 du Code de la consommation) : {{ legal.mediator }}.
+</p>
+
+<h2>12. Droit applicable</h2>
+<p>
+    Les présentes conditions sont soumises au droit français. À défaut d'accord amiable, le litige est porté devant
+    les juridictions compétentes dans les conditions de droit commun.
+</p>
+{% endblock %}

@@ -7,6 +7,7 @@ from .utils import *
 from django.conf import settings
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.templatetags.static import static  # utile pour générer l'URL statique côté Python
 import json
@@ -356,6 +357,15 @@ def valider_reservation(request, token):
 def merci(request):
     return render(request, "merci.html", context_init.copy())
 
+def mentions_legales(request):
+    return render(request, "mentions_legales.html")
+
+def cgv(request):
+    return render(request, "cgv.html")
+
+def confidentialite(request):
+    return render(request, "confidentialite.html")
+
 def paiement(request, client_ref):
     context = context_init.copy()
     checkout_id = request.session.get("checkout_id")
@@ -493,16 +503,18 @@ def download_pdf_reservation(request, client_ref):
 
     return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')
 
-def full_refund(request, client_ref):
-    trajet = Trajet.objects.get(checkout_reference=client_ref)
+@staff_member_required  # un remboursement ne doit jamais être déclenchable par un simple lien public
+def full_refund(request, client_ref, checkout_id):
+    trajet = Trajet.objects.get(checkout_reference=client_ref, checkout_id=checkout_id)
     transaction_id = get_transaction_id(trajet.checkout_id, sumup_api_key)
-    full_refund_sumup(sumup_api_key, transaction_id)
+    full_refund_sumup(transaction_id)
     return HttpResponse("Trajet remboursé totalement")
 
-def partial_refund(request, client_ref):
-    trajet = Trajet.objects.get(checkout_reference=client_ref)
+@staff_member_required
+def partial_refund(request, client_ref, checkout_id):
+    trajet = Trajet.objects.get(checkout_reference=client_ref, checkout_id=checkout_id)
     transaction_id = get_transaction_id(trajet.checkout_id, sumup_api_key)
-    partial_refund_sumup(sumup_api_key, transaction_id, trajet.price_euros)
+    partial_refund_sumup(transaction_id, float(trajet.price_euros))
     return HttpResponse("Trajet remboursé partiellement")
 
 def facture_generation(request, client_ref):

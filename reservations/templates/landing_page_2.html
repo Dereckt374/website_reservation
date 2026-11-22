@@ -41,7 +41,7 @@
     
     <div class="num">
         <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
-        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
+        <a href="tel:{{ legal.phone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
     </div>
     
     <div class="socials">
@@ -58,7 +58,7 @@
 
 <!-- LEGAL MENTIONS -->
 <section class="legal">
-    <p>&copy; 2026 MESLÉ VTC. Tous droits réservés. Reproduction, diffusion et utilisation interdites sans autorisation.</p>
+    {% include "_legal_links.html" %}
 </section>
 
 <script>

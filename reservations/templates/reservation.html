@@ -3,7 +3,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Réservation d'un trajets</title>
+    <title>Demande de trajet — {{ legal.name }}</title>
     <!-- On relie ton CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -42,7 +42,8 @@
       <p><b>Arrivée : </b>{{ trajet.adresse_arrivee }}</p>
       <p><b>Distance </b>{% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.distance_km }} km</p>
       <p><b>Durée </b>{% if  trajet.type_trajet == "Aller-Retour" %}(Aller){% endif %} : {{ trajet.duree_min_aller }} min</p>
-      <p><b>Coût estimé : </b>{{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} </p>
+      <p><b>Prix TTC : </b>{{ trajet.price_euros }} € {% if  trajet.type_trajet == "Aller-Retour" %}(Aller-Retour){% endif %} <small>— {{ legal.vat_mention }}</small></p>
+      <p class="note">Prix calculé selon nos <a href="{% url 'cgv' %}" target="_blank">conditions tarifaires</a>, confirmé dans l'email de validation.</p>
     </div>
   </div>
 {% endif %}
@@ -52,9 +53,9 @@
 <form id="trajetForm" method="POST">
   {% csrf_token %}
     {% if trajet %}
-    <button name="btnConfirmer" type="submit">Confirmer la réservation</button>
+    <button name="btnConfirmer" type="submit">Continuer ma demande</button>
 
-    <button type="button" id="toggleForm">Modifier la préstation ⯆</button>
+    <button type="button" id="toggleForm">Modifier la prestation ⯆</button>
     {% endif %}
     
     <div id="formCollapse" class="{% if trajet %}collapsed{% endif %}">
@@ -63,7 +64,8 @@
   
   <p class="note">Notes :</p>
   <p class="note">Bagages autorisés : 1 bagage cabine par personne</p>
-  <p class="note">Véhicule utilisé pour la préstation : {{ vehicle }}</p>
+  <p class="note">Tarif : {{ legal.price_per_km }} €/km + {{ legal.hourly_cost }} €/h de trajet ; part horaire majorée de {{ legal.evening_factor }} % de 19 h à 23 h et de {{ legal.night_factor }} % de 23 h à 6 h. Prix TTC ({{ legal.vat_mention }}).</p>
+  <p class="note">Véhicule utilisé pour la prestation : {{ vehicle }}</p>
   <p class="note">{{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
   
 
@@ -72,7 +74,7 @@
 </form>
 
   <footer>
-    &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+    {% include "_legal_links.html" %}
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

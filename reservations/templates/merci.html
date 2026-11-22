@@ -39,16 +39,16 @@
       <p>
         Votre demande de réservation a été transmise avec succès.<br>
         Vous recevrez un email de confirmation dès que votre trajet sera validé par notre équipe,
-        généralement dans les plus brefs délais.
+        généralement dans les plus brefs délais. Votre réservation n'est ferme qu'à réception de cet email.
       </p>
       <p>
-        En cas d'urgence, vous pouvez nous joindre directement par téléphone.
+        En cas d'urgence, vous pouvez nous joindre directement par téléphone au <a href="tel:{{ legal.phone }}">{{ legal.phone }}</a>.
       </p>
       <a href="{% url 'welcome' %}" class="btn-home">← Retour à l'accueil</a>
     </div>
 
     <footer>
-      &copy; {{ current_year }} - Réservation de trajets. Tous droits réservés.
+      {% include "_legal_links.html" %}
     </footer>
   </div>
 </body>

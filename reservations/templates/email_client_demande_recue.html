@@ -29,7 +29,8 @@
         <p>Bonjour <strong>{{ prenom_client }} {{ nom_client }}</strong>,</p>
 
         <p>Nous avons bien reçu votre demande de réservation VTC et nous vous en remercions.<br>
-        Notre équipe va étudier votre demande et vous recontactera <strong>dans les plus brefs délais</strong> pour confirmer votre trajet.</p>
+        Notre équipe va étudier votre demande et vous recontactera <strong>dans les plus brefs délais</strong> pour confirmer votre trajet.<br>
+        Cette demande ne vaut pas réservation : celle-ci ne sera ferme qu'à réception de notre email de confirmation.</p>
 
         <div class="recap">
             <p><strong>Référence :</strong> {{ reference }}</p>
@@ -37,7 +38,7 @@
             <p><strong>Date :</strong> {{ date_aller }} à {{ heure_aller }}</p>
             <p><strong>Type :</strong> {{ type_trajet }}</p>
             {% if distance_km %}<p><strong>Distance estimée :</strong> {{ distance_km }} km</p>{% endif %}
-            {% if price_euros %}<p><strong>Prix estimé :</strong> {{ price_euros }} €</p>{% endif %}
+            {% if price_euros %}<p><strong>Prix TTC :</strong> {{ price_euros }} € <small>({{ legal.vat_mention }})</small></p>{% endif %}
         </div>
 
         <p>Si vous avez des questions ou souhaitez modifier votre demande, n'hésitez pas à nous contacter :</p>
@@ -50,9 +51,10 @@
     </div>
 
     <div class="footer">
-        <p>{{ contact_name }} — {{ contact_address_public }}<br>
-        SIRET : {{ contact_siret }}<br>
-        <a href="mailto:{{ email_contact }}">{{ email_contact }}</a></p>
+        <p>{{ legal.name }} — {{ legal.form }} — {{ legal.address }}<br>
+        SIRET : {{ legal.siret }} — Registre VTC : {{ legal.vtc_registry }}<br>
+        <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>
+        {% if site_domain %} · <a href="https://{{ site_domain }}/cgv/">CGV</a> · <a href="https://{{ site_domain }}/confidentialite/">Confidentialité</a>{% endif %}</p>
     </div>
 
 </div>

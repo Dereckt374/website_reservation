@@ -19,8 +19,10 @@
         <!-- Infos société -->
         <div class="company">
             <h2>{{ company.name }}</h2>
+            {{ company.legal_form }}<br>
             {{ company.address }}, {{ company.country }}<br>
-            SIRET : {{ company.siret }}<br>
+            SIRET : {{ company.siret }} — {{ company.registration }}<br>
+            Registre VTC : {{ company.vtc_registry }}<br>
             {{ company.vat_number }}<br>
             <br>
             Email : {{ company.email }}<br>
@@ -46,16 +48,17 @@
     Référence réservation : {{ reservation.reference }}<br>
     <br>
     Date d'émission : {{ invoice.issue_date }}<br>
-    Date de réservation : {{ reservation.date }}<br>
+    Date de réservation : {{ reservation.date|date:"d/m/Y" }}<br>
 </div>
 
 <table>
     <thead>
         <tr>
             <th>Désignation</th>
-            <th>Date</th>
+            <th>Date de la prestation</th>
             <th>Quantité</th>
-            <th>Prix unitaire HT (€)</th>
+            <th>Prix unitaire (€)</th>
+            <th>Montant (€)</th>
         </tr>
     </thead>
     <tbody>
@@ -64,7 +67,8 @@
             <td>{{ item.description }}</td>
             <td>{{ item.date }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.unit_price_ht |floatformat:2 }}</td>
+            <td>{{ item.unit_price|floatformat:2 }}</td>
+            <td>{{ item.unit_price|floatformat:2 }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -72,8 +76,11 @@
 
 <table class="totals">
     <tr class="total">
-        <td>Total TTC</td>
-        <td style="text-align:right;">{{ invoice.total_ttc |floatformat:2 }} €</td>
+        <td>Net à payer</td>
+        <td style="text-align:right;">{{ invoice.total|floatformat:2 }} €</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="font-size:0.85em;">{{ company.vat_number }}</td>
     </tr>
 </table>
 
@@ -83,9 +90,15 @@
 <div class="meta">
     Mode de paiement : {{ payment.method }}<br>
     Statut : {{ payment.status }}<br>
-    Date de paiement : {{ payment.date }}<br>
+    {% if payment.date %}Date de paiement : {{ payment.date }}<br>{% endif %}
 </div>
 {% endif %}
+
+<div class="meta" style="font-size:0.8em;">
+    Client professionnel : paiement à réception de facture. En cas de retard de paiement, pénalités au taux
+    de 3 fois le taux d'intérêt légal et indemnité forfaitaire pour frais de recouvrement de 40 €
+    (art. L441-10 et D441-5 du Code de commerce). Pas d'escompte pour paiement anticipé.
+</div>
 <br><br>
 Nous vous remercions de votre confiance.
 

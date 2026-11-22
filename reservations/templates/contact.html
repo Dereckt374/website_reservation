@@ -92,7 +92,7 @@
                 {% endfor %}
 
                 <button type="submit" class="btn_submit">Envoyer le message</button>
-                <p class="note">En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement pour traiter ma demande de contact.</p>
+                <p class="note">Les informations saisies sont utilisées uniquement pour répondre à votre demande et conservées 3 ans au plus. Vous pouvez exercer vos droits (accès, rectification, suppression…) à tout moment. <a href="{% url 'confidentialite' %}">En savoir plus</a></p>
             </form>
         </div>
     </div>
@@ -103,7 +103,7 @@
     
     <div class="num">
         <img class="icon" src="{% static 'images/icons/appel-telephonique.png' %}" alt="Numéro de téléphone">
-        <a href="tel:{{ telephone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
+        <a href="tel:{{ legal.phone }}" class="phone">06 44 72 39 35 <span>en direct</span></a>
     </div>
     
     <div class="socials">
@@ -120,7 +120,7 @@
 
 <!-- LEGAL MENTIONS -->
 <section class="legal">
-    <p>&copy; 2026 MESLÉ VTC. Tous droits réservés. Reproduction, diffusion et utilisation interdites sans autorisation.</p>
+    {% include "_legal_links.html" %}
 </section>
 
 </body>

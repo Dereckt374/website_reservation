@@ -12,7 +12,7 @@
 
   <h2>Génération de facture</h2>
     <nav>
-      <a href="{% url 'paiement_resultat' client_ref=client_ref %}">← Retour à l'aperçu</a>
+      <a href="{% url 'welcome' %}">← Retour à l'accueil</a>
     </nav>
 
 <form id="trajetForm" method="post" novalidate>
@@ -21,7 +21,7 @@
     <button type="submit" class="btn btn-primary mt-3">Envoyer</button>
     <br>
     <br>
-    <p class="note"> En soumettant ce formulaire, j'accepte que mes informations soient utilisées uniquement dans le cadre de ma réservation</p>
+    <p class="note">Votre adresse est utilisée uniquement pour établir votre facture (obligation légale, conservation 10 ans). <a href="{% url 'confidentialite' %}">Politique de confidentialité</a></p>
 </form>
 
 {% if success_message %}

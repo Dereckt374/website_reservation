@@ -84,7 +84,9 @@ def evaluer_trajet(depart, arrivee, date_aller):
     duree_min = round(summary["duration"] / 60, 1)
     distance_km = round(summary["distance"] / 1000, 1)
 
-    time_multiplier = get_tarif_multiplier(date_aller.hour)["coef"]
+    # Heure locale (Europe/Paris) : date_aller est stockée en UTC, sinon les majorations
+    # soirée/nuit s'appliqueraient avec 1 à 2 h de décalage par rapport aux tarifs annoncés.
+    time_multiplier = get_tarif_multiplier(timezone.localtime(date_aller).hour)["coef"]
     price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min / 60), 1)
 
     print(f"""
@@ -238,6 +240,9 @@ def send_email_template(emails, subject, template_name, context=None, attachment
     """
     if context is None:
         context = {}
+    # Informations légales disponibles dans tous les emails (pied de mail, lien CGV)
+    from .legal import get_legal_context
+    context = {"legal": get_legal_context(), "site_domain": site_domain, **context}
 
     # Rendu HTML avec le moteur de templates Django
     rendered_html = render_to_string(template_name, context)
@@ -292,9 +297,10 @@ def get_services(json_creds_file=json_service_account_file,impersonated_user=Non
     creds = service_account.Credentials.from_service_account_file(
         json_creds_file, scopes=SCOPES
     )
-    if impersonated_user:
-        creds_drive = creds.with_subject(impersonated_user)
-        services['drive'] = build("drive", "v3", credentials=creds_drive)
+    # Impersonation (with_subject) : uniquement avec Google Workspace + délégation domaine.
+    # Sans utilisateur, le compte de service accède en son nom aux dossiers partagés avec lui.
+    creds_drive = creds.with_subject(impersonated_user) if impersonated_user else creds
+    services['drive'] = build("drive", "v3", credentials=creds_drive)
 
     services['calendar'] = build("calendar", "v3", credentials=creds)
 
@@ -483,7 +489,7 @@ def get_client_context(checkout_id):
     date_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%d/%m/%Y")
     time_arrivee_estimee_str = timezone.localtime(datetime_arrivee_estimee_dt).strftime("%H:%M")
     duree_human_readable = humaniser_duree(current_trajet.duree_min_aller)
-    commentaire_trajet = get_tarif_multiplier(current_trajet.date_aller.hour)['commentaire']
+    commentaire_trajet = get_tarif_multiplier(timezone.localtime(current_trajet.date_aller).hour)['commentaire']
 
     context = {
         'logo_image': logo_path,
@@ -493,7 +499,7 @@ def get_client_context(checkout_id):
         "telephone":config.contact_phone ,
         "siret": config.contact_siret,
         "mail" : config.contact_email,
-        "adresse" : config.contact_address,
+        "adresse" : config.legal_address,
         "driver" : config.driver,
         "vehicle" : config.vehicle,
         "vehicle_immatriculation" : config.vehicle_immatriculation,
@@ -528,10 +534,25 @@ def get_client_context(checkout_id):
         context["heure_arrivee_estimee_retour"] = time_arrivee_estimee_str
     return context
 
-def generate_invoice_number(client_ref):
-    current_year = datetime.now().year
-    invoice_number = f"{current_year}-FAC-{client_ref}"
-    return invoice_number
+def generate_invoice_number(trajet):
+    """
+    Attribue (une seule fois) un numéro de facture chronologique et continu : AAAA-0001, AAAA-0002…
+    Une référence aléatoire n'est pas conforme (art. 242 nonies A, annexe II du CGI).
+    """
+    from django.db import transaction
+    if trajet.numero_facture:
+        return trajet.numero_facture
+    year = timezone.localtime().year
+    with transaction.atomic():
+        last = (Trajet.objects.select_for_update()
+                .filter(numero_facture__startswith=f"{year}-")
+                .order_by("-numero_facture")
+                .values_list("numero_facture", flat=True)
+                .first())
+        seq = int(last.split("-")[1]) + 1 if last else 1
+        trajet.numero_facture = f"{year}-{seq:04d}"
+        trajet.save(update_fields=["numero_facture"])
+    return trajet.numero_facture
 
 def get_welcome_context():
     context = {
@@ -620,10 +641,13 @@ def get_facture_context(client_ref):
     'logo_image': logo_path,
     "company": {
         "name": config.contact_name,
-        "address": config.contact_address,
+        "legal_form": config.legal_form,
+        "address": config.legal_address,
         "country": "France",
         "siret": config.contact_siret,
-        "vat_number": "TVA non applicable - Article 293B du code général des impôts",
+        "registration": config.legal_registration,
+        "vtc_registry": config.legal_vtc_registry,
+        "vat_number": config.legal_vat_mention,
         "email": config.contact_email,
         "phone": config.contact_phone,
     },
@@ -643,18 +667,21 @@ def get_facture_context(client_ref):
     },
 
     "invoice": {
-        "number": generate_invoice_number(client_ref),
-        "issue_date": timezone.now(),
+        "number": generate_invoice_number(current_trajet),
+        "issue_date": timezone.localtime().strftime("%d/%m/%Y"),
         "items": [
             {
-                "description": str(current_trajet),
-                "date": current_trajet.date_aller,
+                "description": (
+                    f"Transport de personnes en VTC ({current_trajet.type_trajet}) : "
+                    f"{current_trajet.adresse_depart} → {current_trajet.adresse_arrivee}, "
+                    f"{current_trajet.distance_km} km"
+                ),
+                "date": timezone.localtime(current_trajet.date_aller).strftime("%d/%m/%Y %H:%M"),
                 "quantity": 1,
-                "unit_price_ht": current_trajet.price_euros,
+                "unit_price": current_trajet.price_euros,
             }
-        
         ],
-        "total_ttc": current_trajet.price_euros,
+        "total": current_trajet.price_euros,
     },
 
     "payment": {
@@ -814,14 +841,15 @@ def sync_slider_from_drive() -> dict:
     """
     IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
-    drive_user  = config.slider_drive_user
-    folder_id   = config.slider_drive_folder_id
-    excel_name  = config.slider_excel_name
+    # Paramètres lus dans .venv/.env_prod
+    drive_user  = os.getenv("slider_drive_user", "")
+    folder_id   = os.getenv("slider_drive_folder_id", "").strip()
+    excel_name  = os.getenv("slider_excel_name", "").strip()
 
-    if not drive_user or not folder_id:
-        raise ValueError("Configurez 'slider_drive_user' et 'slider_drive_folder_id' dans Constance.")
+    if not folder_id:
+        raise ValueError("Renseignez 'slider_drive_folder_id' dans .venv/.env_prod puis redémarrez le serveur.")
 
-    drive = get_services(impersonated_user=drive_user)["drive"]
+    drive = get_services(impersonated_user=(drive_user or "").strip() or None)["drive"]
 
     # 1. Lister le contenu du dossier
     files = _lister_fichiers_drive(drive, folder_id)

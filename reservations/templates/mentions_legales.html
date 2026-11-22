@@ -1,0 +1,56 @@
+{% extends "legal_base.html" %}
+{% block title %}Mentions légales{% endblock %}
+{% block subtitle %}Mentions légales{% endblock %}
+{% block content %}
+<h1>Mentions légales</h1>
+<p class="updated">Conformément à l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN).</p>
+
+<h2>Éditeur du site</h2>
+<ul>
+    <li><strong>Dénomination :</strong> {{ legal.name }}</li>
+    <li><strong>Forme juridique :</strong> {{ legal.form }}</li>
+    <li><strong>Exploitant / représentant légal :</strong> {{ legal.owner }}</li>
+    <li><strong>Siège :</strong> {{ legal.address }}</li>
+    <li><strong>SIRET :</strong> {{ legal.siret }}</li>
+    <li><strong>Immatriculation :</strong> {{ legal.registration }}</li>
+    <li><strong>TVA :</strong> {{ legal.vat_mention }}</li>
+    <li><strong>Inscription au registre des exploitants de voitures de transport avec chauffeur (VTC) :</strong> {{ legal.vtc_registry }}</li>
+    <li><strong>Assurance responsabilité civile professionnelle :</strong> {{ legal.insurance }}</li>
+    <li><strong>Téléphone :</strong> <a href="tel:{{ legal.phone }}">{{ legal.phone }}</a></li>
+    <li><strong>Email :</strong> <a href="mailto:{{ legal.email }}">{{ legal.email }}</a></li>
+</ul>
+
+<h2>Directeur de la publication</h2>
+<p>{{ legal.publication_director }}</p>
+
+<h2>Hébergeur</h2>
+<p>{{ legal.host }}</p>
+
+<h2>Activité réglementée</h2>
+<p>
+    L'activité de transport public particulier de personnes en voiture de transport avec chauffeur (VTC) est régie
+    par les articles L3120-1 et suivants du Code des transports. Le véhicule ne peut prendre en charge un client
+    que sur <strong>réservation préalable</strong> ; il ne peut ni stationner ni circuler sur la voie publique en quête de clients.
+</p>
+
+<h2>Propriété intellectuelle</h2>
+<p>
+    L'ensemble des contenus de ce site (textes, logos, photographies, mise en page) est la propriété de {{ legal.name }}
+    ou fait l'objet d'une autorisation d'utilisation. Toute reproduction ou représentation, totale ou partielle,
+    sans autorisation préalable est interdite (art. L122-4 du Code de la propriété intellectuelle).
+</p>
+<p>
+    Cartographie : © les contributeurs d'<a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>
+    (licence ODbL), fonds de carte © <a href="https://carto.com/attributions" rel="noopener">CARTO</a>.
+</p>
+
+<h2>Données personnelles et cookies</h2>
+<p>Voir notre <a href="{% url 'confidentialite' %}">politique de confidentialité</a>.</p>
+
+<h2>Médiation de la consommation</h2>
+<p>
+    Conformément à l'article L612-1 du Code de la consommation, en cas de litige non résolu après réclamation écrite
+    auprès de {{ legal.name }}, le client consommateur peut recourir gratuitement au médiateur suivant :
+    {{ legal.mediator }}.
+</p>
+{% endblock %}

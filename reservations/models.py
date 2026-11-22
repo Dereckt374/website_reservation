@@ -68,6 +68,11 @@ class Trajet(models.Model):
         choices=STATUTS,
         default="en_attente"
     )
+    # Numéro de facture : séquence chronologique et continue, attribué une seule fois
+    # (art. 242 nonies A, annexe II du CGI).
+    numero_facture = models.CharField(
+        "N° de facture", max_length=20, unique=True, null=True, blank=True, editable=False
+    )
     token_validation = models.UUIDField(
         "Token de validation",
         default=uuid.uuid4,

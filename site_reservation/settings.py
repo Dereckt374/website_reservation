@@ -79,9 +79,22 @@ CONSTANCE_CONFIG = {
     "contact_address_private": ("38 Rue Albert Varnet, 26000, VALENCE", "Adresse de référence pour les calculs de trajets"),
     "contact_siret": ("435 222 401 00067", "Numéro de SIRET de l'entreprise"),
     "horaires": ("Disponibilité 24/24 7/7, sous réserve de disponibilité", "Horaires de réservation"),
-    "slider_drive_user":      ("stephane@mesle-entreprises.fr", "Email du compte Google Drive pour le slider (impersonation)"),
-    "slider_drive_folder_id": ("1t9fOFALNxtEy85LAgOAcLw6X26puizCg", "ID du dossier Google Drive contenant les images du slider"),
-    "slider_excel_name":      ("excel_test_exemple.xlsx", "Nom du fichier Excel image→texte dans ce même dossier Drive"),
+    # Paramètres du slider Drive : voir .env_prod (slider_drive_folder_id, slider_excel_name, slider_drive_user)
+
+    # ─── Informations légales (mentions légales, CGV, factures) ───────────────
+    # Les valeurs "[À compléter …]" DOIVENT être renseignées dans l'admin avant la mise en ligne.
+    "legal_form":            ("[À compléter : forme juridique, ex. EI / SASU au capital de … €]", "Forme juridique (+ capital si société). Une EI doit faire figurer « EI » après son nom."),
+    "legal_owner":           ("[À compléter : nom et prénom de l'exploitant / représentant légal]", "Exploitant ou représentant légal"),
+    "legal_address":         ("[À compléter : adresse du siège / domiciliation]", "Adresse du siège (obligatoire dans les mentions légales et sur les factures)"),
+    "legal_registration":    ("[À compléter : RCS / RNE + ville]", "Immatriculation (RCS ou Registre national des entreprises)"),
+    "legal_vat_mention":     ("TVA non applicable, art. 293 B du CGI", "Mention TVA (franchise en base) ou n° de TVA intracommunautaire si assujetti"),
+    "legal_vtc_registry":    ("[À compléter : n° d'inscription au registre des exploitants VTC]", "N° d'inscription au registre des exploitants VTC (art. L3122-3 Code des transports)"),
+    "legal_insurance":       ("[À compléter : assureur RC professionnelle transport de personnes + n° de contrat]", "Assurance responsabilité civile professionnelle"),
+    "legal_publication_director": ("[À compléter : nom du directeur de la publication]", "Directeur de la publication du site"),
+    "legal_host":            ("[À compléter : nom, adresse et téléphone de l'hébergeur]", "Hébergeur du site (art. 6 LCEN)"),
+    "legal_mediator":        ("[À compléter : nom, adresse et site web du médiateur de la consommation]", "Médiateur de la consommation (art. L612-1 Code de la consommation)"),
+    "legal_cancellation":    ("[À compléter : conditions d'annulation, ex. annulation gratuite jusqu'à 24 h avant la prise en charge, 50 % du prix au-delà, 100 % en cas d'absence du client]", "Conditions d'annulation affichées dans les CGV"),
+    "legal_cgv_updated":     ("22/11/2026", "Date de dernière mise à jour des CGV / politique de confidentialité"),
 }
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
@@ -108,6 +121,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'reservations.context_processors.legal',
             ],
         },
     },

@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from .models import Trajet, ContactClient
 from datetime import timedelta
 from .utils import *
@@ -116,6 +117,15 @@ class TrajetForm(forms.ModelForm):
         return obj
 
 class ContactClientForm(forms.ModelForm):
+    # Acceptation expresse des CGV avant transmission de la demande (art. L221-5 et L221-14 Code de la consommation)
+    accepte_cgv = forms.BooleanField(
+        required=True,
+        label=mark_safe(
+            'J\'ai lu et j\'accepte les <a href="/cgv/" target="_blank">conditions générales de vente</a> '
+            '(dont l\'absence de droit de rétractation pour une prestation de transport à date déterminée).'
+        ),
+        error_messages={"required": "Vous devez accepter les conditions générales de vente pour transmettre votre demande."},
+    )
 
     class Meta:
         model = ContactClient

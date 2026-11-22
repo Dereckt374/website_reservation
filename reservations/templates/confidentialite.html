@@ -1,0 +1,83 @@
+{% extends "legal_base.html" %}
+{% block title %}Politique de confidentialité{% endblock %}
+{% block subtitle %}Politique de confidentialité{% endblock %}
+{% block content %}
+<h1>Politique de confidentialité</h1>
+<p class="updated">Dernière mise à jour : {{ legal.updated }}</p>
+
+<h2>Responsable du traitement</h2>
+<p>
+    {{ legal.name }} — {{ legal.owner }}, {{ legal.address }}.
+    Contact pour toute question relative à vos données : <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>.
+</p>
+
+<h2>Données collectées, finalités et bases légales</h2>
+<table>
+    <thead>
+        <tr><th>Traitement</th><th>Données</th><th>Base légale (RGPD art. 6)</th><th>Durée de conservation</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Répondre à un message envoyé via le formulaire de contact</td>
+            <td>Nom, prénom, téléphone, email, message</td>
+            <td>Mesures précontractuelles prises à votre demande / intérêt légitime à répondre</td>
+            <td>3 ans à compter du dernier contact</td>
+        </tr>
+        <tr>
+            <td>Estimer, réserver et réaliser un trajet</td>
+            <td>Adresses de départ et d'arrivée, dates et heures, nombre de passagers, commentaire, nom, prénom,
+                téléphone, email, coordonnées des autres passagers si vous les renseignez</td>
+            <td>Exécution du contrat ou de mesures précontractuelles</td>
+            <td>Durée de la relation commerciale puis 5 ans (prescription civile) ; demandes non confirmées : 1 an</td>
+        </tr>
+        <tr>
+            <td>Facturation et comptabilité</td>
+            <td>Identité, adresse de facturation, prestation, montant</td>
+            <td>Obligation légale</td>
+            <td>10 ans (art. L123-22 du Code de commerce)</td>
+        </tr>
+    </tbody>
+</table>
+<p>
+    Si vous renseignez les coordonnées d'autres passagers, vous vous engagez à les en avoir informés au préalable.
+    Les données sont utilisées uniquement pour ces finalités : elles ne sont ni vendues, ni utilisées à des fins de prospection.
+</p>
+
+<h2>Destinataires et sous-traitants</h2>
+<p>Vos données sont destinées à {{ legal.name }} et, pour les besoins strictement techniques du service, à :</p>
+<ul>
+    <li>l'hébergeur du site : {{ legal.host }} ;</li>
+    <li>Google (Gmail, Google Agenda, Google Drive) pour l'envoi des emails, la gestion du planning et l'archivage des
+        documents. Google LLC est établie aux États-Unis ; les transferts sont encadrés par le
+        <em>EU-U.S. Data Privacy Framework</em> et les clauses contractuelles types de la Commission européenne ;</li>
+    <li>OpenRouteService (HeiGIT, Allemagne) pour le calcul de la distance et du prix (adresses uniquement) ;</li>
+    <li>lors de la saisie des adresses et de l'affichage de la carte, votre navigateur interroge directement
+        Photon (komoot, Allemagne), OSRM (project-osrm.org), CARTO et unpkg.com : ces services reçoivent votre adresse IP
+        et les adresses saisies.</li>
+</ul>
+
+<h2>Cookies</h2>
+<p>
+    Le site n'utilise que des cookies strictement nécessaires à son fonctionnement : <code>sessionid</code> (suivi de
+    votre demande de réservation, 1 heure) et <code>csrftoken</code> (sécurité des formulaires). Conformément à
+    l'article 82 de la loi Informatique et Libertés, ils ne nécessitent pas de consentement. Aucun cookie de mesure
+    d'audience ou publicitaire n'est déposé.
+</p>
+
+<h2>Vos droits</h2>
+<p>
+    Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité
+    de vos données, ainsi que du droit de définir des directives relatives à leur sort après votre décès.
+    Pour les exercer : <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>. Une réponse vous sera apportée dans
+    un délai d'un mois.
+</p>
+<p>
+    Vous pouvez introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">www.cnil.fr/fr/plaintes</a>.
+</p>
+
+<h2>Sécurité</h2>
+<p>
+    Le site est servi exclusivement en HTTPS. L'accès aux données est limité à {{ legal.name }} et aux sous-traitants
+    listés ci-dessus.
+</p>
+{% endblock %}
