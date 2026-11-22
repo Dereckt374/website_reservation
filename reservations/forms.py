@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from .models import Trajet, ContactClient
+from .models import Trajet, ContactClient, Forfait, default_date
 from datetime import timedelta
 from .utils import *
 # from constance import config
@@ -195,3 +195,63 @@ class ContactForm(forms.Form):
             "placeholder": "Votre message..."
         })
     )
+
+
+class ForfaitChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.nom_depart} → {obj.nom_arrivee}"
+
+
+class ForfaitReservationForm(forms.Form):
+    """Demande de trajet au forfait : trajet prédéfini, seule l'heure de prise en charge est choisie."""
+    forfait = ForfaitChoiceField(
+        label="Forfait",
+        queryset=Forfait.objects.filter(actif=True),
+        widget=forms.RadioSelect,
+        empty_label=None,
+        error_messages={"required": "Choisissez un forfait.", "invalid_choice": "Ce forfait n'est plus disponible."},
+    )
+    date_aller = forms.DateTimeField(
+        label="Date et heure de prise en charge",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local", "step": 60, "class": "datetime-input"}, format="%Y-%m-%dT%H:%M"),
+        initial=default_date,
+    )
+    nb_passagers = forms.IntegerField(label="Nombre de passagers", min_value=1, max_value=4, initial=1)
+    commentaire_client = forms.CharField(label="Commentaire", required=False, widget=forms.Textarea)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        forfait = cleaned_data.get("forfait")
+        date_aller = cleaned_data.get("date_aller")
+        if not forfait or not date_aller:
+            return cleaned_data
+
+        min_allowed = timezone.now() + timedelta(minutes=5)
+        if date_aller < min_allowed:
+            self.info_message = "ℹ️ L'heure de départ a été ajustée."
+            date_aller = cleaned_data["date_aller"] = min_allowed
+
+        duree = forfait.duree_min or 60
+        if is_slot_available(id_agenda_creaneaux, date_aller, duree):
+            self.add_error("date_aller", "❌ L'horaire demandé est en dehors des horaires de réservation.")
+        elif not is_slot_available(id_agenda_reservations, date_aller, duree):
+            self.add_error("date_aller", "❌ Une reservation est déjà effectué sur l'horaire demandé.")
+
+        cleaned_data["prix"] = prix_forfait(forfait.tarif, date_aller)
+        return cleaned_data
+
+    def build_trajet(self):
+        """Trajet (non enregistré) correspondant au forfait choisi."""
+        forfait = self.cleaned_data["forfait"]
+        return Trajet(
+            adresse_depart=forfait.adresse_depart,
+            adresse_arrivee=forfait.adresse_arrivee,
+            date_aller=self.cleaned_data["date_aller"],
+            type_trajet=f"Forfait : {forfait.nom_depart} → {forfait.nom_arrivee}",
+            nb_passagers=self.cleaned_data["nb_passagers"],
+            commentaire_client=self.cleaned_data.get("commentaire_client") or None,
+            distance_km=round(forfait.distance_km) if forfait.distance_km is not None else None,
+            duree_min_aller=forfait.duree_min,
+            duree_min_retour=0,
+            price_euros=self.cleaned_data["prix"]["prix"],
+        )

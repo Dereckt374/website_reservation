@@ -131,3 +131,27 @@ class SliderSync(models.Model):
 
     def __str__(self):
         return f"Sync {self.synced_at:%d/%m/%Y %H:%M} — {self.images_count} image(s)"
+
+class Forfait(models.Model):
+    """Trajet à prix fixe (« forfait hôtel »), synchronisé depuis l'onglet « forfaits » de l'Excel du slider."""
+    nom_depart      = models.CharField("Départ (nom affiché)", max_length=200)
+    adresse_depart  = models.CharField("Adresse de départ", max_length=500,
+                                       help_text="Adresse complète utilisée pour le calcul (jamais affichée au client).")
+    nom_arrivee     = models.CharField("Arrivée (nom affiché)", max_length=200)
+    adresse_arrivee = models.CharField("Adresse d'arrivée", max_length=500,
+                                       help_text="Adresse complète utilisée pour le calcul (jamais affichée au client).")
+    tarif           = models.DecimalField("Tarif de jour (€ TTC)", max_digits=7, decimal_places=2,
+                                          validators=[MinValueValidator(Decimal("0.00"))])
+    duree_min       = models.PositiveIntegerField("Durée estimée (min)", null=True, blank=True)
+    distance_km     = models.DecimalField("Distance (km)", max_digits=7, decimal_places=1, null=True, blank=True)
+    ordre           = models.PositiveIntegerField("Ordre d'affichage", default=0)
+    actif           = models.BooleanField("Visible sur le site", default=True)
+    synced_at       = models.DateTimeField("Dernière synchronisation", auto_now=True)
+
+    class Meta:
+        verbose_name        = "Forfait hôtel"
+        verbose_name_plural = "Forfaits hôtel"
+        ordering            = ["ordre", "nom_depart", "nom_arrivee"]
+
+    def __str__(self):
+        return f"{self.nom_depart} → {self.nom_arrivee} ({self.tarif} €)"

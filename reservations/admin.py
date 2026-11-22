@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.utils.html import format_html
 from django.core.management import call_command
 
-from .models import Trajet, ContactClient, SliderSync
-from .utils import sync_slider_from_drive
+from .models import Trajet, ContactClient, SliderSync, Forfait
+from .utils import sync_slider_from_drive, sync_forfaits_from_drive
 
 
 @admin.register(Trajet)
@@ -88,3 +88,32 @@ class SliderSyncAdmin(admin.ModelAdmin):
             )
 
         return redirect("../")   # retour vers la liste SliderSync
+
+
+@admin.register(Forfait)
+class ForfaitAdmin(admin.ModelAdmin):
+    list_display  = ("nom_depart", "nom_arrivee", "tarif", "duree_min", "distance_km", "ordre", "actif", "synced_at")
+    list_editable = ("ordre", "actif")
+    readonly_fields = ("synced_at",)
+    change_list_template = "admin/reservations/forfait/change_list.html"
+
+    def get_urls(self):
+        custom = [
+            path("sync/", self.admin_site.admin_view(self.run_sync_view), name="forfait_run_sync"),
+        ]
+        return custom + super().get_urls()
+
+    def run_sync_view(self, request):
+        """Vue appelée par le bouton 'Synchroniser depuis Drive' : remplace les forfaits par l'onglet Excel."""
+        try:
+            result = sync_forfaits_from_drive()
+            self.message_user(
+                request,
+                format_html("✅ Sync terminée : {} forfait(s) importé(s).", result["forfaits_count"]),
+                messages.SUCCESS,
+            )
+            for erreur in result["erreurs"]:
+                self.message_user(request, format_html("⚠️ Ligne ignorée — {}", erreur), messages.WARNING)
+        except Exception as exc:
+            self.message_user(request, format_html("❌ Erreur lors de la sync : {}", exc), messages.ERROR)
+        return redirect("../")

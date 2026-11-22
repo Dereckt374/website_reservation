@@ -574,11 +574,85 @@ button:active,
 @media (max-width: 480px) {
     button,
     .btn-link {
-        font-size: 0.875rem;
-        padding: 10px 14px;
+        font-size: 1.1rem;
+        padding: 14px 16px;
     }
 
     #apercu {
         padding: 20px;
     }
+}
+
+/* ---- Forfaits hôtel ---- */
+.forfait-label {
+    font-weight: bold;
+    color: #444;
+    text-align: left;
+}
+
+.forfait-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.forfait-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: normal;
+    margin: 0;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.forfait-card:hover {
+    border-color: #007BFF;
+}
+
+.forfait-card:has(input:checked) {
+    border-color: #007BFF;
+    background-color: #f0f7ff;
+    box-shadow: 0 0 5px rgba(0,123,255,0.35);
+}
+
+.forfait-card input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    accent-color: #007BFF;
+}
+
+.forfait-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.forfait-route {
+    font-weight: bold;
+    color: #333;
+}
+
+.forfait-arrow {
+    color: #007BFF;
+}
+
+.forfait-duree {
+    font-size: 0.875rem;
+    color: #555;
+    font-style: italic;
+}
+
+.forfait-prix {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    font-size: 0.875rem;
+    color: #3c3c3c;
 }

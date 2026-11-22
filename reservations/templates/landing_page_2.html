@@ -17,7 +17,10 @@
     <p class="subtitle">
         Vos trajets en toute sérénité
     </p>
-    <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
+    <div class="topbar-actions">
+        <a href="{% url 'forfaits' %}" class="btn btn-secondary">Forfaits hôtel</a>
+        <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
+    </div>
 </header>
 
 <!-- SLIDER -->
@@ -69,7 +72,7 @@ const total = document.querySelectorAll(".slide").length;
 setInterval(() => {
     index = (index + 1) % total;
     slides.style.transform = `translateX(-${index * 100}%)`;
-}, 5000);
+}, 4000);
 </script>
 
 </body>

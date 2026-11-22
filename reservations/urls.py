@@ -7,6 +7,7 @@ urlpatterns = [
     path('landing_page/', views.landing_page, name='landing_page'),
     path('contact/', views.contact, name='contact'),
     path('reservation', views.index, name="reservation"),
+    path('forfaits-hotel/', views.forfaits, name="forfaits"),
     path('merci/', views.merci, name='merci'),
     path('mentions-legales/', views.mentions_legales, name='mentions_legales'),
     path('cgv/', views.cgv, name='cgv'),

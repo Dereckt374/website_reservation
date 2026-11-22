@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import TrajetForm, ContactClientForm, AdressClientForm, ContactForm
-from .models import Trajet, ContactClient
+from .forms import TrajetForm, ContactClientForm, AdressClientForm, ContactForm, ForfaitReservationForm
+from .models import Trajet, ContactClient, Forfait
 from .utils import *
 from django.conf import settings
 from django.http import HttpResponse, FileResponse, Http404
@@ -161,6 +161,39 @@ def index(request):
     context["form"] = form
 
     return render(request, "reservation.html", context)
+
+def forfaits(request):
+    """Réservation d'un trajet au forfait (« forfait hôtel ») : liste issue de l'onglet Excel synchronisé."""
+    context = context_init.copy()
+    context["name"] = config.driver
+    context["vehicle"] = config.vehicle
+    liste = list(Forfait.objects.filter(actif=True))
+    for f in liste:
+        f.grille = grille_forfait(f.tarif)
+        f.duree_txt = humaniser_duree(f.duree_min) if f.duree_min else None
+    context["forfaits"] = liste
+
+    if request.method == "POST":
+        form = ForfaitReservationForm(request.POST)
+        if form.is_valid():
+            trajet = form.build_trajet()
+            if "btnConfirmer" in request.POST:
+                trajet.checkout_reference = ''.join(random.sample(string.ascii_uppercase * 6, 6))
+                trajet.save()
+                request.session["trajet_id"] = trajet.id
+                return redirect("contact_form", client_ref=trajet.checkout_reference)
+            context["trajet"] = trajet
+            context["forfait_choisi"] = form.cleaned_data["forfait"]
+            context["prix"] = form.cleaned_data["prix"]
+            context["duree_txt"] = humaniser_duree(trajet.duree_min_aller) if trajet.duree_min_aller else None
+        else:
+            messages.error(request, "Erreur dans le formulaire ❌")
+    else:
+        form = ForfaitReservationForm(initial={"forfait": request.GET.get("f")})
+
+    context["form"] = form
+    return render(request, "forfaits.html", context)
+
 
 def contact_form_view(request, client_ref):
     context = context_init.copy()

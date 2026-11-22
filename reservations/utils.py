@@ -12,6 +12,8 @@ from constance import config
 from sumup import Sumup
 from sumup.checkouts import CreateCheckoutBody
 import random, string
+import unicodedata
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 # import uuid
 import smtplib
 from email.mime.text import MIMEText
@@ -111,6 +113,30 @@ def calculer_approche(adresse_depart, date_aller):
     except Exception as e:
         print(f"⚠️ Erreur calcul approche : {e}")
         return {"distance_km": "N/A", "duree_min": "N/A"}
+
+
+# ─── Forfaits hôtel ──────────────────────────────────────────────────────────
+# Le tarif saisi dans l'Excel est le tarif de jour. En soirée et la nuit, la même
+# majoration que pour les trajets classiques (evening_factor / night_factor) s'applique
+# à la totalité du forfait.
+
+def prix_forfait(tarif, date_aller):
+    """Prix d'un forfait à l'heure de prise en charge (heure locale), majorations incluses."""
+    multiplier = get_tarif_multiplier(timezone.localtime(date_aller).hour)
+    prix = (Decimal(str(tarif)) * Decimal(str(multiplier["coef"]))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return {"prix": prix, "coef": multiplier["coef"], "commentaire": multiplier["commentaire"]}
+
+
+def grille_forfait(tarif):
+    """Les trois prix d'un forfait (jour / soirée / nuit), pour l'affichage."""
+    tarif = Decimal(str(tarif))
+    def _majore(pourcent):
+        return (tarif * (1 + Decimal(str(pourcent)) / 100)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return {
+        "jour":  tarif,
+        "soir":  _majore(config.evening_factor),
+        "nuit":  _majore(config.night_factor),
+    }
 
 
 def get_merchant_code(sumup_api_key : str) -> str:
@@ -832,6 +858,131 @@ def _lister_fichiers_drive(drive, folder_id: str) -> list:
     return result.get("files", [])
 
 
+def _charger_excel_slider(drive, excel_files: list, excel_name: str):
+    """Télécharge l'Excel du dossier slider (celui nommé excel_name, sinon le premier trouvé)."""
+    excel_match = next((f for f in excel_files if f["name"] == excel_name), None) or \
+                  (excel_files[0] if excel_files else None)
+    if not excel_match:
+        return None
+    excel_data = _telecharger_fichier_drive(drive, excel_match["id"])
+    return openpyxl.load_workbook(io.BytesIO(excel_data), data_only=True)
+
+
+def _onglet_slider(wb):
+    """Onglet des textes du slider : le premier onglet qui n'est pas celui des forfaits."""
+    return next((ws for ws in wb.worksheets if "forfait" not in _normaliser(ws.title)), wb.worksheets[0])
+
+
+def _normaliser(texte) -> str:
+    """Minuscules sans accents, pour comparer des en-têtes saisis à la main."""
+    texte = unicodedata.normalize("NFKD", str(texte or "")).encode("ascii", "ignore").decode()
+    return texte.strip().lower()
+
+
+def _parser_tarif(valeur) -> Decimal:
+    """Accepte 45, 45.5, « 45,50 », « 45 € »."""
+    if isinstance(valeur, (int, float)):
+        return Decimal(str(valeur)).quantize(Decimal("0.01"))
+    texte = str(valeur or "").replace("€", "").replace(" ", "").replace(" ", "").replace(",", ".")
+    try:
+        return Decimal(texte).quantize(Decimal("0.01"))
+    except InvalidOperation:
+        raise ValueError(f"tarif illisible « {valeur} »")
+
+
+def sync_forfaits_from_drive() -> dict:
+    """
+    Synchronise les forfaits hôtel depuis l'onglet « Forfaits » de l'Excel du slider.
+
+    Colonnes attendues (en-têtes en ligne 1, accents et majuscules indifférents) :
+      - « Départ », « Arrivée », « Tarif »            : obligatoires (nom affiché + tarif de jour TTC)
+      - « Adresse départ », « Adresse arrivée »       : facultatives. Si absentes ou vides,
+        le nom est utilisé pour le calcul d'itinéraire (ex. « Novotel Valence Sud »).
+      - « Ordre »                                     : facultative, ordre d'affichage.
+    Le temps de trajet et la distance sont calculés pour chaque ligne (OpenRouteService).
+    Les forfaits existants sont remplacés par le contenu de l'onglet.
+    """
+    from django.db import transaction
+    from .models import Forfait
+
+    drive_user = os.getenv("slider_drive_user", "")
+    folder_id  = os.getenv("slider_drive_folder_id", "").strip()
+    excel_name = os.getenv("slider_excel_name", "").strip()
+    if not folder_id:
+        raise ValueError("Renseignez 'slider_drive_folder_id' dans .venv/.env_prod puis redémarrez le serveur.")
+
+    drive = get_services(impersonated_user=(drive_user or "").strip() or None)["drive"]
+    files = _lister_fichiers_drive(drive, folder_id)
+    excel_files = [f for f in files if f["name"].lower().endswith((".xlsx", ".xls"))]
+    wb = _charger_excel_slider(drive, excel_files, excel_name)
+    if wb is None:
+        raise ValueError("Aucun fichier Excel trouvé dans le dossier Drive du slider.")
+
+    ws = next((w for w in wb.worksheets if "forfait" in _normaliser(w.title)), None)
+    if ws is None:
+        raise ValueError("Aucun onglet « Forfaits » dans l'Excel du slider.")
+
+    headers = [_normaliser(c.value) for c in next(ws.iter_rows(min_row=1, max_row=1))]
+
+    def _col(*mots, sans=None):
+        for i, h in enumerate(headers):
+            if all(m in h for m in mots) and not (sans and sans in h):
+                return i
+        return None
+
+    col_nom_dep  = _col("depart", sans="adresse")
+    col_nom_arr  = _col("arriv", sans="adresse")
+    col_adr_dep  = _col("adresse", "depart")
+    col_adr_arr  = _col("adresse", "arriv")
+    col_tarif    = _col("tarif") if _col("tarif") is not None else _col("prix")
+    col_ordre    = _col("ordre")
+    if None in (col_nom_dep, col_nom_arr, col_tarif):
+        raise ValueError("L'onglet « Forfaits » doit contenir les colonnes « Départ », « Arrivée » et « Tarif ».")
+
+    def _cell(row, idx):
+        if idx is None or idx >= len(row) or row[idx] is None:
+            return ""
+        return str(row[idx]).strip()
+
+    forfaits, erreurs = [], []
+    for num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+        nom_dep, nom_arr = _cell(row, col_nom_dep), _cell(row, col_nom_arr)
+        if not nom_dep and not nom_arr:
+            continue  # ligne vide
+        try:
+            if not nom_dep or not nom_arr:
+                raise ValueError("départ ou arrivée manquant")
+            tarif   = _parser_tarif(row[col_tarif] if col_tarif < len(row) else None)
+            adr_dep = _cell(row, col_adr_dep) or nom_dep
+            adr_arr = _cell(row, col_adr_arr) or nom_arr
+            trajet  = evaluer_trajet(adr_dep, adr_arr, timezone.now())
+            ordre_txt = _cell(row, col_ordre)
+            forfaits.append(Forfait(
+                nom_depart=nom_dep, adresse_depart=adr_dep,
+                nom_arrivee=nom_arr, adresse_arrivee=adr_arr,
+                tarif=tarif,
+                duree_min=round(trajet["duree_min"]),
+                distance_km=Decimal(str(trajet["distance_km"])),
+                ordre=int(float(ordre_txt)) if ordre_txt else num,
+            ))
+        except Exception as e:
+            erreurs.append(f"ligne {num} ({nom_dep or '?'} → {nom_arr or '?'}) : {e}")
+
+    if not forfaits and erreurs:
+        raise ValueError("aucun forfait valide — " + " ; ".join(erreurs))
+
+    with transaction.atomic():
+        Forfait.objects.all().delete()
+        Forfait.objects.bulk_create(forfaits)
+
+    print(f"""
+🏨 Fonction - SYNC FORFAITS DRIVE
+    Forfaits importés : {len(forfaits)}
+    Erreurs : {len(erreurs)}
+    """)
+    return {"forfaits_count": len(forfaits), "erreurs": erreurs}
+
+
 def sync_slider_from_drive() -> dict:
     """
     Synchronise le slider depuis Google Drive :
@@ -881,13 +1032,10 @@ def sync_slider_from_drive() -> dict:
 
     # 5. Télécharger et parser l'Excel de mapping
     texts_map = {}
-    excel_match = next((f for f in excel_files if f["name"] == excel_name), None) or \
-                  (excel_files[0] if excel_files else None)
+    wb = _charger_excel_slider(drive, excel_files, excel_name)
 
-    if excel_match:
-        excel_data = _telecharger_fichier_drive(drive, excel_match["id"])
-        wb = openpyxl.load_workbook(io.BytesIO(excel_data))
-        ws = wb.active
+    if wb is not None:
+        ws = _onglet_slider(wb)
 
         # Lecture de l'en-tête pour localiser les colonnes dynamiquement
         headers = [str(c.value).strip().lower() if c.value else "" for c in next(ws.iter_rows(min_row=1, max_row=1))]
