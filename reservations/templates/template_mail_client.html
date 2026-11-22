@@ -1,126 +1,51 @@
-<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; color:#333; line-height:1.5; padding:20px;">
+{% extends "email_base.html" %}
 
-  <div style="max-width:650px; margin:auto; border:1px solid #e5e5e5; border-radius:8px; padding:25px;">
+{% comment %}E-mail envoyé par le webhook SumUp (paiement en ligne, actuellement désactivé).{% endcomment %}
 
-    <h2 style="color:#1a73e8; margin-bottom:5px;">
-      Votre réservation est confirmée
-    </h2>
-    <p style="margin-top:0;">
-      Bonjour {{ nom_client }},<br>
-      Nous vous confirmons que votre réservation a bien été validée.
+{% block title %}Réservation confirmée{% endblock %}
+{% block header_title %}Votre réservation est confirmée ✅{% endblock %}
+{% block header_subtitle %}Référence dossier : {{ reference_dossier }}{% endblock %}
+
+{% block content %}
+    <p>Bonjour <strong>{{ nom_client }}</strong>,</p>
+
+    <p>Nous vous confirmons que votre réservation a bien été validée. Vous trouverez ci-dessous le récapitulatif de votre trajet.</p>
+
+    <h3 class="section">📝 Votre réservation</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Référence :</td><td>{{ reference_dossier }}</td></tr>
+            <tr><td class="k">Date de la demande :</td><td>{{ asked_date }}</td></tr>
+            <tr><td class="k">Mode de réservation :</td><td>{{ mode_reservation }}</td></tr>
+        </table>
+    </div>
+
+    <h3 class="section">📍 Votre trajet</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Départ :</td><td><strong>{{ date_aller }} à {{ heure_aller }}</strong></td></tr>
+            <tr><td class="k">Arrivée estimée :</td><td>{{ date_arrivee_estimee }} à {{ heure_arrivee_estimee }}</td></tr>
+            <tr><td class="k">Adresse de départ :</td><td>{{ adresse_depart }}</td></tr>
+            <tr><td class="k">Adresse d'arrivée :</td><td>{{ adresse_arrivee }}</td></tr>
+            <tr><td class="k">Durée estimée :</td><td>{{ temps_humain }}</td></tr>
+        </table>
+    </div>
+
+    <h3 class="section">🚘 Votre chauffeur</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Chauffeur :</td><td>{{ driver }}</td></tr>
+            <tr><td class="k">Véhicule :</td><td>{{ vehicle }}</td></tr>
+        </table>
+    </div>
+
+    <p>Pour toute question ou modification de votre trajet, n'hésitez pas à nous contacter :</p>
+    <p>
+        📞 <a href="tel:{{ telephone }}">{{ telephone }}</a><br>
+        ✉️ <a href="mailto:{{ mail }}">{{ mail }}</a>
     </p>
 
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+    <p>Merci pour votre confiance, nous vous souhaitons un excellent trajet !<br><strong>{{ driver }}</strong></p>
+{% endblock %}
 
-
-    <!-- SECTION RÉSERVATION -->
-    <h3 style="margin-bottom:8px;">📝 Détails de votre réservation</h3>
-
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:8px 0; width:210px; font-weight:bold;">Date de la demande :</td>
-        <td style="padding:8px 0;">{{ asked_date }}</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Mode de réservation :</td>
-        <td style="padding:8px 0;">{{ mode_reservation }}</td>
-        <td style="padding:8px 0; font-weight:bold;">Référence de dossier : {{ reference_dossier }}</td>
-        
-      </tr>
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Nom du client :</td>
-        <td style="padding:8px 0;">{{ nom_client }}</td>
-      </tr>
-    </table>
-
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-
-    <!-- SECTION TRAJET -->
-    <h3 style="margin-bottom:8px;">🚗 Informations sur le trajet</h3>
-
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:8px 0; width:210px; font-weight:bold;">Conducteur :</td>
-        <td style="padding:8px 0;">{{ driver }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Véhicule :</td>
-        <td style="padding:8px 0;">{{ vehicle }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Départ :</td>
-        <td style="padding:8px 0;">
-          {{ date_aller }} à {{ heure_aller }}
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Arrivée estimée :</td>
-        <td style="padding:8px 0;">
-          {{ date_arrivee_estimee }} à {{ heure_arrivee_estimee }}
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Adresse de départ :</td>
-        <td style="padding:8px 0;">{{ adresse_depart }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Adresse d'arrivée :</td>
-        <td style="padding:8px 0;">{{ adresse_arrivee }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:8px 0; font-weight:bold;">Durée estimée :</td>
-        <td style="padding:8px 0;">{{ temps_humain }}</td>
-      </tr>
-    </table>
-
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-
-    <!-- SECTION CONTACT -->
-    <h3 style="margin-bottom:8px;">📞 Informations utiles & assistance</h3>
-
-    <p style="margin-bottom:10px; font-size:14px;">
-      Pour toute question ou modification de votre trajet :
-    </p>
-
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
-      <tr>
-        <td style="padding:6px 0; width:210px; font-weight:bold;">Téléphone d'urgence :</td>
-        <td style="padding:6px 0;">{{ telephone }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Email de contact :</td>
-        <td style="padding:6px 0;">{{ mail }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">SIRET :</td>
-        <td style="padding:6px 0;">{{ siret }}</td>
-      </tr>
-    </table>
-
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:25px 0;">
-
-
-    <p style="font-size:13px; color:#777;">
-      Merci pour votre confiance.<br>
-      Si vous avez besoin d'assistance avant votre trajet, nous restons à votre disposition.
-    </p>
-
-  </div>
-
-</body>
-</html>
+{% block footer_extra %}<p>Message généré automatiquement — merci de ne pas répondre directement à cet email.</p>{% endblock %}

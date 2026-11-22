@@ -1,53 +1,25 @@
-<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; color:#333; line-height:1.5; padding:20px;">
+{% extends "email_base.html" %}
 
-  <div style="max-width:600px; margin:auto; border:1px solid #e5e5e5; border-radius:8px; padding:20px;">
+{% block title %}Confirmation de votre message{% endblock %}
+{% block header_title %}Message bien reçu ✅{% endblock %}
+{% block header_subtitle %}Nous revenons vers vous très rapidement{% endblock %}
 
-    <h2 style="color:#1a73e8; margin-bottom:10px;">
-      Confirmation de votre message
-    </h2>
+{% block content %}
+    <p>Bonjour <strong>{{ prenom }} {{ nom }}</strong>,</p>
 
-    <p>
-      Bonjour {{ prenom }} {{ nom }},<br>
-      Nous avons bien reçu votre message. Nous vous contacterons dans les plus brefs délais.
-    </p>
+    <p>Nous avons bien reçu votre message et nous vous en remercions.<br>
+    Nous vous recontacterons <strong>dans les plus brefs délais</strong>.</p>
 
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Récapitulatif de votre message</h3>
-
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:6px 0; width:180px; font-weight:bold;">Nom :</td>
-        <td style="padding:6px 0;">{{ nom }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Prénom :</td>
-        <td style="padding:6px 0;">{{ prenom }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Téléphone :</td>
-        <td style="padding:6px 0;">{{ telephone }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Email :</td>
-        <td style="padding:6px 0;">{{ email }}</td>
-      </tr>
-    </table>
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Votre message</h3>
-    <div style="background:#f8f8f8; padding:15px; border-radius:6px; white-space: pre-wrap;">
-      {{ message }}
+    <h3 class="section">📝 Vos coordonnées</h3>
+    <div class="recap">
+        <p><strong>Nom :</strong> {{ nom }}</p>
+        <p><strong>Prénom :</strong> {{ prenom }}</p>
+        <p><strong>Téléphone :</strong> {{ telephone }}</p>
+        <p><strong>Email :</strong> {{ email }}</p>
     </div>
 
-    <p style="margin-top:20px; font-size:14px; color:#666;">
-      Cordialement,<br>
-      L'équipe MESLÉ VTC
-    </p>
+    <h3 class="section">💬 Votre message</h3>
+    <div class="message">{{ message }}</div>
 
-  </div>
-</body>
-</html>
+    <p>À très bientôt,<br><strong>L'équipe {{ legal.name }}</strong></p>
+{% endblock %}

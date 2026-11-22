@@ -1,128 +1,54 @@
-<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; color:#333; line-height:1.6; padding:20px; background:#f5f5f5;">
+{% extends "email_base.html" %}
 
-  <div style="max-width:640px; margin:auto; background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:30px;">
+{% block title %}Nouvelle demande de réservation{% endblock %}
+{% block header_title %}Nouvelle demande de réservation 🚗{% endblock %}
+{% block header_subtitle %}Référence dossier : {{ reference }}{% endblock %}
 
-    <!-- EN-TÊTE -->
-    <h2 style="color:#1a73e8; margin-bottom:4px;">🚗 Nouvelle demande de réservation</h2>
-    <p style="margin-top:0; color:#555;">Référence dossier : <strong>{{ reference }}</strong></p>
+{% block content %}
+    <p>Une nouvelle demande de réservation vient d'être déposée sur le site. Elle est <strong>en attente de votre validation</strong>.</p>
 
-    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
-
-
-    <!-- SECTION CLIENT -->
-    <h3 style="margin-bottom:8px; color:#333;">👤 Informations client</h3>
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:5px 0; width:200px; font-weight:bold;">Nom :</td>
-        <td style="padding:5px 0;">{{ nom_client }} {{ prenom_client }}</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Téléphone :</td>
-        <td style="padding:5px 0;"><a href="tel:{{ telephone_client }}" style="color:#1a73e8;">{{ telephone_client }}</a></td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Email :</td>
-        <td style="padding:5px 0;"><a href="mailto:{{ email_client }}" style="color:#1a73e8;">{{ email_client }}</a></td>
-      </tr>
-      {% if passagers %}
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Passagers :</td>
-        <td style="padding:5px 0;">{{ passagers }}</td>
-      </tr>
-      {% endif %}
-    </table>
-
-    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
-
-
-    <!-- SECTION TRAJET -->
-    <h3 style="margin-bottom:8px; color:#333;">📍 Détails du trajet</h3>
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:5px 0; width:200px; font-weight:bold;">Type :</td>
-        <td style="padding:5px 0;">{{ type_trajet }}</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Date de départ :</td>
-        <td style="padding:5px 0;"><strong>{{ date_aller }} à {{ heure_aller }}</strong></td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Adresse de départ :</td>
-        <td style="padding:5px 0;">{{ adresse_depart }}</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Adresse d'arrivée :</td>
-        <td style="padding:5px 0;">{{ adresse_arrivee }}</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Distance :</td>
-        <td style="padding:5px 0;">{{ distance_km }} km</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Durée estimée (aller) :</td>
-        <td style="padding:5px 0;">{{ duree_min_aller }} min</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold; color:#1a73e8;">Prix estimé :</td>
-        <td style="padding:5px 0; font-weight:bold; color:#1a73e8;">{{ price_euros }} €</td>
-      </tr>
-      {% if commentaire_client %}
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Commentaire client :</td>
-        <td style="padding:5px 0; font-style:italic;">{{ commentaire_client }}</td>
-      </tr>
-      {% endif %}
-    </table>
-
-    <!-- Trajet retour (si applicable) -->
-    {% if date_retour %}
-    <div style="background:#f0f7ff; border-left:4px solid #1a73e8; padding:12px 16px; margin-top:16px; border-radius:4px;">
-      <strong>↩️ Trajet retour :</strong> {{ date_retour }} à {{ heure_retour }} — Durée estimée : {{ duree_min_retour }} min
+    <h3 class="section">👤 Informations client</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Nom :</td><td>{{ nom_client }} {{ prenom_client }}</td></tr>
+            <tr><td class="k">Téléphone :</td><td><a href="tel:{{ telephone_client }}">{{ telephone_client }}</a></td></tr>
+            <tr><td class="k">Email :</td><td><a href="mailto:{{ email_client }}">{{ email_client }}</a></td></tr>
+            {% if passagers %}<tr><td class="k">Passagers :</td><td>{{ passagers }}</td></tr>{% endif %}
+        </table>
     </div>
+
+    <h3 class="section">📍 Détails du trajet</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Type :</td><td>{{ type_trajet }}</td></tr>
+            <tr><td class="k">Départ :</td><td><strong>{{ date_aller }} à {{ heure_aller }}</strong></td></tr>
+            <tr><td class="k">Adresse de départ :</td><td>{{ adresse_depart }}</td></tr>
+            <tr><td class="k">Adresse d'arrivée :</td><td>{{ adresse_arrivee }}</td></tr>
+            <tr><td class="k">Distance :</td><td>{{ distance_km }} km</td></tr>
+            <tr><td class="k">Durée estimée (aller) :</td><td>{{ duree_min_aller }} min</td></tr>
+            {% if date_retour %}<tr><td class="k">↩️ Trajet retour :</td><td>{{ date_retour }} à {{ heure_retour }} — {{ duree_min_retour }} min</td></tr>{% endif %}
+            <tr class="total"><td class="k">Prix estimé :</td><td>{{ price_euros }} €</td></tr>
+        </table>
+    </div>
+
+    {% if commentaire_client %}
+    <h3 class="section">💬 Commentaire client</h3>
+    <div class="message">{{ commentaire_client }}</div>
     {% endif %}
 
-    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
-
-
-    <!-- SECTION APPROCHE -->
-    <h3 style="margin-bottom:8px; color:#333;">🏠 Distance d'approche</h3>
-    <p style="color:#555; font-size:14px;">Depuis votre adresse de référence (<em>{{ adresse_reference }}</em>) jusqu'au point de départ client :</p>
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:5px 0; width:200px; font-weight:bold;">Distance approche :</td>
-        <td style="padding:5px 0;">{{ approche_distance_km }} km</td>
-      </tr>
-      <tr>
-        <td style="padding:5px 0; font-weight:bold;">Durée approche :</td>
-        <td style="padding:5px 0;">{{ approche_duree_min }} min</td>
-      </tr>
-    </table>
-
-    <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0;">
-
-
-    <!-- BOUTON DE VALIDATION -->
-    <div style="text-align:center; margin:30px 0;">
-      <a href="{{ validation_url }}"
-         style="background-color:#16a34a; color:#fff; padding:14px 32px;
-                text-decoration:none; border-radius:8px; font-size:16px;
-                font-weight:bold; display:inline-block; letter-spacing:0.3px;">
-        ✅ Valider la réservation
-      </a>
-      <p style="margin-top:12px; font-size:12px; color:#888;">
-        Lien de validation : <a href="{{ validation_url }}" style="color:#1a73e8;">{{ validation_url }}</a>
-      </p>
+    <h3 class="section">🏠 Distance d'approche</h3>
+    <div class="recap">
+        <p>Depuis <em>{{ adresse_reference }}</em> jusqu'au point de départ :</p>
+        <table class="kv">
+            <tr><td class="k">Distance approche :</td><td>{{ approche_distance_km }} km</td></tr>
+            <tr><td class="k">Durée approche :</td><td>{{ approche_duree_min }} min</td></tr>
+        </table>
     </div>
 
-    <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
+    <div class="actions">
+        <a href="{{ validation_url }}" class="btn btn-success">✅ Valider la réservation</a>
+    </div>
+    <p class="note" style="text-align:center;">Lien de validation : <a href="{{ validation_url }}">{{ validation_url }}</a></p>
+{% endblock %}
 
-    <p style="font-size:12px; color:#aaa; text-align:center;">
-      Message généré automatiquement par le système de réservation VTC.
-    </p>
-
-  </div>
-
-</body>
-</html>
+{% block footer_extra %}<p>Message généré automatiquement par le système de réservation VTC.</p>{% endblock %}

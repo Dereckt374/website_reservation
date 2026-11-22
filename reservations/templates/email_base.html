@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VTC MESLE Valence{% endblock %}</title>
+    {% comment %}
+    Gabarit commun à tous les e-mails, sur le modèle de « Demande de trajet reçue ».
+    Blocs disponibles : title, header_title, header_subtitle, content, footer_extra.
+    Composants : .recap (encadré récapitulatif, avec ou sans table.kv), h3.section,
+    .message (texte libre), .btn / .btn-success / .btn-danger, .note (petit texte gris).
+    {% endcomment %}
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .wrapper { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .header { background: #009fe3; padding: 30px 40px; text-align: center; }
+        .header h1 { color: #ffffff; font-size: 1.5rem; margin: 0; letter-spacing: 0.05rem; }
+        .header p { color: #d0effa; font-size: 0.9rem; margin: 6px 0 0; }
+        .body { padding: 35px 40px; color: #3a3a3a; }
+        .body p { line-height: 1.7; margin: 0 0 16px; }
+        .body a { color: #009fe3; }
+        h3.section { color: #007ab8; font-size: 1rem; margin: 28px 0 0; }
+        .recap { background: #f0f8fd; border-left: 4px solid #009fe3; border-radius: 6px; padding: 18px 22px; margin: 16px 0 24px; }
+        .recap p { margin: 6px 0; font-size: 0.92rem; }
+        .recap strong { color: #007ab8; }
+        .kv { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        .kv td { padding: 5px 0; vertical-align: top; line-height: 1.5; }
+        .kv td.k { width: 190px; font-weight: bold; color: #007ab8; padding-right: 12px; }
+        .kv tr.total td { padding-top: 10px; font-size: 1rem; font-weight: bold; color: #007ab8; }
+        .message { background: #f7f7f7; border-radius: 6px; padding: 16px 20px; margin: 16px 0 24px; font-size: 0.92rem; line-height: 1.6; white-space: pre-wrap; }
+        .actions { text-align: center; margin: 30px 0 10px; }
+        .btn { display: inline-block; background: #009fe3; color: #ffffff !important; padding: 13px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; margin: 6px; }
+        .btn-success { background: #16a34a; }
+        .btn-danger { background: #d90429; }
+        .note { font-size: 0.8rem; color: #888; line-height: 1.5; }
+        .note a { word-break: break-all; }
+        .footer { background: #f0f0f0; text-align: center; padding: 18px 40px; font-size: 0.78rem; color: #888; }
+        .footer p { margin: 0 0 6px; }
+        .footer a { color: #009fe3; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <div class="header">
+        <h1>{% block header_title %}VTC MESLE Valence{% endblock %}</h1>
+        <p>{% block header_subtitle %}{% endblock %}</p>
+    </div>
+
+    <div class="body">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        {% block footer_extra %}{% endblock %}
+        <p>{{ legal.name }} — {{ legal.form }} — {{ legal.address }}<br>
+        SIRET : {{ legal.siret }} — Registre VTC : {{ legal.vtc_registry }}<br>
+        <a href="mailto:{{ legal.email }}">{{ legal.email }}</a>
+        {% if site_domain %} · <a href="https://{{ site_domain }}/cgv/">CGV</a> · <a href="https://{{ site_domain }}/confidentialite/">Confidentialité</a>{% endif %}</p>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,47 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; color:#333; line-height:1.5; padding:20px;">
+{% extends "email_base.html" %}
 
-  <div style="max-width:600px; margin:auto; border:1px solid #e5e5e5; border-radius:8px; padding:20px;">
+{% block title %}Nouveau message de contact{% endblock %}
+{% block header_title %}Nouveau message de contact ✉️{% endblock %}
+{% block header_subtitle %}Envoyé via le formulaire du site{% endblock %}
 
-    <h2 style="color:#1a73e8; margin-bottom:10px;">
-      Nouveau message de contact
-    </h2>
+{% block content %}
+    <p>Un nouveau message a été envoyé via le formulaire de contact du site.</p>
 
-    <p>
-      Un nouveau message a été envoyé via le formulaire de contact du site.
-    </p>
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Informations du contact</h3>
-
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:6px 0; width:180px; font-weight:bold;">Nom :</td>
-        <td style="padding:6px 0;">{{ nom }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Prénom :</td>
-        <td style="padding:6px 0;">{{ prenom }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Téléphone :</td>
-        <td style="padding:6px 0;">{{ telephone }}</td>
-      </tr>
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Email :</td>
-        <td style="padding:6px 0;">{{ email }}</td>
-      </tr>
-    </table>
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Message</h3>
-    <div style="background:#f8f8f8; padding:15px; border-radius:6px; white-space: pre-wrap;">
-      {{ message }}
+    <h3 class="section">👤 Informations du contact</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Nom :</td><td>{{ nom }} {{ prenom }}</td></tr>
+            <tr><td class="k">Téléphone :</td><td><a href="tel:{{ telephone }}">{{ telephone }}</a></td></tr>
+            <tr><td class="k">Email :</td><td>{% if email %}<a href="mailto:{{ email }}">{{ email }}</a>{% else %}—{% endif %}</td></tr>
+        </table>
     </div>
 
-  </div>
-</body>
-</html>
+    <h3 class="section">💬 Message</h3>
+    <div class="message">{{ message }}</div>
+{% endblock %}
+
+{% block footer_extra %}<p>Message généré automatiquement par le site.</p>{% endblock %}

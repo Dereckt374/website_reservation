@@ -1,92 +1,36 @@
-<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; color:#333; line-height:1.5; padding:20px;">
+{% extends "email_base.html" %}
 
-  <div style="max-width:600px; margin:auto; border:1px solid #e5e5e5; border-radius:8px; padding:20px;">
+{% comment %}E-mail envoyé par le webhook SumUp (paiement en ligne, actuellement désactivé).{% endcomment %}
 
-    <h2 style="color:#1a73e8; margin-bottom:10px;">
-      Nouvelle réservation confirmée
-    </h2>
+{% block title %}Nouvelle réservation payée{% endblock %}
+{% block header_title %}Nouvelle réservation payée 💳{% endblock %}
+{% block header_subtitle %}Validée et payée via le site{% endblock %}
 
-    <p>
-      Une nouvelle réservation vient d'être <strong>validée et payée</strong> via le site.
+{% block content %}
+    <p>Une nouvelle réservation vient d'être <strong>validée et payée</strong> via le site.</p>
+
+    <h3 class="section">ℹ️ Informations générales</h3>
+    <div class="recap">
+        <table class="kv">
+            <tr><td class="k">Checkout ID :</td><td>{{ checkout_id }}</td></tr>
+            <tr><td class="k">Statut du paiement :</td><td><strong style="color:#16a34a;">{{ status }}</strong></td></tr>
+            <tr><td class="k">Adresse IP client :</td><td>{{ request.META.REMOTE_ADDR }}</td></tr>
+        </table>
+    </div>
+
+    <h3 class="section">📦 Données de réservation</h3>
+    <p class="note">Informations issues du payload reçu au moment du paiement.</p>
+    <div class="message" style="font-family: monospace; font-size: 0.8rem;">{{ data }}</div>
+
+    <h3 class="section">↩️ Remboursement</h3>
+    <div class="actions">
+        <a href="{{ partial_refund_link }}" class="btn btn-danger">Remboursement partiel (80 %)</a>
+        <a href="{{ full_refund_link }}" class="btn btn-danger" style="background:#9b1c31;">Remboursement total (100 %)</a>
+    </div>
+    <p class="note" style="text-align:center;">
+        Partiel : <a href="{{ partial_refund_link }}">{{ partial_refund_link }}</a><br>
+        Total : <a href="{{ full_refund_link }}">{{ full_refund_link }}</a>
     </p>
+{% endblock %}
 
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Informations générales</h3>
-
-    <table style="width:100%; border-collapse:collapse;">
-      <tr>
-        <td style="padding:6px 0; width:180px; font-weight:bold;">Checkout ID :</td>
-        <td style="padding:6px 0;">{{ checkout_id }}</td>
-      </tr>
-
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Statut du paiement :</td>
-        <td style="padding:6px 0;">
-          <span style="color:green; font-weight:bold;">{{ status }}</span>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding:6px 0; font-weight:bold;">Adresse IP client :</td>
-        <td style="padding:6px 0;">
-          {{ request.META.REMOTE_ADDR }}
-        </td>
-      </tr>
-    </table>
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-
-    <h3 style="margin-bottom:5px;">Données de réservation</h3>
-    <p style="font-size:14px; color:#555;">
-      Les informations ci-dessous proviennent du payload reçu au moment du paiement.
-    </p>
-
-    <pre style="
-      background:#f8f8f8;
-      padding:15px;
-      border-radius:6px;
-      border:1px solid #e0e0e0;
-      font-size:13px;
-      overflow-x:auto;
-      white-space:pre-wrap;
-    ">{{ data }}</pre>
-
-    <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-<div style="
-    display:flex;
-    justify-content:center;
-    gap:30px;
-    margin-top:50px;
-">
-
-    <!-- Bouton 1 -->
-    <a href="{{ partial_refund_link }}"
-       style="background-color:#d90429; color:white; padding:10px 18px;
-              text-decoration:none; border-radius:6px; font-weight:bold;
-              display:inline-block;">
-        Remboursement partiel (80%)
-    </a>
-    Ci-après le lien : {{ partial_refund_link }}
-
-    <!-- Bouton 2 -->
-    <a href="{{ full_refund_link }}"
-       style="background-color:#9b1c31; color:white; padding:10px 18px;
-              text-decoration:none; border-radius:6px; font-weight:bold;
-              display:inline-block;">
-        Remboursement total (100%)
-    </a>
-    Ci-après le lien : {{ full_refund_link }}
-
-</div>
-
-    <p style="font-size:13px; color:#777;">
-      Ce message a été généré automatiquement par le système de réservation.
-    </p>
-
-  </div>
-
-</body>
-</html>
+{% block footer_extra %}<p>Message généré automatiquement par le système de réservation.</p>{% endblock %}
