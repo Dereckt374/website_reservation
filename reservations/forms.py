@@ -12,6 +12,12 @@ load_dotenv(dotenv_path = '.venv/.env_prod')
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 
+def message_contact_telephone():
+    """Invitation à appeler, ajoutée aux erreurs de créneau (numéro réglable dans l'admin)."""
+    return (f"Pour une demande sur cet horaire, veuillez vous adresser directement "
+            f"au chauffeur par téléphone au {config.contact_phone}.")
+
+
 class TrajetForm(forms.ModelForm):
     class Meta:
         model = Trajet
@@ -80,7 +86,8 @@ class TrajetForm(forms.ModelForm):
         if cleaned_data.get("date_aller"):
             if is_slot_available(id_agenda_creaneaux,  cleaned_data['date_aller'], data_trajet_aller['duree_min']):
                 self.add_error("date_aller",
-                               "❌ L'horaire pour le trajet aller est en dehors des horaires de réservation.")
+                               "❌ L'horaire pour le trajet aller est en dehors des horaires de réservation. "
+                               + message_contact_telephone())
         if cleaned_data.get("date_aller"):
             if not is_slot_available(id_agenda_reservations,  cleaned_data['date_aller'], data_trajet_aller['duree_min']):        
                 self.add_error("date_aller",
@@ -88,7 +95,8 @@ class TrajetForm(forms.ModelForm):
         if cleaned_data.get("date_retour") :
             if is_slot_available(id_agenda_creaneaux,  cleaned_data['date_retour'], data_trajet_retour['duree_min']):
                 self.add_error("date_retour",
-                               "❌ L'horaire pour le trajet retour est en dehors des horaires de réservation.")
+                               "❌ L'horaire pour le trajet retour est en dehors des horaires de réservation. "
+                               + message_contact_telephone())
         if cleaned_data.get("date_retour") :    
             if not is_slot_available(id_agenda_reservations,  cleaned_data['date_retour'], data_trajet_retour['duree_min']):
                 self.add_error("date_retour",
@@ -249,7 +257,8 @@ class ForfaitReservationForm(forms.Form):
 
         duree = forfait.duree_min or 60
         if is_slot_available(id_agenda_creaneaux, date_aller, duree):
-            self.add_error("date_aller", "❌ L'horaire demandé est en dehors des horaires de réservation.")
+            self.add_error("date_aller", "❌ L'horaire demandé est en dehors des horaires de réservation. "
+                                         + message_contact_telephone())
         elif not is_slot_available(id_agenda_reservations, date_aller, duree):
             self.add_error("date_aller", "❌ Une reservation est déjà effectué sur l'horaire demandé.")
 
