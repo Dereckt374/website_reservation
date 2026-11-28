@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import TrajetForm, ContactClientForm, AdressClientForm, ContactForm, ForfaitReservationForm
 from .models import Trajet, ContactClient, Forfait
 from .utils import *
+from .security import est_robot, limite_depassee, autoriser_reference, acces_reference
 from django.conf import settings
 from django.http import HttpResponse, FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -40,7 +41,13 @@ def contact(request):
     
     if request.method == "POST":
         form = ContactForm(request.POST)
-        if form.is_valid():
+        if est_robot(request):
+            # Robot : on fait comme si l'envoi avait réussi, sans rien envoyer
+            messages.success(request, "Message bien envoyé, vous serez contacté d'ici peu.")
+            form = ContactForm()
+        elif limite_depassee(request, "contact"):
+            messages.error(request, "Trop de messages envoyés. Merci de réessayer plus tard ou de nous appeler.")
+        elif form.is_valid():
             # Get form data
             nom = form.cleaned_data['nom']
             prenom = form.cleaned_data['prenom']
@@ -65,12 +72,13 @@ def contact(request):
             
             # Send email to client if email provided
             if email:
+                # Le message libre n'est pas recopié : l'e-mail de confirmation part de notre adresse
+                # vers une adresse saisie par le visiteur, il ne doit pas pouvoir servir à relayer du texte.
                 context_client = {
                     'nom': nom,
                     'prenom': prenom,
                     'telephone': telephone,
                     'email': email,
-                    'message': message,
                 }
                 send_email_template(
                     emails=[email],
@@ -138,8 +146,12 @@ def index(request):
     context['vehicle_immatriculation'] = config.vehicle_immatriculation
     context['vehicle'] = config.vehicle
     if request.method == "POST":
+        if est_robot(request) or limite_depassee(request, "calcul"):
+            messages.error(request, "Trop de demandes de calcul. Merci de réessayer plus tard ou de nous appeler.")
+            context["form"] = TrajetForm(request.POST)
+            return render(request, "reservation.html", context)
         form = TrajetForm(request.POST)
- 
+
         if "btnConfirmer" not in request.POST and form.is_valid():
             trajet = form.save(commit=False) 
 
@@ -175,7 +187,9 @@ def forfaits(request):
 
     if request.method == "POST":
         form = ForfaitReservationForm(request.POST)
-        if form.is_valid():
+        if est_robot(request) or limite_depassee(request, "calcul"):
+            messages.error(request, "Trop de demandes. Merci de réessayer plus tard ou de nous appeler.")
+        elif form.is_valid():
             trajet = form.build_trajet()
             if "btnConfirmer" in request.POST:
                 trajet.checkout_reference = ''.join(random.sample(string.ascii_uppercase * 6, 6))
@@ -212,6 +226,11 @@ def contact_form_view(request, client_ref):
     if request.method == "POST":
         form = ContactClientForm(request.POST)
         context["form"] = form
+        if est_robot(request):
+            return redirect("merci")
+        if limite_depassee(request, "demande"):
+            messages.error(request, "Trop de demandes transmises. Merci de réessayer plus tard ou de nous appeler.")
+            return render(request, "contact_reservation.html", context=context)
         if form.is_valid():
             telephone  = form.cleaned_data["telephone_client"]
             email_cl   = form.cleaned_data["email_client"]
@@ -222,6 +241,7 @@ def contact_form_view(request, client_ref):
             current_trajet.telephone_client = telephone
             current_trajet.save()
             form.save()
+            autoriser_reference(request, current_trajet.checkout_reference)
 
             # Calcul distance approche
             approche = calculer_approche(current_trajet.adresse_depart, current_trajet.date_aller)
@@ -529,6 +549,8 @@ def sumup_webhook(request):
     return HttpResponse("OK", status=200)
 
 def download_pdf_reservation(request, client_ref):
+    if not acces_reference(request, client_ref):
+        raise Http404("PDF non trouvé")
     pdf_path = os.path.join(settings.MEDIA_ROOT, "reservations/output/bons_de_reservations", f"bon_de_reservation_{client_ref}.pdf")
 
     if not os.path.exists(pdf_path):
@@ -551,15 +573,24 @@ def partial_refund(request, client_ref, checkout_id):
     return HttpResponse("Trajet remboursé partiellement")
 
 def facture_generation(request, client_ref):
+    # Réservé à l'admin ou au client qui a fait la réservation (sinon n'importe qui connaissant
+    # la référence pourrait modifier l'adresse du client)
+    if not acces_reference(request, client_ref):
+        raise Http404("Réservation introuvable")
+    current_trajet = Trajet.objects.filter(checkout_reference=client_ref).first()
+    if current_trajet is None:
+        raise Http404("Réservation introuvable")
+    client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
+    if client is None:
+        raise Http404("Client introuvable")
+
     context = context_init.copy()
     context['form'] = AdressClientForm()
     context['client_ref'] = client_ref
 
     if request.method == "POST":
         form = AdressClientForm(request.POST)
-        if form.is_valid(): 
-            current_trajet = Trajet.objects.get(checkout_reference=client_ref)
-            client = ContactClient.objects.filter(telephone_client=current_trajet.telephone_client).last()
+        if form.is_valid():
             adress = form.cleaned_data["client_adress"]
             client.client_adress = adress
             client.save()
@@ -572,6 +603,8 @@ def facture_generation(request, client_ref):
 
 
 def download_pdf_facture(request, client_ref):
+    if not acces_reference(request, client_ref):
+        raise Http404("PDF non trouvé")
     pdf_path = os.path.join(settings.MEDIA_ROOT, "reservations/output/factures", f"facture_{client_ref}.pdf")
 
     if not os.path.exists(pdf_path):

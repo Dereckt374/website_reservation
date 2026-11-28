@@ -73,7 +73,7 @@
             {% endif %}
             
             <form id="contactForm" method="post" novalidate>
-                {% csrf_token %}
+                {% csrf_token %}{% include "_honeypot.html" %}
                 
                 {% if form.non_field_errors %}
                     <div style="color: red; margin-bottom: 15px;">

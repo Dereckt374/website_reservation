@@ -109,7 +109,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'reservations.security.AdminLoginThrottleMiddleware',   # blocage après 5 échecs de connexion admin
 ]
+
+# Cache sur disque : partagé entre les workers Gunicorn (compteurs anti-abus de reservations/security.py)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": BASE_DIR / ".django_cache",
+    }
+}
 
 ROOT_URLCONF = 'site_reservation.urls'
 

@@ -12,6 +12,14 @@ load_dotenv(dotenv_path = '.venv/.env_prod')
 id_agenda_creaneaux = os.getenv("id_agenda_creaneaux")
 id_agenda_reservations = os.getenv("id_agenda_reservations")
 
+# Noms et prénoms : lettres (accents compris), espaces, tirets, apostrophes. Empêche d'y glisser
+# un lien ou un texte arbitraire, recopié ensuite dans les e-mails envoyés depuis notre adresse.
+valider_nom = RegexValidator(
+    regex=r"^[A-Za-zÀ-ÖØ-öø-ÿ' \-]{1,60}$",
+    message="Utilisez uniquement des lettres, espaces, tirets ou apostrophes.",
+)
+
+
 def message_contact_telephone():
     """Invitation à appeler, ajoutée aux erreurs de créneau (numéro réglable dans l'admin)."""
     return (f"Pour une demande sur cet horaire, veuillez vous adresser directement "
@@ -150,6 +158,16 @@ class ContactClientForm(forms.ModelForm):
         error_messages={"required": "Vous devez accepter les conditions générales de vente pour transmettre votre demande."},
     )
 
+    def clean_nom_client(self):
+        valeur = self.cleaned_data["nom_client"].strip()
+        valider_nom(valeur)
+        return valeur
+
+    def clean_prenom_client(self):
+        valeur = self.cleaned_data["prenom_client"].strip()
+        valider_nom(valeur)
+        return valeur
+
     class Meta:
         model = ContactClient
         fields = [
@@ -188,12 +206,14 @@ class AdressClientForm(forms.ModelForm):
 class ContactForm(forms.Form):
     nom = forms.CharField(
         label="Nom",
-        max_length=100,
+        max_length=60,
+        validators=[valider_nom],
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Votre nom"})
     )
     prenom = forms.CharField(
         label="Prénom",
-        max_length=100,
+        max_length=60,
+        validators=[valider_nom],
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Votre prénom"})
     )
     telephone = forms.CharField(

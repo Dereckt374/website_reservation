@@ -30,7 +30,7 @@
     </div>
 
     <form method="POST">
-      {% csrf_token %}
+      {% csrf_token %}{% include "_honeypot.html" %}
 
       {{ form.as_p }}
 

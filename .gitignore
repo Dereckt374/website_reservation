@@ -7,3 +7,4 @@ db.sqlite3
 */migrations/*
 staticfiles/
 .claude/
+.django_cache/

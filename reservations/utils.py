@@ -66,8 +66,9 @@ def get_tarif_multiplier(hour):
 def _geocoder_adresse(adresse):
     """Géocode une adresse via l'API ORS, retourne (lat, lon)."""
     url = f"{ORS_BASE_URL}/pelias/v1/search"
-    params = {"api_key": ors_api_key, "text": adresse, "size": 1, "boundary.country": "FRA,MCO,BEL,CHE,LUX"}
-    resp = requests.get(url, params=params, timeout=10)
+    # Clé dans l'en-tête et non dans l'URL : sinon elle apparaît dans les messages d'erreur et les logs
+    params = {"text": adresse, "size": 1, "boundary.country": "FRA,MCO,BEL,CHE,LUX"}
+    resp = requests.get(url, params=params, headers={"Authorization": ors_api_key}, timeout=10)
     resp.raise_for_status()
     features = resp.json().get("features", [])
     if not features:

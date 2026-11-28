@@ -49,7 +49,7 @@
 
 {% if forfaits %}
 <form id="trajetForm" method="POST">
-  {% csrf_token %}
+  {% csrf_token %}{% include "_honeypot.html" %}
   {% if trajet %}
     <button name="btnConfirmer" type="submit">Continuer ma demande</button>
     <button type="button" id="toggleForm">Modifier la prestation ⯆</button>
