@@ -8,6 +8,7 @@
     <!-- On relie ton CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% include "_favicon.html" %}
 </head>
 
 
@@ -65,7 +66,7 @@
   
   <p class="note">Notes :</p>
   <p class="note">Bagages autorisés : 1 bagage cabine par personne</p>
-  <p class="note">Tarif : {{ legal.price_per_km }} €/km + {{ legal.hourly_cost }} €/h de trajet ; part horaire majorée de {{ legal.evening_factor }} % de 19 h à 23 h et de {{ legal.night_factor }} % de 23 h à 6 h. Prix TTC ({{ legal.vat_mention }}).</p>
+  <p class="note">Tarif : {{ legal.price_per_km }} €/km + {{ legal.hourly_cost }} €/h de trajet ; part horaire majorée de {{ legal.night_factor }} % la nuit, de {{ legal.night_start }} à {{ legal.night_end }}. Prix TTC ({{ legal.vat_mention }}).</p>
   <p class="note">Véhicule utilisé pour la prestation : {{ vehicle }}</p>
   <p class="note">{{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
   

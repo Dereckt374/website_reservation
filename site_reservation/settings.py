@@ -67,8 +67,10 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "hourly_cost": (30, "Taux horaire (€uros)"),
     "price_per_km": (1.5, "Prix par km en euros"),
-    "evening_factor" : (20, "Majoration soirée (%)"),
+    # Deux tarifications : jour (sans majoration) et nuit (majorée), plage de nuit réglable.
     "night_factor" : (40, "Majoration nuit (%)"),
+    "night_start_hour" : (19, "Début de la tarification de nuit (heure, 0-23)"),
+    "night_end_hour" : (6, "Fin de la tarification de nuit (heure, 0-23)"),
     "driver" : ("Stéphane", "Nom du chauffeur"),
     "vehicle" : ("Polestar 2 - Edition 2026, Véhicule Electrique, 5 places, coupé 4 portes", "Description du véhicule utilisé"),
     "vehicle_immatriculation" : ("HJ-663-EX", "Imatriculation du véhicule"),

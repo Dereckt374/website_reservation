@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MESLÉ VTC</title>
 <link rel="stylesheet" href="{% static 'css/vtc_landing_2.css' %}">
+{% include "_favicon.html" %}
 </head>
 
 <body>
@@ -18,7 +19,7 @@
         Vos trajets en toute sérénité
     </p>
     <div class="topbar-actions">
-        <a href="{% url 'forfaits' %}" class="btn btn-secondary">Forfaits hôtel</a>
+        <a href="{% url 'forfaits' %}" class="btn btn-secondary">Nos forfaits</a>
         <a href="{% url 'reservation' %}" class="btn">Demande de trajet</a>
     </div>
 </header>

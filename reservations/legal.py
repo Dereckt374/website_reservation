@@ -23,7 +23,8 @@ def get_legal_context():
         "phone": config.contact_phone,
         "hourly_cost": config.hourly_cost,
         "price_per_km": config.price_per_km,
-        "evening_factor": config.evening_factor,
         "night_factor": config.night_factor,
+        "night_start": f"{int(config.night_start_hour) % 24} h",
+        "night_end": f"{int(config.night_end_hour) % 24} h",
         "vehicle": config.vehicle,
     }

@@ -41,24 +41,31 @@ logo_path = os.path.join(
 )
 
 
-def get_tarif_multiplier(hour):
-    """Renvoie le multiplicateur horaire selon la période (jour/soir/nuit)."""
+# OpenRouteService : api.openrouteservice.org est coupé depuis le 24/11/2026 (410 Gone),
+# remplacé par api.heigit.org (géocodage : /pelias/v1, itinéraires : /openrouteservice/v2).
+ORS_BASE_URL = "https://api.heigit.org"
 
-    if 6 <= hour < 19:
-        coef = 1.0
-        commentaire = "Tarification de jour"
-        return {"coef": coef, "commentaire":commentaire}
-    elif 19 <= hour < 23:
-        coef = 1.0 + (config.evening_factor/100)
-        commentaire = "Tarification de soirée" 
-        return {"coef": coef, "commentaire":commentaire}
-    else:
-        coef = 1.0 + (config.night_factor/100)
-        commentaire = "Tarification de nuit"
-        return {"coef": coef, "commentaire":commentaire} 
+
+def est_heure_de_nuit(hour):
+    """True si l'heure (locale) tombe dans la plage de nuit [night_start_hour ; night_end_hour[."""
+    debut, fin = int(config.night_start_hour) % 24, int(config.night_end_hour) % 24
+    if debut == fin:
+        return False                      # plage vide : toujours tarif de jour
+    if debut < fin:
+        return debut <= hour < fin        # ex. 0 h → 6 h
+    return hour >= debut or hour < fin    # ex. 19 h → 6 h (passe minuit)
+
+
+def get_tarif_multiplier(hour):
+    """Renvoie le multiplicateur horaire selon la période (jour/nuit)."""
+    if est_heure_de_nuit(hour):
+        return {"coef": 1.0 + (config.night_factor / 100), "commentaire": "Tarification de nuit"}
+    return {"coef": 1.0, "commentaire": "Tarification de jour"}
+
+
 def _geocoder_adresse(adresse):
     """Géocode une adresse via l'API ORS, retourne (lat, lon)."""
-    url = "https://api.openrouteservice.org/geocode/search"
+    url = f"{ORS_BASE_URL}/pelias/v1/search"
     params = {"api_key": ors_api_key, "text": adresse, "size": 1, "boundary.country": "FRA,MCO,BEL,CHE,LUX"}
     resp = requests.get(url, params=params, timeout=10)
     resp.raise_for_status()
@@ -76,7 +83,7 @@ def evaluer_trajet(depart, arrivee, date_aller):
     lat_dep, lon_dep = _geocoder_adresse(depart)
     lat_arr, lon_arr = _geocoder_adresse(arrivee)
 
-    url = "https://api.openrouteservice.org/v2/directions/driving-car"
+    url = f"{ORS_BASE_URL}/openrouteservice/v2/directions/driving-car"
     headers = {"Authorization": ors_api_key, "Content-Type": "application/json"}
     body = {"coordinates": [[lon_dep, lat_dep], [lon_arr, lat_arr]]}
     resp = requests.post(url, json=body, headers=headers, timeout=15)
@@ -87,7 +94,7 @@ def evaluer_trajet(depart, arrivee, date_aller):
     distance_km = round(summary["distance"] / 1000, 1)
 
     # Heure locale (Europe/Paris) : date_aller est stockée en UTC, sinon les majorations
-    # soirée/nuit s'appliqueraient avec 1 à 2 h de décalage par rapport aux tarifs annoncés.
+    # de nuit s'appliqueraient avec 1 à 2 h de décalage par rapport aux tarifs annoncés.
     time_multiplier = get_tarif_multiplier(timezone.localtime(date_aller).hour)["coef"]
     price = round((distance_km * config.price_per_km + time_multiplier * config.hourly_cost * duree_min / 60), 1)
 
@@ -116,9 +123,8 @@ def calculer_approche(adresse_depart, date_aller):
 
 
 # ─── Forfaits hôtel ──────────────────────────────────────────────────────────
-# Le tarif saisi dans l'Excel est le tarif de jour. En soirée et la nuit, la même
-# majoration que pour les trajets classiques (evening_factor / night_factor) s'applique
-# à la totalité du forfait.
+# Le tarif saisi dans l'Excel est le tarif de jour. La nuit, la même majoration que
+# pour les trajets classiques (night_factor) s'applique à la totalité du forfait.
 
 def prix_forfait(tarif, date_aller):
     """Prix d'un forfait à l'heure de prise en charge (heure locale), majorations incluses."""
@@ -128,15 +134,10 @@ def prix_forfait(tarif, date_aller):
 
 
 def grille_forfait(tarif):
-    """Les trois prix d'un forfait (jour / soirée / nuit), pour l'affichage."""
+    """Les deux prix d'un forfait (jour / nuit), pour l'affichage."""
     tarif = Decimal(str(tarif))
-    def _majore(pourcent):
-        return (tarif * (1 + Decimal(str(pourcent)) / 100)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    return {
-        "jour":  tarif,
-        "soir":  _majore(config.evening_factor),
-        "nuit":  _majore(config.night_factor),
-    }
+    nuit = (tarif * (1 + Decimal(str(config.night_factor)) / 100)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return {"jour": tarif, "nuit": nuit}
 
 
 def get_merchant_code(sumup_api_key : str) -> str:

@@ -1,9 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
+from django.templatetags.static import static
+from django.utils.functional import lazy
 from . import views
 
 urlpatterns = [
     path('', views.landing_page, name='welcome'),
+    # Les navigateurs et Google demandent /favicon.ico à la racine : redirection vers le fichier statique
+    path('favicon.ico', RedirectView.as_view(url=lazy(static, str)('images/favicon/favicon.ico'), permanent=False)),
     path('landing_page/', views.landing_page, name='landing_page'),
     path('contact/', views.contact, name='contact'),
     path('reservation', views.index, name="reservation"),

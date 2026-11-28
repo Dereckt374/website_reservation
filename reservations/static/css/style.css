@@ -641,6 +641,7 @@ button:active,
 
 .forfait-arrow {
     color: #007BFF;
+    font-weight: normal;
 }
 
 .forfait-duree {
@@ -655,4 +656,64 @@ button:active,
     gap: 4px 16px;
     font-size: 0.875rem;
     color: #3c3c3c;
+}
+
+/* La règle globale « * { font-size: 18px } » casse l'héritage :
+   les éléments internes reprennent la taille de leur parent. */
+.forfait-route *,
+.forfait-prix *,
+.page-forfaits #apercu p * {
+    font-size: inherit;
+}
+
+/* Prix de jour : mis en avant par la couleur plutôt que par un gras de plus */
+.forfait-prix b {
+    color: #007BFF;
+}
+
+/* ---- Page forfaits : hiérarchie typographique ----
+   Gras : titres et intitulés uniquement. Italique : infos secondaires courtes.
+   Texte courant (notes, valeurs) : normal. */
+.page-forfaits {
+    -webkit-text-size-adjust: 100%;   /* évite le grossissement auto du texte sur iOS */
+    text-size-adjust: 100%;
+}
+
+.page-forfaits .forfait-label {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.page-forfaits .forfait-card {
+    font-size: 1rem;
+}
+
+.page-forfaits #trajetForm label:not(.forfait-card) {
+    font-size: 1rem;
+    color: #444;
+}
+
+.page-forfaits .note {
+    font-style: normal;
+    font-size: 0.9rem;
+    color: #555;
+    margin: 6px auto;
+}
+
+.page-forfaits .note.note-title {
+    font-weight: bold;
+    color: #444;
+    margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+    .page-forfaits .forfait-card {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .page-forfaits .forfait-label,
+    .page-forfaits #trajetForm label:not(.forfait-card) {
+        font-size: 0.95rem;
+    }
 }

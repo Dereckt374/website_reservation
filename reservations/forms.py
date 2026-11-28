@@ -37,10 +37,26 @@ class TrajetForm(forms.ModelForm):
         if cleaned_data.get("type_trajet") is None:
             cleaned_data['type_trajet'] = self._meta.model._meta.get_field("type_trajet").default
 
-        if cleaned_data.get("date_retour") : 
-            cleaned_data["type_trajet"] = "Aller-Retour"
-            data_trajet_retour = evaluer_trajet(cleaned_data["adresse_arrivee"],cleaned_data["adresse_depart"],cleaned_data['date_retour'])
-        data_trajet_aller = evaluer_trajet(cleaned_data["adresse_depart"],cleaned_data["adresse_arrivee"],cleaned_data['date_aller'])
+        # Champ manquant ou invalide : Django a déjà posé l'erreur sur le champ, inutile de calculer
+        if not all(cleaned_data.get(c) for c in ("adresse_depart", "adresse_arrivee", "date_aller")):
+            return cleaned_data
+
+        # Calcul du trajet via OpenRouteService : une erreur d'API ne doit jamais produire une erreur 500
+        try:
+            if cleaned_data.get("date_retour") :
+                cleaned_data["type_trajet"] = "Aller-Retour"
+                data_trajet_retour = evaluer_trajet(cleaned_data["adresse_arrivee"],cleaned_data["adresse_depart"],cleaned_data['date_retour'])
+            data_trajet_aller = evaluer_trajet(cleaned_data["adresse_depart"],cleaned_data["adresse_arrivee"],cleaned_data['date_aller'])
+        except ValueError as e:
+            # Adresse introuvable par le géocodeur
+            print(f"⚠️ Géocodage : {e}")
+            self.add_error(None, "❌ Une des adresses est introuvable. Vérifiez-la ou précisez la ville.")
+            return cleaned_data
+        except Exception as e:
+            print(f"⚠️ Erreur calcul trajet (ORS) : {type(e).__name__} {e}")
+            self.add_error(None, "❌ Le calcul du trajet est momentanément indisponible. "
+                                 "Réessayez dans quelques instants ou contactez-nous par téléphone.")
+            return cleaned_data
 
         price = data_trajet_aller['price_euros'] + data_trajet_retour['price_euros']
         cleaned_data["distance_km"] = data_trajet_aller['distance_km'] 

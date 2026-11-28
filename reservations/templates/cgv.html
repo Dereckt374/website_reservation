@@ -30,8 +30,8 @@
 <ul>
     <li>{{ legal.price_per_km }} € par kilomètre parcouru (itinéraire calculé entre l'adresse de départ et l'adresse d'arrivée) ;</li>
     <li>+ {{ legal.hourly_cost }} € de l'heure, au prorata de la durée estimée du trajet ;</li>
-    <li>la part horaire est majorée de {{ legal.evening_factor }} % pour les prises en charge entre 19 h et 23 h,
-        et de {{ legal.night_factor }} % entre 23 h et 6 h ;</li>
+    <li>la part horaire est majorée de {{ legal.night_factor }} % pour les prises en charge de nuit,
+        entre {{ legal.night_start }} et {{ legal.night_end }} ;</li>
     <li>pour un aller-retour, le prix de chaque trajet est calculé séparément puis additionné.</li>
 </ul>
 <p>

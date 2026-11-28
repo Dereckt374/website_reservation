@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forfaits hôtel — {{ legal.name }}</title>
+    <title>Nos forfaits — {{ legal.name }}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% include "_favicon.html" %}
 </head>
 
-<body>
+<body class="page-forfaits">
   <div class="container">
-    <h1>Forfaits hôtel</h1>
+    <h1>Nos forfaits</h1>
     <nav>
       <a href="{% url 'welcome' %}">Page d'accueil</a> |
       <a href="{% url 'reservation' %}">Trajet sur mesure</a>
@@ -37,8 +38,7 @@
       {% if duree_txt %}<p><b>Durée estimée : </b>{{ duree_txt }}</p>{% endif %}
       <p><b>Prix TTC : </b>{{ prix.prix }} € <small>— {{ legal.vat_mention }}</small></p>
       {% if prix.coef != 1.0 %}
-        <p class="note">{{ prix.commentaire }} : forfait de {{ forfait_choisi.tarif }} € majoré de
-          {% if prix.commentaire == "Tarification de nuit" %}{{ legal.night_factor }}{% else %}{{ legal.evening_factor }}{% endif %} %.</p>
+        <p class="note">{{ prix.commentaire }} : forfait de {{ forfait_choisi.tarif }} € majoré de {{ legal.night_factor }} %.</p>
       {% else %}
         <p class="note">Tarification de jour : forfait sans majoration.</p>
       {% endif %}
@@ -69,7 +69,6 @@
             {% if f.duree_txt %}<span class="forfait-duree">≈ {{ f.duree_txt }} de trajet</span>{% endif %}
             <span class="forfait-prix">
               <span><b>{{ f.grille.jour }} €</b> de jour</span>
-              <span>{{ f.grille.soir }} € en soirée</span>
               <span>{{ f.grille.nuit }} € la nuit</span>
             </span>
           </span>
@@ -82,9 +81,9 @@
     <p>{{ form.commentaire_client.label_tag }} {{ form.commentaire_client }} {{ form.commentaire_client.errors }}</p>
     {{ form.non_field_errors }}
 
-    <p class="note">Notes :</p>
+    <p class="note note-title">Notes :</p>
     <p class="note">Bagages autorisés : 1 bagage cabine par personne</p>
-    <p class="note">Tarif forfaitaire TTC ({{ legal.vat_mention }}) indiqué pour une prise en charge de jour (6 h – 19 h). Il est majoré de {{ legal.evening_factor }} % de 19 h à 23 h et de {{ legal.night_factor }} % de 23 h à 6 h, selon l'heure de prise en charge.</p>
+    <p class="note">Tarif forfaitaire TTC ({{ legal.vat_mention }}) indiqué pour une prise en charge de jour. Il est majoré de {{ legal.night_factor }} % la nuit, de {{ legal.night_start }} à {{ legal.night_end }}, selon l'heure de prise en charge.</p>
     <p class="note">Véhicule utilisé pour la prestation : {{ vehicle }}</p>
     <p class="note">{{ name }} sera chargé de la prestation, et s'assurera de votre bon voyage</p>
 
